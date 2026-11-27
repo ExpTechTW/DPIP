@@ -1,0 +1,33 @@
+{
+  "lang": "zh-TW",
+  "cards": [
+    {
+      "id": 1785070411,
+      "serial": 1,
+      "kind": "issue",
+      "type": "intensity",
+      "hazard": "earthquake",
+      "status": 1,
+      "author": "trem",
+      "lang": "zh-TW",
+      "title": "震度速報",
+      "subtitle": "震度速報 [20:53]",
+      "send": 1785070411000,
+      "expires": 1785156801000,
+      "area": [970, 100, 900],
+      "hasPolygon": false,
+      "addition": {
+        "id": 1785070401000,
+        "serial": 1,
+        "area": {
+          "1": [900],
+          "2": [100],
+          "5": [970]
+        },
+        "max": 5,
+        "final": 0
+      },
+      "description": "[震度 ５弱]　花蓮縣\n[震度 ２]　臺北市\n[震度 １]　屏東縣\n"
+    }
+  ]
+}

@@ -1,10 +1,11 @@
 import 'package:dpip/core/settings/locale_config.dart';
+import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/geo/town.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/core/settings/region_store.dart';
-import 'package:dpip/features/events/domain/event.dart';
+import 'package:dpip/features/events/domain/event_card.dart';
 import 'package:dpip/features/events/domain/event_repository.dart';
 import 'package:dpip/features/events/presentation/pages/events_page.dart';
 import 'package:dpip/features/events/presentation/widgets/event_timeline.dart';
@@ -20,14 +21,20 @@ class _RecordingEventRepository implements EventRepository {
   final List<String?> requests = [];
 
   @override
-  Future<Result<List<Event>>> events({String? regionCode}) async {
+  Future<Result<List<EventCard>>> events({String? regionCode}) async {
     requests.add(regionCode);
     return const Ok([]);
   }
 
   @override
-  Future<Result<List<Event>>> activeEvents({String? regionCode}) async =>
+  Future<Result<List<EventCard>>> activeEvents({String? regionCode}) async =>
       const Ok([]);
+
+  @override
+  Future<Result<EventCardDetail>> detail({
+    required int id,
+    String? regionCode,
+  }) async => const Err(NetworkFailure('unused'));
 }
 
 Widget _wrap(RegionStore store, EventRepository events) {

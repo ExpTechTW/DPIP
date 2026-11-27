@@ -1,0 +1,43 @@
+{
+  "lang": "zh-TW",
+  "cards": [
+    {
+      "id": 1717214400,
+      "serial": 1,
+      "kind": "issue",
+      "type": "barrierLake",
+      "hazard": "landslide_dam",
+      "status": 1,
+      "author": "農業部林業及自然保育署",
+      "lang": "zh-TW",
+      "title": "堰塞湖警戒",
+      "subtitle": "堰塞湖警戒",
+      "send": 1717213800000,
+      "expires": 1717236000000,
+      "area": [],
+      "hasPolygon": true,
+      "description": "南投縣仁愛鄉廬山堰塞湖水位上升，請下游居民撤離",
+      "polygon": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "properties": {},
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [120.663, 24.1436],
+                  [120.663, 24.1664],
+                  [120.687, 24.1664],
+                  [120.687, 24.1436],
+                  [120.663, 24.1436]
+                ]
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

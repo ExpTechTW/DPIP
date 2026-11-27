@@ -1,0 +1,46 @@
+{
+  "lang": "zh-TW",
+  "cards": [
+    {
+      "id": 1717214400,
+      "serial": 1,
+      "kind": "issue",
+      "type": "heavy-rain",
+      "hazard": "heavy_rain",
+      "status": 1,
+      "author": "cwa",
+      "lang": "zh-TW",
+      "title": "大雨特報",
+      "subtitle": "低壓帶影響，易有短延時強降雨，請注意 (雷擊) 與強陣風",
+      "send": 1717213800000,
+      "expires": 1717254000000,
+      "area": [100],
+      "hasPolygon": false,
+      "addition": {
+        "issueTime": 1717213800000
+      },
+      "description": "摘要:臺北市中正區有超大豪雨請注意防範"
+    },
+    {
+      "id": 1717214400,
+      "serial": 2,
+      "kind": "cancel",
+      "type": "heavy-rain",
+      "hazard": "heavy_rain",
+      "status": 1,
+      "author": "cwa",
+      "lang": "zh-TW",
+      "title": "大雨特報",
+      "subtitle": "低壓帶影響，易有短延時強降雨，請注意 (雷擊) 與強陣風",
+      "send": 1717214460000,
+      "expires": 1717214460000,
+      "area": [100],
+      "hasPolygon": false,
+      "addition": {
+        "issueTime": 1717213800000,
+        "released": [100]
+      },
+      "description": "低壓帶影響，易有短延時強降雨，請注意 (雷擊) 與強陣風。"
+    }
+  ]
+}

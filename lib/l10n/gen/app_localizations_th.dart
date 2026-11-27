@@ -3976,4 +3976,187 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get locationModeManualBadge => 'กำหนดตำแหน่งเอง';
+
+  @override
+  String get eventHazardEarthquake => 'แผ่นดินไหว';
+
+  @override
+  String get eventHazardTsunami => 'สึนามิ';
+
+  @override
+  String get eventHazardWind => 'ลมแรง';
+
+  @override
+  String get eventHazardHeavyRain => 'ฝนตกหนัก';
+
+  @override
+  String get eventHazardFlood => 'น้ำท่วม';
+
+  @override
+  String get eventHazardRiverRise => 'ระดับน้ำในแม่น้ำ';
+
+  @override
+  String get eventHazardDamRelease => 'การระบายน้ำจากเขื่อน';
+
+  @override
+  String get eventHazardSwell => 'คลื่นสูง';
+
+  @override
+  String get eventHazardDebrisFlow => 'ดินโคลนถล่ม';
+
+  @override
+  String get eventHazardLandslideDam => 'เขื่อนธรรมชาติจากดินถล่ม';
+
+  @override
+  String get eventHazardThunderstorm => 'พายุฝนฟ้าคะนอง';
+
+  @override
+  String get eventHazardFog => 'หมอกหนา';
+
+  @override
+  String get eventHazardRoadClosure => 'ปิดถนน';
+
+  @override
+  String get eventHazardAnnouncement => 'ประกาศ';
+
+  @override
+  String get eventHazardClosure => 'หยุดงานและหยุดเรียน';
+
+  @override
+  String get eventHazardOther => 'อื่น ๆ';
+
+  @override
+  String get eventStatusCancelled => 'ยกเลิกแล้ว';
+
+  @override
+  String get eventStatusOpenEnded => 'ยังไม่กำหนดเวลาสิ้นสุด';
+
+  @override
+  String get eventStatusActive => 'มีผลอยู่';
+
+  @override
+  String get eventStatusEnded => 'สิ้นสุดแล้ว';
+
+  @override
+  String eventReportSerial(int serial) {
+    return 'รายงาน $serial';
+  }
+
+  @override
+  String get eventReportKindIssue => 'ออกประกาศ';
+
+  @override
+  String get eventReportKindUpdate => 'อัปเดต';
+
+  @override
+  String get eventReportKindCorrect => 'แก้ไข';
+
+  @override
+  String get eventReportKindCancel => 'ยกเลิก';
+
+  @override
+  String get eventReportKindUnknown => 'ไม่ทราบ';
+
+  @override
+  String get eventDetailTitle => 'รายละเอียดเหตุการณ์';
+
+  @override
+  String get eventDetailReports => 'รายงานทั้งหมด';
+
+  @override
+  String eventDetailEnds(String time) {
+    return 'สิ้นสุด: $time';
+  }
+
+  @override
+  String get eventDetailEndsUndetermined => 'ยังไม่กำหนด';
+
+  @override
+  String get eventDetailShowOriginal => 'แสดงต้นฉบับ';
+
+  @override
+  String get eventDetailShowTranslation => 'แสดงคำแปล';
+
+  @override
+  String eventDetailShowAll(int count) {
+    return 'แสดงทั้งหมด ($count)';
+  }
+
+  @override
+  String get eventDetailShowLess => 'แสดงน้อยลง';
+
+  @override
+  String get eventDetailEewLatest => 'ค่าประมาณล่าสุด';
+
+  @override
+  String get eventDetailIntensityByArea => 'ความรุนแรงตามพื้นที่';
+
+  @override
+  String get eventDetailMissingStations => 'สถานีที่ไม่ส่งข้อมูล';
+
+  @override
+  String get eventDetailTsunamiByArea => 'การคาดการณ์ตามพื้นที่';
+
+  @override
+  String get eventDetailTsunamiObserved => 'ค่าที่ตรวจวัดได้';
+
+  @override
+  String get eventDetailAffectedAreas => 'พื้นที่ได้รับผลกระทบ';
+
+  @override
+  String get eventDetailStations => 'สถานีตรวจวัด';
+
+  @override
+  String get eventFactMagnitude => 'ขนาด';
+
+  @override
+  String get eventFactDepth => 'ความลึก';
+
+  @override
+  String get eventFactMaxIntensity => 'ความรุนแรงสูงสุด';
+
+  @override
+  String get eventFactEpicenter => 'จุดศูนย์กลาง';
+
+  @override
+  String get eventFactOriginTime => 'เวลาเกิดเหตุ';
+
+  @override
+  String get eventFactSerial => 'รายงานที่';
+
+  @override
+  String get eventFactWaveHeight => 'ความสูงคลื่น';
+
+  @override
+  String get eventFactArrivalTime => 'เวลาที่มาถึง';
+
+  @override
+  String get eventFactRainfall => 'ฝนรายชั่วโมง';
+
+  @override
+  String get eventFactWindSpeed => 'ความเร็วลม';
+
+  @override
+  String get eventFactGust => 'ลมกระโชก';
+
+  @override
+  String get eventFactVisibility => 'ทัศนวิสัย';
+
+  @override
+  String get eventFactWaterLevel => 'ระดับน้ำ';
+
+  @override
+  String get eventFactWarningLevel => 'ระดับเตือนภัย';
+
+  @override
+  String get eventFactLightningStrikes => 'จำนวนฟ้าผ่า';
+
+  @override
+  String get eventFactRoad => 'ถนน';
+
+  @override
+  String get eventFactLocation => 'สถานที่';
+
+  @override
+  String get eventFactStation => 'สถานี';
 }

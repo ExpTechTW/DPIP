@@ -1,0 +1,5 @@
+{"lang":"zh-TW","cards":[
+  {"id":1800000000,"serial":3,"kind":"cancel","type":"heavy-rain","hazard":"heavy_rain","status":1,"author":"cwa","lang":"zh-TW","title":"大雨特報","subtitle":"臺北市、新北市","send":1799999400000,"expires":1799999400000,"hasPolygon":false},
+  {"id":1800000001,"serial":2,"kind":"update","type":"heavy-rain","hazard":"heavy_rain","status":1,"author":"cwa","lang":"zh-TW","title":"大雨特報","subtitle":"新北市","send":1799913600000,"expires":1800086400000,"hasPolygon":false},
+  {"id":1800000002,"serial":2,"kind":"cancel","type":"heavy-rain","hazard":"heavy_rain","status":1,"author":"cwa","lang":"zh-TW","title":"大雨特報","subtitle":"基隆市","send":1799913600000,"expires":1799913600000,"hasPolygon":false}
+]}

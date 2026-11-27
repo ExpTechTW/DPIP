@@ -1,0 +1,20 @@
+{
+  "lang": "zh-TW",
+  "cards": [
+    {
+      "id": 1785070411,
+      "serial": 2,
+      "kind": "update",
+      "type": "intensity",
+      "hazard": "earthquake",
+      "status": 1,
+      "author": "trem",
+      "lang": "zh-TW",
+      "title": "震度速報",
+      "subtitle": "震度速報 [20:53]",
+      "send": 1785070411000,
+      "expires": 1785156801000,
+      "hasPolygon": false
+    }
+  ]
+}

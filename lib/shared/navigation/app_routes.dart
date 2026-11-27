@@ -15,6 +15,13 @@ abstract final class AppRoutes {
   static const String events = 'events';
   static const String eventsPath = '/events';
 
+  /// One event card with every report it has had — pushed over the shell
+  /// from the Events tab and the home sheet. Takes the card id as an `:id`
+  /// path parameter and, optionally, a `?region=` township code whose text
+  /// the reports carry (the nationwide text without one).
+  static const String eventDetail = 'eventDetail';
+  static const String eventDetailPath = '/event/:id';
+
   static const String map = 'map';
   static const String mapPath = '/map';
 

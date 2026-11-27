@@ -1,0 +1,35 @@
+{
+  "lang": "zh-TW",
+  "cards": [
+    {
+      "id": 1785069451,
+      "serial": 1,
+      "kind": "issue",
+      "type": "earthquake",
+      "hazard": "earthquake",
+      "status": 1,
+      "author": "cwa",
+      "lang": "zh-TW",
+      "title": "地震報告",
+      "subtitle": "地震報告 [114201]",
+      "send": 1785069391000,
+      "expires": 1785155791000,
+      "hasPolygon": false
+    },
+    {
+      "id": 1785069452,
+      "serial": 1,
+      "kind": "issue",
+      "type": "tsunami_note",
+      "hazard": "tsunami",
+      "status": 1,
+      "author": "cwa",
+      "lang": "zh-TW",
+      "title": "若干海面變動",
+      "subtitle": "若干海面變動",
+      "send": 1785069391000,
+      "expires": 1785155791000,
+      "hasPolygon": false
+    }
+  ]
+}

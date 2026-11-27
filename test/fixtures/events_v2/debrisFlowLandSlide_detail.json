@@ -1,0 +1,46 @@
+{
+  "lang": "zh-TW",
+  "cards": [
+    {
+      "id": 1717214400,
+      "serial": 1,
+      "kind": "issue",
+      "type": "debrisFlowLandSlide",
+      "hazard": "debris_flow",
+      "status": 1,
+      "author": "ardswc",
+      "lang": "zh-TW",
+      "title": "土石流黃色警戒",
+      "subtitle": "土石流黃色警戒發布",
+      "send": 1717213800000,
+      "expires": 1717236000000,
+      "area": [],
+      "hasPolygon": true,
+      "addition": {
+        "light": "yellow"
+      },
+      "description": "依據中央氣象署風雨資料研判：花蓮縣吉安鄉南昌村達黃色警戒。",
+      "polygon": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "properties": {},
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [121.5785, 23.9822],
+                  [121.5656, 23.9625],
+                  [121.5745, 23.9558],
+                  [121.5952, 23.9717],
+                  [121.5785, 23.9822]
+                ]
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

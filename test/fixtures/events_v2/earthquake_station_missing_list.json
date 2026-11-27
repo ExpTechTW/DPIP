@@ -1,0 +1,20 @@
+{
+  "lang": "zh-TW",
+  "cards": [
+    {
+      "id": 1717214400,
+      "serial": 1,
+      "kind": "issue",
+      "type": "earthquake.station_missing",
+      "hazard": "earthquake",
+      "status": 1,
+      "author": "exptech",
+      "lang": "zh-TW",
+      "title": "未入電觀測點",
+      "subtitle": "[11:45] 地震，臺東縣蘭嶼鄉等 3 處",
+      "send": 1717213500000,
+      "expires": 1717299900000,
+      "hasPolygon": false
+    }
+  ]
+}

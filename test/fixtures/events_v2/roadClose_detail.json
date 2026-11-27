@@ -1,0 +1,52 @@
+{
+  "lang": "zh-TW",
+  "cards": [
+    {
+      "id": 1717214400,
+      "serial": 1,
+      "kind": "issue",
+      "type": "roadClose",
+      "hazard": "road_closure",
+      "status": 1,
+      "author": "thb",
+      "lang": "zh-TW",
+      "title": "道路封閉",
+      "subtitle": "臺中市西屯區道路封閉",
+      "send": 1717213800000,
+      "expires": 1717236000000,
+      "area": [],
+      "hasPolygon": true,
+      "addition": {
+        "areaDesc": "臺中市西屯區",
+        "polygon": "24.1500,120.6700 24.1600,120.6700 24.1600,120.6800 24.1500,120.6800 24.1500,120.6700",
+        "geocode": "6600600",
+        "county": "臺中市",
+        "town": "西屯區",
+        "roadName": "台灣大道線",
+        "location": "中清路口"
+      },
+      "description": "臺中市西屯區台灣大道線中清路口。請用路人改道。",
+      "polygon": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "properties": {},
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [120.663, 24.1436],
+                  [120.663, 24.1664],
+                  [120.687, 24.1664],
+                  [120.687, 24.1436],
+                  [120.663, 24.1436]
+                ]
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

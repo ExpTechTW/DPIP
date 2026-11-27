@@ -1,0 +1,77 @@
+{
+  "lang": "zh-TW",
+  "cards": [
+    {
+      "id": 1785069401,
+      "serial": 1,
+      "kind": "issue",
+      "type": "earthquake.eew",
+      "hazard": "earthquake",
+      "status": 1,
+      "author": "cwa",
+      "lang": "zh-TW",
+      "title": "地震速報",
+      "subtitle": "地震速報 [20:36]",
+      "send": 1785069401000,
+      "expires": 1785155801000,
+      "area": [209, 210, 211, 212, 896],
+      "hasPolygon": false,
+      "addition": {
+        "id": "10006",
+        "serial": 1,
+        "alert": 0,
+        "eq": {
+          "time": 1785069391000,
+          "lat": 26.15,
+          "lon": 119.94,
+          "depth": 10,
+          "mag": 4.5,
+          "loc": "連江縣南竿鄉",
+          "max": 4
+        },
+        "intensity": {
+          "4": [209, 210],
+          "3": [211],
+          "1": [212, 896]
+        }
+      },
+      "description": "20:36左右，連江縣南竿鄉發生地震。震源深度10公里，地震規模M4.5，最大預估震度4。"
+    },
+    {
+      "id": 1785069401,
+      "serial": 2,
+      "kind": "update",
+      "type": "earthquake.eew",
+      "hazard": "earthquake",
+      "status": 1,
+      "author": "cwa",
+      "lang": "zh-TW",
+      "title": "地震速報",
+      "subtitle": "地震速報 [20:36]",
+      "send": 1785069406000,
+      "expires": 1785155806000,
+      "area": [209, 210, 211, 212, 896],
+      "hasPolygon": false,
+      "addition": {
+        "id": "10006",
+        "serial": 2,
+        "alert": 0,
+        "eq": {
+          "time": 1785069391000,
+          "lat": 26.15,
+          "lon": 119.94,
+          "depth": 10,
+          "mag": 4.5,
+          "loc": "連江縣南竿鄉",
+          "max": 4
+        },
+        "intensity": {
+          "4": [209, 210],
+          "3": [211],
+          "1": [212, 896]
+        }
+      },
+      "description": "20:36左右，連江縣南竿鄉發生地震。震源深度10公里，地震規模M4.5，最大預估震度4。"
+    }
+  ]
+}

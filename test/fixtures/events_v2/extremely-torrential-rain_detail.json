@@ -1,0 +1,25 @@
+{
+  "lang": "zh-TW",
+  "cards": [
+    {
+      "id": 1717214400,
+      "serial": 1,
+      "kind": "issue",
+      "type": "extremely-torrential-rain",
+      "hazard": "heavy_rain",
+      "status": 1,
+      "author": "cwa",
+      "lang": "zh-TW",
+      "title": "超大豪雨特報",
+      "subtitle": "西南氣流影響，臺北市中正區有超大豪雨",
+      "send": 1717213800000,
+      "expires": 1717254000000,
+      "area": [100],
+      "hasPolygon": false,
+      "addition": {
+        "issueTime": 1717213800000
+      },
+      "description": "摘要:臺北市中正區有超大豪雨請注意防範"
+    }
+  ]
+}

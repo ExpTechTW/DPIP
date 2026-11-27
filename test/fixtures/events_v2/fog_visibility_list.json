@@ -1,0 +1,20 @@
+{
+  "lang": "zh-TW",
+  "cards": [
+    {
+      "id": 1794997800,
+      "serial": 1,
+      "kind": "issue",
+      "type": "fog.visibility",
+      "hazard": "fog",
+      "status": 1,
+      "author": "cwa",
+      "lang": "zh-TW",
+      "title": "能見度不佳",
+      "subtitle": "臺北市北投區 鞍部 等 2 站",
+      "send": 1794997800000,
+      "expires": 1795019400000,
+      "hasPolygon": true
+    }
+  ]
+}

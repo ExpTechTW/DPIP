@@ -3858,6 +3858,189 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get locationModeManualBadge => '所在地為手動設定';
+
+  @override
+  String get eventHazardEarthquake => '地震';
+
+  @override
+  String get eventHazardTsunami => '海嘯';
+
+  @override
+  String get eventHazardWind => '強風';
+
+  @override
+  String get eventHazardHeavyRain => '豪大雨';
+
+  @override
+  String get eventHazardFlood => '淹水';
+
+  @override
+  String get eventHazardRiverRise => '河川水位';
+
+  @override
+  String get eventHazardDamRelease => '水庫放流';
+
+  @override
+  String get eventHazardSwell => '大浪';
+
+  @override
+  String get eventHazardDebrisFlow => '土石流';
+
+  @override
+  String get eventHazardLandslideDam => '堰塞湖';
+
+  @override
+  String get eventHazardThunderstorm => '雷雨';
+
+  @override
+  String get eventHazardFog => '濃霧';
+
+  @override
+  String get eventHazardRoadClosure => '道路封閉';
+
+  @override
+  String get eventHazardAnnouncement => '公告';
+
+  @override
+  String get eventHazardClosure => '停班停課';
+
+  @override
+  String get eventHazardOther => '其他';
+
+  @override
+  String get eventStatusCancelled => '已撤銷';
+
+  @override
+  String get eventStatusOpenEnded => '結束時間未定';
+
+  @override
+  String get eventStatusActive => '進行中';
+
+  @override
+  String get eventStatusEnded => '已結束';
+
+  @override
+  String eventReportSerial(int serial) {
+    return '第 $serial 報';
+  }
+
+  @override
+  String get eventReportKindIssue => '發布';
+
+  @override
+  String get eventReportKindUpdate => '更新';
+
+  @override
+  String get eventReportKindCorrect => '更正';
+
+  @override
+  String get eventReportKindCancel => '撤銷';
+
+  @override
+  String get eventReportKindUnknown => '未知';
+
+  @override
+  String get eventDetailTitle => '事件詳情';
+
+  @override
+  String get eventDetailReports => '歷次報告';
+
+  @override
+  String eventDetailEnds(String time) {
+    return '結束時間：$time';
+  }
+
+  @override
+  String get eventDetailEndsUndetermined => '未定';
+
+  @override
+  String get eventDetailShowOriginal => '顯示原文';
+
+  @override
+  String get eventDetailShowTranslation => '顯示翻譯';
+
+  @override
+  String eventDetailShowAll(int count) {
+    return '顯示全部（$count）';
+  }
+
+  @override
+  String get eventDetailShowLess => '收合';
+
+  @override
+  String get eventDetailEewLatest => '最新推估';
+
+  @override
+  String get eventDetailIntensityByArea => '各地震度';
+
+  @override
+  String get eventDetailMissingStations => '未回傳的測站';
+
+  @override
+  String get eventDetailTsunamiByArea => '各地區預估';
+
+  @override
+  String get eventDetailTsunamiObserved => '實際觀測';
+
+  @override
+  String get eventDetailAffectedAreas => '影響地區';
+
+  @override
+  String get eventDetailStations => '測站';
+
+  @override
+  String get eventFactMagnitude => '規模';
+
+  @override
+  String get eventFactDepth => '深度';
+
+  @override
+  String get eventFactMaxIntensity => '最大震度';
+
+  @override
+  String get eventFactEpicenter => '震央';
+
+  @override
+  String get eventFactOriginTime => '發震時間';
+
+  @override
+  String get eventFactSerial => '報數';
+
+  @override
+  String get eventFactWaveHeight => '浪高';
+
+  @override
+  String get eventFactArrivalTime => '到達時間';
+
+  @override
+  String get eventFactRainfall => '時雨量';
+
+  @override
+  String get eventFactWindSpeed => '風速';
+
+  @override
+  String get eventFactGust => '陣風';
+
+  @override
+  String get eventFactVisibility => '能見度';
+
+  @override
+  String get eventFactWaterLevel => '水位';
+
+  @override
+  String get eventFactWarningLevel => '警戒水位';
+
+  @override
+  String get eventFactLightningStrikes => '雷擊次數';
+
+  @override
+  String get eventFactRoad => '道路';
+
+  @override
+  String get eventFactLocation => '地點';
+
+  @override
+  String get eventFactStation => '測站';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -7710,6 +7893,189 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get locationModeManualBadge => '所在地为手动设置';
+
+  @override
+  String get eventHazardEarthquake => '地震';
+
+  @override
+  String get eventHazardTsunami => '海啸';
+
+  @override
+  String get eventHazardWind => '强风';
+
+  @override
+  String get eventHazardHeavyRain => '暴雨';
+
+  @override
+  String get eventHazardFlood => '内涝';
+
+  @override
+  String get eventHazardRiverRise => '河流水位';
+
+  @override
+  String get eventHazardDamRelease => '水库泄洪';
+
+  @override
+  String get eventHazardSwell => '大浪';
+
+  @override
+  String get eventHazardDebrisFlow => '泥石流';
+
+  @override
+  String get eventHazardLandslideDam => '堰塞湖';
+
+  @override
+  String get eventHazardThunderstorm => '雷雨';
+
+  @override
+  String get eventHazardFog => '大雾';
+
+  @override
+  String get eventHazardRoadClosure => '道路封闭';
+
+  @override
+  String get eventHazardAnnouncement => '公告';
+
+  @override
+  String get eventHazardClosure => '停工停课';
+
+  @override
+  String get eventHazardOther => '其他';
+
+  @override
+  String get eventStatusCancelled => '已撤销';
+
+  @override
+  String get eventStatusOpenEnded => '结束时间未定';
+
+  @override
+  String get eventStatusActive => '进行中';
+
+  @override
+  String get eventStatusEnded => '已结束';
+
+  @override
+  String eventReportSerial(int serial) {
+    return '第 $serial 报';
+  }
+
+  @override
+  String get eventReportKindIssue => '发布';
+
+  @override
+  String get eventReportKindUpdate => '更新';
+
+  @override
+  String get eventReportKindCorrect => '更正';
+
+  @override
+  String get eventReportKindCancel => '撤销';
+
+  @override
+  String get eventReportKindUnknown => '未知';
+
+  @override
+  String get eventDetailTitle => '事件详情';
+
+  @override
+  String get eventDetailReports => '历次报告';
+
+  @override
+  String eventDetailEnds(String time) {
+    return '结束时间：$time';
+  }
+
+  @override
+  String get eventDetailEndsUndetermined => '未定';
+
+  @override
+  String get eventDetailShowOriginal => '显示原文';
+
+  @override
+  String get eventDetailShowTranslation => '显示译文';
+
+  @override
+  String eventDetailShowAll(int count) {
+    return '显示全部（$count）';
+  }
+
+  @override
+  String get eventDetailShowLess => '收起';
+
+  @override
+  String get eventDetailEewLatest => '最新推估';
+
+  @override
+  String get eventDetailIntensityByArea => '各地震度';
+
+  @override
+  String get eventDetailMissingStations => '未回传的测站';
+
+  @override
+  String get eventDetailTsunamiByArea => '各地区预估';
+
+  @override
+  String get eventDetailTsunamiObserved => '实际观测';
+
+  @override
+  String get eventDetailAffectedAreas => '影响地区';
+
+  @override
+  String get eventDetailStations => '测站';
+
+  @override
+  String get eventFactMagnitude => '规模';
+
+  @override
+  String get eventFactDepth => '深度';
+
+  @override
+  String get eventFactMaxIntensity => '最大震度';
+
+  @override
+  String get eventFactEpicenter => '震中';
+
+  @override
+  String get eventFactOriginTime => '发震时间';
+
+  @override
+  String get eventFactSerial => '报数';
+
+  @override
+  String get eventFactWaveHeight => '浪高';
+
+  @override
+  String get eventFactArrivalTime => '到达时间';
+
+  @override
+  String get eventFactRainfall => '小时雨量';
+
+  @override
+  String get eventFactWindSpeed => '风速';
+
+  @override
+  String get eventFactGust => '阵风';
+
+  @override
+  String get eventFactVisibility => '能见度';
+
+  @override
+  String get eventFactWaterLevel => '水位';
+
+  @override
+  String get eventFactWarningLevel => '警戒水位';
+
+  @override
+  String get eventFactLightningStrikes => '雷击次数';
+
+  @override
+  String get eventFactRoad => '道路';
+
+  @override
+  String get eventFactLocation => '地点';
+
+  @override
+  String get eventFactStation => '测站';
 }
 
 /// The translations for Chinese, as used in Hong Kong, using the Han script (`zh_Hant_HK`).
@@ -11563,6 +11929,189 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get locationModeManualBadge => '所在地為手動設定';
+
+  @override
+  String get eventHazardEarthquake => '地震';
+
+  @override
+  String get eventHazardTsunami => '海嘯';
+
+  @override
+  String get eventHazardWind => '強風';
+
+  @override
+  String get eventHazardHeavyRain => '暴雨';
+
+  @override
+  String get eventHazardFlood => '水浸';
+
+  @override
+  String get eventHazardRiverRise => '河道水位';
+
+  @override
+  String get eventHazardDamRelease => '水塘排洪';
+
+  @override
+  String get eventHazardSwell => '大浪';
+
+  @override
+  String get eventHazardDebrisFlow => '泥石流';
+
+  @override
+  String get eventHazardLandslideDam => '堰塞湖';
+
+  @override
+  String get eventHazardThunderstorm => '雷暴';
+
+  @override
+  String get eventHazardFog => '大霧';
+
+  @override
+  String get eventHazardRoadClosure => '道路封閉';
+
+  @override
+  String get eventHazardAnnouncement => '公告';
+
+  @override
+  String get eventHazardClosure => '停工停課';
+
+  @override
+  String get eventHazardOther => '其他';
+
+  @override
+  String get eventStatusCancelled => '已取消';
+
+  @override
+  String get eventStatusOpenEnded => '結束時間未定';
+
+  @override
+  String get eventStatusActive => '生效中';
+
+  @override
+  String get eventStatusEnded => '已結束';
+
+  @override
+  String eventReportSerial(int serial) {
+    return '第 $serial 報';
+  }
+
+  @override
+  String get eventReportKindIssue => '發出';
+
+  @override
+  String get eventReportKindUpdate => '更新';
+
+  @override
+  String get eventReportKindCorrect => '更正';
+
+  @override
+  String get eventReportKindCancel => '取消';
+
+  @override
+  String get eventReportKindUnknown => '未知';
+
+  @override
+  String get eventDetailTitle => '事件詳情';
+
+  @override
+  String get eventDetailReports => '歷次報告';
+
+  @override
+  String eventDetailEnds(String time) {
+    return '結束時間：$time';
+  }
+
+  @override
+  String get eventDetailEndsUndetermined => '未定';
+
+  @override
+  String get eventDetailShowOriginal => '顯示原文';
+
+  @override
+  String get eventDetailShowTranslation => '顯示翻譯';
+
+  @override
+  String eventDetailShowAll(int count) {
+    return '顯示全部（$count）';
+  }
+
+  @override
+  String get eventDetailShowLess => '收起';
+
+  @override
+  String get eventDetailEewLatest => '最新推算';
+
+  @override
+  String get eventDetailIntensityByArea => '各地震度';
+
+  @override
+  String get eventDetailMissingStations => '未有回傳的測站';
+
+  @override
+  String get eventDetailTsunamiByArea => '各地區預測';
+
+  @override
+  String get eventDetailTsunamiObserved => '實際觀測';
+
+  @override
+  String get eventDetailAffectedAreas => '受影響地區';
+
+  @override
+  String get eventDetailStations => '測站';
+
+  @override
+  String get eventFactMagnitude => '規模';
+
+  @override
+  String get eventFactDepth => '深度';
+
+  @override
+  String get eventFactMaxIntensity => '最高震度';
+
+  @override
+  String get eventFactEpicenter => '震中';
+
+  @override
+  String get eventFactOriginTime => '發震時間';
+
+  @override
+  String get eventFactSerial => '報數';
+
+  @override
+  String get eventFactWaveHeight => '浪高';
+
+  @override
+  String get eventFactArrivalTime => '到達時間';
+
+  @override
+  String get eventFactRainfall => '每小時雨量';
+
+  @override
+  String get eventFactWindSpeed => '風速';
+
+  @override
+  String get eventFactGust => '陣風';
+
+  @override
+  String get eventFactVisibility => '能見度';
+
+  @override
+  String get eventFactWaterLevel => '水位';
+
+  @override
+  String get eventFactWarningLevel => '警戒水位';
+
+  @override
+  String get eventFactLightningStrikes => '雷擊次數';
+
+  @override
+  String get eventFactRoad => '道路';
+
+  @override
+  String get eventFactLocation => '地點';
+
+  @override
+  String get eventFactStation => '監測站';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -15416,4 +15965,187 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get locationModeManualBadge => '所在地為手動設定';
+
+  @override
+  String get eventHazardEarthquake => '地震';
+
+  @override
+  String get eventHazardTsunami => '海嘯';
+
+  @override
+  String get eventHazardWind => '強風';
+
+  @override
+  String get eventHazardHeavyRain => '豪大雨';
+
+  @override
+  String get eventHazardFlood => '淹水';
+
+  @override
+  String get eventHazardRiverRise => '河川水位';
+
+  @override
+  String get eventHazardDamRelease => '水庫放流';
+
+  @override
+  String get eventHazardSwell => '大浪';
+
+  @override
+  String get eventHazardDebrisFlow => '土石流';
+
+  @override
+  String get eventHazardLandslideDam => '堰塞湖';
+
+  @override
+  String get eventHazardThunderstorm => '雷雨';
+
+  @override
+  String get eventHazardFog => '濃霧';
+
+  @override
+  String get eventHazardRoadClosure => '道路封閉';
+
+  @override
+  String get eventHazardAnnouncement => '公告';
+
+  @override
+  String get eventHazardClosure => '停班停課';
+
+  @override
+  String get eventHazardOther => '其他';
+
+  @override
+  String get eventStatusCancelled => '已撤銷';
+
+  @override
+  String get eventStatusOpenEnded => '結束時間未定';
+
+  @override
+  String get eventStatusActive => '進行中';
+
+  @override
+  String get eventStatusEnded => '已結束';
+
+  @override
+  String eventReportSerial(int serial) {
+    return '第 $serial 報';
+  }
+
+  @override
+  String get eventReportKindIssue => '發布';
+
+  @override
+  String get eventReportKindUpdate => '更新';
+
+  @override
+  String get eventReportKindCorrect => '更正';
+
+  @override
+  String get eventReportKindCancel => '撤銷';
+
+  @override
+  String get eventReportKindUnknown => '未知';
+
+  @override
+  String get eventDetailTitle => '事件詳情';
+
+  @override
+  String get eventDetailReports => '歷次報告';
+
+  @override
+  String eventDetailEnds(String time) {
+    return '結束時間：$time';
+  }
+
+  @override
+  String get eventDetailEndsUndetermined => '未定';
+
+  @override
+  String get eventDetailShowOriginal => '顯示原文';
+
+  @override
+  String get eventDetailShowTranslation => '顯示翻譯';
+
+  @override
+  String eventDetailShowAll(int count) {
+    return '顯示全部（$count）';
+  }
+
+  @override
+  String get eventDetailShowLess => '收合';
+
+  @override
+  String get eventDetailEewLatest => '最新推估';
+
+  @override
+  String get eventDetailIntensityByArea => '各地震度';
+
+  @override
+  String get eventDetailMissingStations => '未回傳的測站';
+
+  @override
+  String get eventDetailTsunamiByArea => '各地區預估';
+
+  @override
+  String get eventDetailTsunamiObserved => '實際觀測';
+
+  @override
+  String get eventDetailAffectedAreas => '影響地區';
+
+  @override
+  String get eventDetailStations => '測站';
+
+  @override
+  String get eventFactMagnitude => '規模';
+
+  @override
+  String get eventFactDepth => '深度';
+
+  @override
+  String get eventFactMaxIntensity => '最大震度';
+
+  @override
+  String get eventFactEpicenter => '震央';
+
+  @override
+  String get eventFactOriginTime => '發震時間';
+
+  @override
+  String get eventFactSerial => '報數';
+
+  @override
+  String get eventFactWaveHeight => '浪高';
+
+  @override
+  String get eventFactArrivalTime => '到達時間';
+
+  @override
+  String get eventFactRainfall => '時雨量';
+
+  @override
+  String get eventFactWindSpeed => '風速';
+
+  @override
+  String get eventFactGust => '陣風';
+
+  @override
+  String get eventFactVisibility => '能見度';
+
+  @override
+  String get eventFactWaterLevel => '水位';
+
+  @override
+  String get eventFactWarningLevel => '警戒水位';
+
+  @override
+  String get eventFactLightningStrikes => '雷擊次數';
+
+  @override
+  String get eventFactRoad => '道路';
+
+  @override
+  String get eventFactLocation => '地點';
+
+  @override
+  String get eventFactStation => '測站';
 }

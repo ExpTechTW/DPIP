@@ -1,0 +1,20 @@
+{
+  "lang": "zh-TW",
+  "cards": [
+    {
+      "id": 1717214400,
+      "serial": 1,
+      "kind": "issue",
+      "type": "barrierLake",
+      "hazard": "landslide_dam",
+      "status": 1,
+      "author": "農業部林業及自然保育署",
+      "lang": "zh-TW",
+      "title": "堰塞湖警戒",
+      "subtitle": "堰塞湖警戒",
+      "send": 1717213800000,
+      "expires": 1717236000000,
+      "hasPolygon": true
+    }
+  ]
+}

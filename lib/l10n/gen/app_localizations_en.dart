@@ -3987,4 +3987,187 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get locationModeManualBadge => 'Location set by hand';
+
+  @override
+  String get eventHazardEarthquake => 'Earthquake';
+
+  @override
+  String get eventHazardTsunami => 'Tsunami';
+
+  @override
+  String get eventHazardWind => 'Strong wind';
+
+  @override
+  String get eventHazardHeavyRain => 'Heavy rain';
+
+  @override
+  String get eventHazardFlood => 'Flooding';
+
+  @override
+  String get eventHazardRiverRise => 'River rise';
+
+  @override
+  String get eventHazardDamRelease => 'Dam release';
+
+  @override
+  String get eventHazardSwell => 'High waves';
+
+  @override
+  String get eventHazardDebrisFlow => 'Debris flow';
+
+  @override
+  String get eventHazardLandslideDam => 'Landslide dam';
+
+  @override
+  String get eventHazardThunderstorm => 'Thunderstorm';
+
+  @override
+  String get eventHazardFog => 'Dense fog';
+
+  @override
+  String get eventHazardRoadClosure => 'Road closure';
+
+  @override
+  String get eventHazardAnnouncement => 'Announcement';
+
+  @override
+  String get eventHazardClosure => 'Work & school closure';
+
+  @override
+  String get eventHazardOther => 'Other';
+
+  @override
+  String get eventStatusCancelled => 'Cancelled';
+
+  @override
+  String get eventStatusOpenEnded => 'No end time yet';
+
+  @override
+  String get eventStatusActive => 'In effect';
+
+  @override
+  String get eventStatusEnded => 'Ended';
+
+  @override
+  String eventReportSerial(int serial) {
+    return 'Report $serial';
+  }
+
+  @override
+  String get eventReportKindIssue => 'Issued';
+
+  @override
+  String get eventReportKindUpdate => 'Update';
+
+  @override
+  String get eventReportKindCorrect => 'Correction';
+
+  @override
+  String get eventReportKindCancel => 'Cancellation';
+
+  @override
+  String get eventReportKindUnknown => 'Unknown';
+
+  @override
+  String get eventDetailTitle => 'Event details';
+
+  @override
+  String get eventDetailReports => 'All reports';
+
+  @override
+  String eventDetailEnds(String time) {
+    return 'Ends: $time';
+  }
+
+  @override
+  String get eventDetailEndsUndetermined => 'not yet set';
+
+  @override
+  String get eventDetailShowOriginal => 'Show original';
+
+  @override
+  String get eventDetailShowTranslation => 'Show translation';
+
+  @override
+  String eventDetailShowAll(int count) {
+    return 'Show all ($count)';
+  }
+
+  @override
+  String get eventDetailShowLess => 'Show less';
+
+  @override
+  String get eventDetailEewLatest => 'Latest estimate';
+
+  @override
+  String get eventDetailIntensityByArea => 'Intensity by area';
+
+  @override
+  String get eventDetailMissingStations => 'Stations not reporting';
+
+  @override
+  String get eventDetailTsunamiByArea => 'Forecast by area';
+
+  @override
+  String get eventDetailTsunamiObserved => 'Observed';
+
+  @override
+  String get eventDetailAffectedAreas => 'Affected areas';
+
+  @override
+  String get eventDetailStations => 'Stations';
+
+  @override
+  String get eventFactMagnitude => 'Magnitude';
+
+  @override
+  String get eventFactDepth => 'Depth';
+
+  @override
+  String get eventFactMaxIntensity => 'Max intensity';
+
+  @override
+  String get eventFactEpicenter => 'Epicenter';
+
+  @override
+  String get eventFactOriginTime => 'Origin time';
+
+  @override
+  String get eventFactSerial => 'Report';
+
+  @override
+  String get eventFactWaveHeight => 'Wave height';
+
+  @override
+  String get eventFactArrivalTime => 'Arrival';
+
+  @override
+  String get eventFactRainfall => 'Hourly rain';
+
+  @override
+  String get eventFactWindSpeed => 'Wind speed';
+
+  @override
+  String get eventFactGust => 'Gust';
+
+  @override
+  String get eventFactVisibility => 'Visibility';
+
+  @override
+  String get eventFactWaterLevel => 'Water level';
+
+  @override
+  String get eventFactWarningLevel => 'Alert level';
+
+  @override
+  String get eventFactLightningStrikes => 'Lightning strikes';
+
+  @override
+  String get eventFactRoad => 'Road';
+
+  @override
+  String get eventFactLocation => 'Location';
+
+  @override
+  String get eventFactStation => 'Station';
 }

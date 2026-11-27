@@ -4012,4 +4012,187 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get locationModeManualBadge => 'Manwal na nakatakda ang lokasyon';
+
+  @override
+  String get eventHazardEarthquake => 'Lindol';
+
+  @override
+  String get eventHazardTsunami => 'Tsunami';
+
+  @override
+  String get eventHazardWind => 'Malakas na hangin';
+
+  @override
+  String get eventHazardHeavyRain => 'Malakas na ulan';
+
+  @override
+  String get eventHazardFlood => 'Baha';
+
+  @override
+  String get eventHazardRiverRise => 'Pagtaas ng ilog';
+
+  @override
+  String get eventHazardDamRelease => 'Pagpapakawala ng dam';
+
+  @override
+  String get eventHazardSwell => 'Malalaking alon';
+
+  @override
+  String get eventHazardDebrisFlow => 'Daloy ng putik at bato';
+
+  @override
+  String get eventHazardLandslideDam => 'Landslide dam';
+
+  @override
+  String get eventHazardThunderstorm => 'Bagyong may kulog';
+
+  @override
+  String get eventHazardFog => 'Makapal na hamog';
+
+  @override
+  String get eventHazardRoadClosure => 'Sarado ang kalsada';
+
+  @override
+  String get eventHazardAnnouncement => 'Anunsyo';
+
+  @override
+  String get eventHazardClosure => 'Walang pasok sa trabaho at klase';
+
+  @override
+  String get eventHazardOther => 'Iba pa';
+
+  @override
+  String get eventStatusCancelled => 'Binawi';
+
+  @override
+  String get eventStatusOpenEnded => 'Wala pang oras ng pagtatapos';
+
+  @override
+  String get eventStatusActive => 'Umiiral';
+
+  @override
+  String get eventStatusEnded => 'Natapos na';
+
+  @override
+  String eventReportSerial(int serial) {
+    return 'Ulat $serial';
+  }
+
+  @override
+  String get eventReportKindIssue => 'Inilabas';
+
+  @override
+  String get eventReportKindUpdate => 'Update';
+
+  @override
+  String get eventReportKindCorrect => 'Pagwawasto';
+
+  @override
+  String get eventReportKindCancel => 'Pagbawi';
+
+  @override
+  String get eventReportKindUnknown => 'Hindi alam';
+
+  @override
+  String get eventDetailTitle => 'Detalye ng kaganapan';
+
+  @override
+  String get eventDetailReports => 'Lahat ng ulat';
+
+  @override
+  String eventDetailEnds(String time) {
+    return 'Matatapos: $time';
+  }
+
+  @override
+  String get eventDetailEndsUndetermined => 'hindi pa tiyak';
+
+  @override
+  String get eventDetailShowOriginal => 'Ipakita ang orihinal';
+
+  @override
+  String get eventDetailShowTranslation => 'Ipakita ang salin';
+
+  @override
+  String eventDetailShowAll(int count) {
+    return 'Ipakita lahat ($count)';
+  }
+
+  @override
+  String get eventDetailShowLess => 'Ipakita ang mas kaunti';
+
+  @override
+  String get eventDetailEewLatest => 'Pinakabagong tantiya';
+
+  @override
+  String get eventDetailIntensityByArea => 'Intensity bawat lugar';
+
+  @override
+  String get eventDetailMissingStations => 'Mga istasyong hindi nag-uulat';
+
+  @override
+  String get eventDetailTsunamiByArea => 'Tantiya bawat lugar';
+
+  @override
+  String get eventDetailTsunamiObserved => 'Naobserbahan';
+
+  @override
+  String get eventDetailAffectedAreas => 'Mga apektadong lugar';
+
+  @override
+  String get eventDetailStations => 'Mga istasyon';
+
+  @override
+  String get eventFactMagnitude => 'Magnitude';
+
+  @override
+  String get eventFactDepth => 'Lalim';
+
+  @override
+  String get eventFactMaxIntensity => 'Pinakamataas na intensity';
+
+  @override
+  String get eventFactEpicenter => 'Epicenter';
+
+  @override
+  String get eventFactOriginTime => 'Oras ng pangyayari';
+
+  @override
+  String get eventFactSerial => 'Ulat';
+
+  @override
+  String get eventFactWaveHeight => 'Taas ng alon';
+
+  @override
+  String get eventFactArrivalTime => 'Oras ng pagdating';
+
+  @override
+  String get eventFactRainfall => 'Ulan kada oras';
+
+  @override
+  String get eventFactWindSpeed => 'Bilis ng hangin';
+
+  @override
+  String get eventFactGust => 'Bugso';
+
+  @override
+  String get eventFactVisibility => 'Visibility';
+
+  @override
+  String get eventFactWaterLevel => 'Lebel ng tubig';
+
+  @override
+  String get eventFactWarningLevel => 'Lebel ng babala';
+
+  @override
+  String get eventFactLightningStrikes => 'Bilang ng kidlat';
+
+  @override
+  String get eventFactRoad => 'Kalsada';
+
+  @override
+  String get eventFactLocation => 'Lokasyon';
+
+  @override
+  String get eventFactStation => 'Istasyon';
 }

@@ -1,0 +1,63 @@
+{
+  "lang": "zh-TW",
+  "cards": [
+    {
+      "id": 1717214400,
+      "serial": 1,
+      "kind": "issue",
+      "type": "earthquake.station_missing",
+      "hazard": "earthquake",
+      "status": 1,
+      "author": "exptech",
+      "lang": "zh-TW",
+      "title": "未入電觀測點",
+      "subtitle": "[11:45] 地震，臺東縣蘭嶼鄉等 3 處",
+      "send": 1717213500000,
+      "expires": 1717299900000,
+      "area": [952, 951, 947],
+      "hasPolygon": false,
+      "addition": {
+        "eq": {
+          "time": 1717213500000,
+          "lat": 22.03727,
+          "lon": 121.55813,
+          "depth": 15,
+          "mag": 5.2
+        },
+        "stations": [
+          {
+            "code": "LAY",
+            "name": "蘭嶼氣象站",
+            "county": "臺東縣",
+            "town": "蘭嶼鄉",
+            "area": 952,
+            "lat": 22.03727,
+            "lon": 121.55813,
+            "intensity": "5強"
+          },
+          {
+            "code": "LDU",
+            "name": "綠島國小",
+            "county": "臺東縣",
+            "town": "綠島鄉",
+            "area": 951,
+            "lat": 22.67327,
+            "lon": 121.46924,
+            "intensity": "2"
+          },
+          {
+            "code": "SMS",
+            "name": "滿州國小",
+            "county": "屏東縣",
+            "town": "滿州鄉",
+            "area": 947,
+            "lat": 22.02045,
+            "lon": 120.83718,
+            "intensity": "2"
+          }
+        ]
+      },
+      "description": "臺東縣蘭嶼鄉(LAY-蘭嶼氣象站)觀測點位於預估震度 5強 以上區域，但這次地震報告沒有該觀測點資料，可能斷電或觀測點異常。當地實際震度可能高於預估，請務必留意。"
+    }
+  ]
+}

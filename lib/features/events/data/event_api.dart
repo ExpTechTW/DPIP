@@ -2,60 +2,84 @@ import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/api_region.dart';
 import 'package:dpip/core/network/stale_if_error.dart';
+import 'package:dpip/features/events/domain/event_card.dart';
 
-/// DPIP disaster-event (事件) endpoints — **API v1**, still on the legacy host.
+/// DPIP disaster-event cards (事件卡片) — **App API v2**
+/// (`/api/v2/dpip/{lang}/…`), on the core hosts.
 ///
-/// Two feeds share the same item shape:
-///  - **history** ([getHistoryList] / [getHistoryRegion]) — past notices; the
-///    Events tab.
-///  - **realtime** ([getRealtimeList] / [getRealtimeRegion]) — currently active
-///    notices; the home sheet when collapsed.
+/// Two list feeds share the list shape `{"lang", "cards": [...]}`:
+///  - **history** ([history]) — cards still in force or ended within the last
+///    3 days; the Events tab.
+///  - **realtime** ([realtime]) — cards in force now; the home sheet when
+///    collapsed.
 ///
-/// The region form is not a client-side filter of the list — the server decides
-/// membership from the event's own `area`/polygon, which the app has no way to
-/// evaluate — so 全國 and a township are genuinely different requests.
+/// [detail] returns one card's every report, first to latest.
+///
+/// `{lang}` is one of `eventApiLanguageTags` (`event_language.dart`); the
+/// server 404s any other value. `{region}` is a township code as a decimal
+/// integer. The region form of a list is not a client-side filter — the server
+/// decides membership from the card's own `area` and per-region expiry — so
+/// 全國 and a township are genuinely different requests.
+///
+/// Each method decodes the body through the card model, which throws a
+/// [FormatException] on a body of the wrong shape.
 class EventApi {
   const EventApi(this._client);
 
   final ApiClient _client;
 
-  /// Not yet migrated to the region topology (see [ApiTier.legacyApi]).
-  static const ApiTier _tier = ApiTier.legacyApi;
+  /// Multi-active core (`api.core-{tyo1,tnn1}`), confirmed on the server side:
+  /// both regions read the same PostgreSQL, so card ids, bodies and ETags are
+  /// byte-identical and an `If-None-Match` saved from one region revalidates
+  /// against the other. [ApiClient.request] fails over to the other region on
+  /// a 503 (the server's answer when PostgreSQL is unavailable) and on any
+  /// other 5xx or transport fault, and throws a 400 or 404 at once.
+  static const ApiTier _tier = ApiTier.coreApi;
 
-  /// Nationwide event history, newest first.
-  ///
-  /// `https://api-1.exptech.dev/api/v1/dpip/history/list`
-  ///
-  /// History is stale-if-error ([ApiClientStaleIfError.getOrSaved]): offline,
-  /// the list saved last time comes back marked as a saved copy. Past notices
-  /// stay true; the marker tells the reader newer ones may be missing.
-  Future<Fetched<List<dynamic>>> getHistoryList() =>
-      _history('/api/v1/dpip/history/list');
+  static const String _root = '/api/v2/dpip';
 
-  /// Event history affecting the township [region] (a 3-digit code), newest
-  /// first. Stale-if-error, like [getHistoryList].
+  /// Cards in force now or ended within the last 3 days, nationwide or for the
+  /// township [region].
   ///
-  /// `https://api-1.exptech.dev/api/v1/dpip/history/{region}`
-  Future<Fetched<List<dynamic>>> getHistoryRegion(String region) =>
-      _history('/api/v1/dpip/history/$region');
-
-  Future<Fetched<List<dynamic>>> _history(String path) async {
-    final fetched = await _client.getOrSaved(_tier, path);
-    return (data: fetched.data as List? ?? const [], stale: fetched.stale);
+  /// `https://api.core-{tyo1,tnn1}.exptech.dev/api/v2/dpip/{lang}/history[/{region}]`
+  ///
+  /// Stale-if-error ([ApiClientStaleIfError.getOrSaved]): when every host is
+  /// unreachable or answers 5xx, the list saved last time comes back marked as
+  /// a saved copy. Past notices stay true; the marker tells the reader newer
+  /// ones may be missing.
+  Future<Fetched<EventCardList>> history({
+    required String lang,
+    int? region,
+  }) async {
+    final fetched = await _client.getOrSaved(
+      _tier,
+      _listPath(lang, 'history', region),
+    );
+    return (data: EventCardList.fromJson(fetched.data), stale: fetched.stale);
   }
 
-  /// Nationwide *active* events, newest first.
+  /// Cards in force now, nationwide or for the township [region].
   ///
-  /// `https://api-1.exptech.dev/api/v1/dpip/realtime/list`
-  Future<List<dynamic>> getRealtimeList() async =>
-      (await _client.get(_tier, '/api/v1/dpip/realtime/list') as List?) ??
-      const [];
+  /// `https://api.core-{tyo1,tnn1}.exptech.dev/api/v2/dpip/{lang}/realtime[/{region}]`
+  Future<EventCardList> realtime({required String lang, int? region}) async =>
+      EventCardList.fromJson(
+        await _client.get(_tier, _listPath(lang, 'realtime', region)),
+      );
 
-  /// Active events affecting the township [region] (a 3-digit code), newest
-  /// first.
+  /// Every report of card [id], first to latest, with the per-township text
+  /// for [region] (`0` for the nationwide text).
   ///
-  /// `https://api-1.exptech.dev/api/v1/dpip/realtime/{region}`
-  Future<List<dynamic>> getRealtimeRegion(String region) async =>
-      (await _client.get(_tier, '/api/v1/dpip/realtime/$region') as List?) ??
-      const [];
+  /// `https://api.core-{tyo1,tnn1}.exptech.dev/api/v2/dpip/{lang}/event/{id}/{region}`
+  ///
+  /// A card that does not exist answers 404.
+  Future<EventCardDetail> detail({
+    required String lang,
+    required int id,
+    required int region,
+  }) async => EventCardDetail.fromJson(
+    await _client.get(_tier, '$_root/$lang/event/$id/$region'),
+  );
+
+  static String _listPath(String lang, String feed, int? region) =>
+      region == null ? '$_root/$lang/$feed' : '$_root/$lang/$feed/$region';
 }

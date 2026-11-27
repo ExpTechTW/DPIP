@@ -1,50 +1,78 @@
+import 'dart:ui' show Locale;
+
 import 'package:dpip/core/error/result.dart';
+import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/network/api_exception.dart';
 import 'package:dpip/features/events/data/event_api.dart';
-import 'package:dpip/features/events/domain/event.dart';
+import 'package:dpip/features/events/data/event_language.dart';
+import 'package:dpip/features/events/domain/event_card.dart';
 import 'package:dpip/features/events/domain/event_repository.dart';
 
-/// [EventRepository] backed by [EventApi], mapping transport/decode errors to
-/// typed failures via [guardResult] and owning the JSON → [Event] mapping.
+/// [EventRepository] backed by [EventApi], mapping transport and decode errors
+/// (a 404, 410 or 503, a body of the wrong shape) to typed failures via
+/// [guardResult] / [guardFetched].
+///
+/// The `{lang}` of every request is derived from [_locale], read once per
+/// request, so a language change applies from the next fetch on.
 class EventRepositoryImpl implements EventRepository {
-  const EventRepositoryImpl(this._api);
+  const EventRepositoryImpl(this._api, {required this._locale});
 
   final EventApi _api;
 
+  /// The locale the app is showing now.
+  final Locale Function() _locale;
+
+  /// The largest `{region}` the server accepts (int32).
+  static const int _maxRegion = 0x7fffffff;
+
+  static final RegExp _decimal = RegExp(r'^[0-9]+$');
+
   @override
-  Future<Result<List<Event>>> events({String? regionCode}) =>
+  Future<Result<List<EventCard>>> events({String? regionCode}) =>
       guardFetched(() async {
-        final raw = regionCode == null
-            ? await _api.getHistoryList()
-            : await _api.getHistoryRegion(regionCode);
-        return (
-          data: parseEvents(raw.data, regionCode: regionCode),
-          stale: raw.stale,
+        final fetched = await _api.history(
+          lang: _lang(),
+          region: _regionOf(regionCode),
         );
+        return (data: fetched.data.cards, stale: fetched.stale);
       });
 
   @override
-  Future<Result<List<Event>>> activeEvents({String? regionCode}) =>
+  Future<Result<List<EventCard>>> activeEvents({String? regionCode}) =>
       guardResult(() async {
-        final raw = regionCode == null
-            ? await _api.getRealtimeList()
-            : await _api.getRealtimeRegion(regionCode);
-        return parseEvents(raw, regionCode: regionCode);
+        final list = await _api.realtime(
+          lang: _lang(),
+          region: _regionOf(regionCode),
+        );
+        return list.cards;
       });
 
-  /// Maps the wire list to [Event]s, newest first.
-  ///
-  /// Unmappable entries are skipped rather than failing the whole feed: one
-  /// malformed record from a legacy v1 endpoint must not blank out every other
-  /// hazard the user needs to see. Pure and public so the mapping is testable
-  /// without the network.
-  static List<Event> parseEvents(List<dynamic> raw, {String? regionCode}) {
-    final events = <Event>[
-      for (final item in raw)
-        if (item is Map)
-          ?Event.fromJson(item.cast<String, dynamic>(), regionCode: regionCode),
-    ];
-    events.sort((a, b) => b.time.compareTo(a.time));
-    return events;
+  @override
+  Future<Result<EventCardDetail>> detail({
+    required int id,
+    String? regionCode,
+  }) => guardResult(
+    () =>
+        _api.detail(lang: _lang(), id: id, region: _regionOf(regionCode) ?? 0),
+  );
+
+  String _lang() => eventApiLanguage(_locale());
+
+  /// [regionCode] as the API's `{region}`: its decimal value, or null when it
+  /// is null or not a plain decimal that fits in an int32 (logged, since the
+  /// caller then gets the nationwide answer instead of its township's).
+  static int? _regionOf(String? regionCode) {
+    if (regionCode == null) return null;
+    final value = _decimal.hasMatch(regionCode)
+        ? int.tryParse(regionCode)
+        : null;
+    if (value == null || value > _maxRegion) {
+      Log.warning(
+        'EventRepository: region code "$regionCode" is not a decimal int32; '
+        'using the nationwide request',
+      );
+      return null;
+    }
+    return value;
   }
 }

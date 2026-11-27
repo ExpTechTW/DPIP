@@ -1,0 +1,2 @@
+{"lang":"en","cards":[{"id":42,"serial":1,"kind":"issue","type":"earthquake","hazard":"earthquake","status":1,"author":"cwa","lang":"zh-TW","title":"地震","subtitle":"規模 5",
+  "send":1000,"expires":2000,"area":[],"hasPolygon":false,"addition":{"max":4,"area":["臺北市"]},"description":"說明"}]}

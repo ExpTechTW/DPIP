@@ -1,0 +1,20 @@
+{
+  "lang": "zh-TW",
+  "cards": [
+    {
+      "id": 1785069401,
+      "serial": 2,
+      "kind": "update",
+      "type": "earthquake.eew",
+      "hazard": "earthquake",
+      "status": 1,
+      "author": "cwa",
+      "lang": "zh-TW",
+      "title": "地震速報",
+      "subtitle": "地震速報 [20:36]",
+      "send": 1785069406000,
+      "expires": 1785155806000,
+      "hasPolygon": false
+    }
+  ]
+}

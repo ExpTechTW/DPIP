@@ -1,0 +1,872 @@
+[
+  {
+    "id": "earthquake#1",
+    "type": "earthquake",
+    "addition": {
+      "id": "114201"
+    }
+  },
+  {
+    "id": "tsunami_note#1",
+    "type": "tsunami_note",
+    "addition": {
+      "id": "114201"
+    }
+  },
+  {
+    "id": "intensity#1",
+    "type": "intensity",
+    "addition": {
+      "id": 1785070401000,
+      "serial": 1,
+      "area": {
+        "1": [
+          900
+        ],
+        "2": [
+          100
+        ],
+        "5": [
+          970
+        ]
+      },
+      "max": 5,
+      "final": 0
+    }
+  },
+  {
+    "id": "intensity#2",
+    "type": "intensity",
+    "addition": {
+      "id": 1785070401000,
+      "serial": 2,
+      "area": {
+        "1": [
+          900
+        ],
+        "2": [
+          100
+        ],
+        "5": [
+          970
+        ]
+      },
+      "max": 5,
+      "final": 1
+    }
+  },
+  {
+    "id": "earthquake.eew#1",
+    "type": "earthquake.eew",
+    "addition": {
+      "id": "10006",
+      "serial": 1,
+      "alert": 0,
+      "eq": {
+        "time": 1785069391000,
+        "lat": 26.15,
+        "lon": 119.94,
+        "depth": 10,
+        "mag": 4.5,
+        "loc": "連江縣南竿鄉",
+        "max": 4
+      },
+      "intensity": {
+        "4": [
+          209,
+          210
+        ],
+        "3": [
+          211
+        ],
+        "1": [
+          212,
+          896
+        ]
+      }
+    }
+  },
+  {
+    "id": "earthquake.eew#2",
+    "type": "earthquake.eew",
+    "addition": {
+      "id": "10006",
+      "serial": 2,
+      "alert": 0,
+      "eq": {
+        "time": 1785069391000,
+        "lat": 26.15,
+        "lon": 119.94,
+        "depth": 10,
+        "mag": 4.5,
+        "loc": "連江縣南竿鄉",
+        "max": 4
+      },
+      "intensity": {
+        "4": [
+          209,
+          210
+        ],
+        "3": [
+          211
+        ],
+        "1": [
+          212,
+          896
+        ]
+      }
+    }
+  },
+  {
+    "id": "earthquake.eew#3",
+    "type": "earthquake.eew",
+    "addition": {
+      "id": "10010",
+      "serial": 1,
+      "alert": 0,
+      "eq": {
+        "time": 1785069391000,
+        "lat": 26.15,
+        "lon": 119.94,
+        "depth": 10,
+        "mag": 4.5,
+        "loc": "連江縣南竿鄉",
+        "max": 4
+      },
+      "intensity": {
+        "4": [
+          209,
+          210
+        ],
+        "3": [
+          211
+        ],
+        "1": [
+          212,
+          896
+        ]
+      }
+    }
+  },
+  {
+    "id": "earthquake.eew.alert#1",
+    "type": "earthquake.eew.alert",
+    "addition": {
+      "id": "10010",
+      "serial": 2,
+      "alert": 1,
+      "eq": {
+        "time": 1785069391000,
+        "lat": 26.15,
+        "lon": 119.94,
+        "depth": 10,
+        "mag": 5,
+        "loc": "連江縣南竿鄉",
+        "max": 4
+      },
+      "intensity": {
+        "5": [
+          209
+        ],
+        "4": [
+          210
+        ],
+        "3": [
+          211
+        ],
+        "2": [
+          212
+        ],
+        "1": [
+          302,
+          305,
+          310,
+          314,
+          328,
+          337,
+          350,
+          351,
+          356,
+          366,
+          896
+        ]
+      }
+    }
+  },
+  {
+    "id": "earthquake.detection#1",
+    "type": "earthquake.detection",
+    "addition": {
+      "id": 1785069441,
+      "serial": 1,
+      "alert": 0,
+      "eq": {
+        "time": 1785069391000,
+        "lat": 26.15,
+        "lon": 119.94,
+        "depth": 10,
+        "loc": "連江縣南竿鄉",
+        "max": 4
+      },
+      "intensity": {
+        "4": [
+          209,
+          210
+        ],
+        "3": [
+          211
+        ]
+      }
+    }
+  },
+  {
+    "id": "earthquake.detection#2",
+    "type": "earthquake.detection",
+    "addition": {
+      "id": 1785069441,
+      "serial": 2,
+      "alert": 0,
+      "cancel": 1
+    }
+  },
+  {
+    "id": "earthquake.station_missing#1",
+    "type": "earthquake.station_missing",
+    "addition": {
+      "eq": {
+        "time": 1717213500000,
+        "lat": 22.03727,
+        "lon": 121.55813,
+        "depth": 15,
+        "mag": 5.2
+      },
+      "stations": [
+        {
+          "code": "LAY",
+          "name": "蘭嶼氣象站",
+          "county": "臺東縣",
+          "town": "蘭嶼鄉",
+          "area": 952,
+          "lat": 22.03727,
+          "lon": 121.55813,
+          "intensity": "5強"
+        },
+        {
+          "code": "LDU",
+          "name": "綠島國小",
+          "county": "臺東縣",
+          "town": "綠島鄉",
+          "area": 951,
+          "lat": 22.67327,
+          "lon": 121.46924,
+          "intensity": "2"
+        },
+        {
+          "code": "SMS",
+          "name": "滿州國小",
+          "county": "屏東縣",
+          "town": "滿州鄉",
+          "area": 947,
+          "lat": 22.02045,
+          "lon": 120.83718,
+          "intensity": "2"
+        }
+      ]
+    }
+  },
+  {
+    "id": "tsunami.warning#1",
+    "type": "tsunami.warning",
+    "addition": {
+      "id": 1785069391,
+      "serial": 1,
+      "status": 0,
+      "author": "cwa",
+      "content": "沿海地區應嚴加戒備",
+      "eq": {
+        "time": 1785069331000,
+        "lat": 23.9,
+        "lon": 121.6,
+        "depth": 20,
+        "mag": 7.2,
+        "loc": "臺灣東部海域"
+      },
+      "info": {
+        "type": "estimate",
+        "data": [
+          {
+            "area": "臺灣東部沿海地區",
+            "arrival_time": 1785070591000,
+            "wave_height": 100
+          },
+          {
+            "area": "臺灣北部沿海地區",
+            "arrival_time": 1785071791000,
+            "wave_height": 50
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "tsunami.warning#2",
+    "type": "tsunami.warning",
+    "addition": {
+      "id": 1785069391,
+      "serial": 2,
+      "status": 1,
+      "author": "cwa",
+      "content": "海嘯警報持續中",
+      "eq": {
+        "time": 1785069331000,
+        "lat": 23.9,
+        "lon": 121.6,
+        "depth": 20,
+        "mag": 7.2,
+        "loc": "臺灣東部海域"
+      },
+      "info": {
+        "type": "estimate",
+        "data": [
+          {
+            "area": "臺灣東部沿海地區",
+            "arrival_time": 1785070591000,
+            "wave_height": 100
+          },
+          {
+            "area": "臺灣北部沿海地區",
+            "arrival_time": 1785071791000,
+            "wave_height": 50
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "tsunami.warning#3",
+    "type": "tsunami.warning",
+    "addition": {
+      "id": 1785069391,
+      "serial": 3,
+      "status": 0,
+      "author": "cwa",
+      "content": "未知類型仍走警報",
+      "eq": {
+        "time": 1785069331000,
+        "lat": 23.9,
+        "lon": 121.6,
+        "depth": 20,
+        "mag": 7.2,
+        "loc": "臺灣東部海域"
+      },
+      "info": {
+        "type": "forecast",
+        "data": []
+      }
+    }
+  },
+  {
+    "id": "tsunami.warning#4",
+    "type": "tsunami.warning",
+    "addition": {
+      "id": 1785069391,
+      "serial": 4,
+      "status": 2,
+      "author": "cwa",
+      "content": "警報解除",
+      "eq": {
+        "time": 1785069331000,
+        "lat": 23.9,
+        "lon": 121.6,
+        "depth": 20,
+        "mag": 7.2,
+        "loc": "臺灣東部海域"
+      },
+      "info": {
+        "type": "estimate",
+        "data": [
+          {
+            "area": "臺灣東部沿海地區",
+            "arrival_time": 1785070591000,
+            "wave_height": 100
+          },
+          {
+            "area": "臺灣北部沿海地區",
+            "arrival_time": 1785071791000,
+            "wave_height": 50
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "tsunami.warning#5",
+    "type": "tsunami.warning",
+    "addition": {
+      "id": 1785069391,
+      "serial": 5,
+      "status": 2,
+      "author": "cwa",
+      "content": "有觀測仍先解除",
+      "eq": {
+        "time": 1785069331000,
+        "lat": 23.9,
+        "lon": 121.6,
+        "depth": 20,
+        "mag": 7.2,
+        "loc": "臺灣東部海域"
+      },
+      "info": {
+        "type": "actual",
+        "data": [
+          {
+            "name": "花蓮",
+            "id": "46699A",
+            "lat": 23.98,
+            "lon": 121.61,
+            "wave_height": 25,
+            "arrival_time": 1785069691000
+          },
+          {
+            "name": "成功",
+            "id": "46761A",
+            "lat": 23.1,
+            "lon": 121.38,
+            "wave_height": 12,
+            "arrival_time": 1785069871000
+          },
+          {
+            "name": "蘭嶼",
+            "id": "46762A",
+            "lat": 22.04,
+            "lon": 121.55,
+            "wave_height": 8,
+            "arrival_time": 1785070111000
+          },
+          {
+            "name": "恆春",
+            "id": "46759A",
+            "lat": 21.95,
+            "lon": 120.74,
+            "wave_height": 5,
+            "arrival_time": 1785070291000
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "tsunami.info#1",
+    "type": "tsunami.info",
+    "addition": {
+      "no": "114001",
+      "serial": 1,
+      "eq": {
+        "time": 1717213800000
+      }
+    }
+  },
+  {
+    "id": "tsunami.info#2",
+    "type": "tsunami.info",
+    "addition": {
+      "no": "114001",
+      "serial": 2,
+      "eq": {
+        "time": 1717213800000
+      }
+    }
+  },
+  {
+    "id": "heavy-rain#1",
+    "type": "heavy-rain",
+    "addition": {
+      "issueTime": 1717213800000
+    }
+  },
+  {
+    "id": "heavy-rain#2",
+    "type": "heavy-rain",
+    "addition": {
+      "issueTime": 1717213800000,
+      "released": [
+        100
+      ]
+    }
+  },
+  {
+    "id": "heavy-rain#3",
+    "type": "heavy-rain",
+    "addition": {
+      "issueTime": 1717214400000,
+      "changed": [
+        {
+          "area": [
+            100
+          ],
+          "from": "heavy-rain",
+          "to": "extremely-heavy-rain"
+        }
+      ],
+      "end": "upgrade"
+    }
+  },
+  {
+    "id": "extremely-heavy-rain#1",
+    "type": "extremely-heavy-rain",
+    "addition": {
+      "issueTime": 1717214400000,
+      "changed": [
+        {
+          "area": [
+            100
+          ],
+          "from": "heavy-rain",
+          "to": "extremely-heavy-rain"
+        }
+      ]
+    }
+  },
+  {
+    "id": "extremely-torrential-rain#1",
+    "type": "extremely-torrential-rain",
+    "addition": {
+      "issueTime": 1717213800000
+    }
+  },
+  {
+    "id": "debrisFlowLandSlide#1",
+    "type": "debrisFlowLandSlide",
+    "addition": {
+      "light": "yellow"
+    }
+  },
+  {
+    "id": "roadClose#1",
+    "type": "roadClose",
+    "addition": {
+      "areaDesc": "臺中市西屯區",
+      "polygon": "24.1500,120.6700 24.1600,120.6700 24.1600,120.6800 24.1500,120.6800 24.1500,120.6700",
+      "geocode": "6600600",
+      "county": "臺中市",
+      "town": "西屯區",
+      "roadName": "台灣大道線",
+      "location": "中清路口"
+    }
+  },
+  {
+    "id": "floodSensor#1",
+    "type": "floodSensor",
+    "addition": {
+      "areaDesc": "臺南市安南區",
+      "polygon": "24.1500,120.6700 24.1600,120.6700 24.1600,120.6800 24.1500,120.6800 24.1500,120.6700",
+      "geocode": "6703500",
+      "county": "",
+      "town": "",
+      "waterLevelStation": "",
+      "waterLevel": ""
+    }
+  },
+  {
+    "id": "heavy_rain.short#1",
+    "type": "heavy_rain.short",
+    "addition": {
+      "stations": [
+        {
+          "eventId": "rain:C0A001:1794974400000:orange",
+          "stationId": "C0A001",
+          "stationName": "測試站",
+          "county": "臺北市",
+          "town": "信義區",
+          "lat": 25.033964,
+          "lng": 121.564468,
+          "altitude": 8.5,
+          "obsTime": 1794974400000,
+          "rain": {
+            "now": 0,
+            "10m": 8,
+            "1h": 50.5,
+            "3h": 0,
+            "6h": 0,
+            "12h": 0,
+            "24h": 0,
+            "2d": 0,
+            "3d": 0
+          },
+          "threshold": 40
+        }
+      ]
+    }
+  },
+  {
+    "id": "heavy_rain.short_extreme#1",
+    "type": "heavy_rain.short_extreme",
+    "addition": {
+      "stations": [
+        {
+          "eventId": "rain:C0A001:1794976800000:purple",
+          "stationId": "C0A001",
+          "stationName": "測試站",
+          "county": "臺北市",
+          "town": "信義區",
+          "lat": 25.033964,
+          "lng": 121.564468,
+          "altitude": 8.5,
+          "obsTime": 1794976800000,
+          "rain": {
+            "now": 0,
+            "10m": 20,
+            "1h": 85,
+            "3h": 0,
+            "6h": 0,
+            "12h": 0,
+            "24h": 0,
+            "2d": 0,
+            "3d": 0
+          },
+          "threshold": 80
+        }
+      ]
+    }
+  },
+  {
+    "id": "wind.strong#1",
+    "type": "wind.strong",
+    "addition": {
+      "stations": [
+        {
+          "eventId": "wind:C0A980:1717200000000:9:3",
+          "stationId": "C0A980",
+          "stationName": "信義",
+          "county": "臺北市",
+          "town": "信義區",
+          "lat": 25.033,
+          "lng": 121.565,
+          "altitude": 10,
+          "obsTime": 1717200000000,
+          "wind": {
+            "speed": 21,
+            "direction": 90,
+            "beaufort": 9
+          },
+          "gust": {
+            "speed": 5,
+            "direction": 80,
+            "time": 1717200000000,
+            "beaufort": 3
+          },
+          "thresholds": {
+            "beaufort": 9,
+            "gustBeaufort": 11
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id": "wind.damaging#1",
+    "type": "wind.damaging",
+    "addition": {
+      "stations": [
+        {
+          "eventId": "wind:C0D120:1717200000000:12:11",
+          "stationId": "C0D120",
+          "stationName": "梧棲",
+          "county": "臺中市",
+          "town": "梧棲區",
+          "lat": 24.147,
+          "lng": 120.673,
+          "altitude": 10,
+          "obsTime": 1717200000000,
+          "wind": {
+            "speed": 33,
+            "direction": 180,
+            "beaufort": 12
+          },
+          "gust": {
+            "speed": 29,
+            "direction": 170,
+            "time": 1717200000000,
+            "beaufort": 11
+          },
+          "thresholds": {
+            "beaufort": 12,
+            "gustBeaufort": 14
+          }
+        },
+        {
+          "eventId": "wind:C0C330:1717200000000:3:14",
+          "stationId": "C0C330",
+          "stationName": "蘭嶼",
+          "county": "臺東縣",
+          "town": "蘭嶼鄉",
+          "lat": 22.045,
+          "lng": 121.51,
+          "altitude": 10,
+          "obsTime": 1717200000000,
+          "wind": {
+            "speed": 5,
+            "direction": 10,
+            "beaufort": 3
+          },
+          "gust": {
+            "speed": 42,
+            "direction": 15,
+            "time": 1717200000000,
+            "beaufort": 14
+          },
+          "thresholds": {
+            "beaufort": 12,
+            "gustBeaufort": 14
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id": "thunderstorm.lightning#1",
+    "type": "thunderstorm.lightning",
+    "addition": {
+      "stations": [
+        {
+          "eventId": "lightning:1794997800000:25.030,121.500",
+          "dataTime": 1794997800000,
+          "center": {
+            "lat": 25.03,
+            "lng": 121.5
+          },
+          "count": 20,
+          "clusterRadius": 1,
+          "notifyRadius": 5,
+          "forced": false,
+          "threshold": 20
+        },
+        {
+          "eventId": "lightning:1794997800000:25.032,121.004",
+          "dataTime": 1794997800000,
+          "center": {
+            "lat": 25.032,
+            "lng": 121.004
+          },
+          "count": 20,
+          "clusterRadius": 5,
+          "notifyRadius": 5,
+          "forced": false,
+          "threshold": 20
+        },
+        {
+          "eventId": "lightning:1794997800000:25.030,122.491",
+          "dataTime": 1794997800000,
+          "center": {
+            "lat": 25.03,
+            "lng": 122.491
+          },
+          "count": 160,
+          "clusterRadius": 1,
+          "notifyRadius": 5,
+          "forced": true,
+          "threshold": 20
+        }
+      ]
+    }
+  },
+  {
+    "id": "river_rise.watch#1",
+    "type": "river_rise.watch",
+    "addition": {
+      "stations": [
+        {
+          "eventId": "river:S0:1718434800000:l2up",
+          "stationId": "S0",
+          "stationName": "大甲溪零級",
+          "lat": 25.033,
+          "lng": 121.565,
+          "obsTime": 1718434800000,
+          "stage": "l2up",
+          "waterLevel": 7,
+          "velocity": 0.3,
+          "warningLevel2": 6,
+          "warningLevel1": 0,
+          "topLevel": 9
+        }
+      ]
+    }
+  },
+  {
+    "id": "river_rise.warning#1",
+    "type": "river_rise.warning",
+    "addition": {
+      "stations": [
+        {
+          "eventId": "river:S1:1718434800000:l1up",
+          "stationId": "S1",
+          "stationName": "高屏溪里嶺",
+          "lat": 24.15,
+          "lng": 120.68,
+          "obsTime": 1718434800000,
+          "stage": "l1up",
+          "waterLevel": 4.5,
+          "velocity": 1.6,
+          "warningLevel2": 3,
+          "warningLevel1": 4,
+          "topLevel": 9
+        },
+        {
+          "eventId": "river:NEGU:1718434800000:l1up",
+          "stationId": "NEGU",
+          "stationName": "負一級站",
+          "lat": 22.8,
+          "lng": 120.3,
+          "obsTime": 1718434800000,
+          "stage": "l1up",
+          "waterLevel": 2.6,
+          "velocity": 0.2,
+          "warningLevel2": 2,
+          "warningLevel1": -1,
+          "topLevel": 5
+        }
+      ]
+    }
+  },
+  {
+    "id": "fog.visibility#1",
+    "type": "fog.visibility",
+    "addition": {
+      "stations": [
+        {
+          "eventId": "fog:46691:1794997800000",
+          "stationId": "46691",
+          "stationName": "鞍部",
+          "county": "臺北市",
+          "town": "北投區",
+          "lat": 25.182,
+          "lng": 121.546,
+          "obsTime": 1794997800000,
+          "visibility": 0.5,
+          "visibilityText": "<1",
+          "threshold": 1
+        },
+        {
+          "eventId": "fog:KIN9:1794997800000",
+          "stationId": "KIN9",
+          "stationName": "東引",
+          "county": "連江縣",
+          "town": "南竿鄉",
+          "lat": 26.16,
+          "lng": 119.95,
+          "obsTime": 1794997800000,
+          "visibility": 0.5,
+          "visibilityText": "<1",
+          "threshold": 1
+        }
+      ]
+    }
+  },
+  {
+    "id": "announcement#1",
+    "type": "announcement",
+    "addition": {
+      "code": "drill-20261127"
+    }
+  }
+]

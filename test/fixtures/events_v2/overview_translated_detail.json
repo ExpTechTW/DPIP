@@ -1,0 +1,12 @@
+{"lang":"en","cards":[
+  {"id":1800000000,"serial":1,"kind":"issue","type":"heavy-rain","hazard":"heavy_rain","status":1,"author":"cwa","lang":"en",
+   "title":"Heavy rain advisory","subtitle":"Taipei City","send":1799992800000,"expires":1800010800000,"area":[100],"hasPolygon":false,
+   "description":"Heavy rain in Taipei City",
+   "original":{"title":"大雨特報","subtitle":"臺北市","description":"臺北市有大雨"}},
+  {"id":1800000000,"serial":2,"kind":"update","type":"heavy-rain","hazard":"heavy_rain","status":1,"author":"cwa","lang":"zh-TW",
+   "title":"大雨特報","subtitle":"臺北市、新北市","send":1799996400000,"expires":1800021600000,"area":[100,200],"hasPolygon":false,
+   "description":"新北市山區有大雨"},
+  {"id":1800000000,"serial":3,"kind":"cancel","type":"heavy-rain","hazard":"heavy_rain","status":1,"author":"cwa","lang":"zh-TW",
+   "title":"大雨特報","subtitle":"臺北市、新北市","send":1799999400000,"expires":1799999400000,"area":[100,200],"hasPolygon":false,
+   "description":"新北市山區有大雨"}
+]}

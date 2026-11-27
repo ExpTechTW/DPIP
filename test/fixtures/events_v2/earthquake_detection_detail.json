@@ -1,0 +1,62 @@
+{
+  "lang": "zh-TW",
+  "cards": [
+    {
+      "id": 1785069442,
+      "serial": 1,
+      "kind": "issue",
+      "type": "earthquake.detection",
+      "hazard": "earthquake",
+      "status": 1,
+      "author": "trem",
+      "lang": "zh-TW",
+      "title": "強震監視器",
+      "subtitle": "強震監視器 [20:37]",
+      "send": 1785069441000,
+      "expires": 1785155841000,
+      "area": [209, 210, 211],
+      "hasPolygon": false,
+      "addition": {
+        "id": 1785069441,
+        "serial": 1,
+        "alert": 0,
+        "eq": {
+          "time": 1785069391000,
+          "lat": 26.15,
+          "lon": 119.94,
+          "depth": 10,
+          "loc": "連江縣南竿鄉",
+          "max": 4
+        },
+        "intensity": {
+          "4": [209, 210],
+          "3": [211]
+        }
+      },
+      "description": "連江縣南竿鄉　偵測到晃動。檢測到較大的加速度，請注意自身安全。"
+    },
+    {
+      "id": 1785069442,
+      "serial": 2,
+      "kind": "update",
+      "type": "earthquake.detection",
+      "hazard": "earthquake",
+      "status": 1,
+      "author": "trem",
+      "lang": "zh-TW",
+      "title": "檢知取消",
+      "subtitle": "強震監視器 [20:37]",
+      "send": 1785069441000,
+      "expires": 1785155841000,
+      "area": [209, 210, 211],
+      "hasPolygon": false,
+      "addition": {
+        "id": 1785069441,
+        "serial": 2,
+        "alert": 0,
+        "cancel": 1
+      },
+      "description": "20:37 左右 連江縣南竿鄉 偵測到晃動之事件，已被系統取消了，我們正在確認原因。"
+    }
+  ]
+}
