@@ -222,12 +222,23 @@ cluster 帶 `point_count`。
 | `FrameTileApi.tileUrl` | `/api/v2/tiles/wind/{model}/{cycle}/{validTime}/{z}/{x}/{y}.webp` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
 | `FrameTileApi.fetchWindBin` | `/api/v1/wind/{model}/{cycle}/{validTime}.bin` | `coreStaticExclusive` | `static.core-tnn1.exptech.dev` |
 
-### 氣象家族（**v5**）—— `core-tnn1`
+### 氣象家族（**v5**）—— core 雙區
 
 **已自 `api-1` 的 v2/v3 遷移完成。** 四個家族（weather / rain / lightning /
 typhoon）共用同一組形狀：`/api/v5/meteor/{family}` 是最新快照、`/list` 是可用時間
 清單、`/{sec}` 是該時刻的歷史快照且放在 **static** 主機。舊的
 `/api/v2/meteor/*`、`/api/v3/weather/*` 在 `api-1` 上仍然活著，但 App 已不再呼叫。
+
+**兩個 core 區都有完整的 v5 meteor**（`api.core-{tyo1,tnn1}` 與
+`static.core-{tyo1,tnn1}`，2026-11-28 逐支實測皆 200），所以 mutable 走
+`coreApi`、`/{sec}` 走 `coreStatic`，選定區域優先、失敗換另一區。
+
+**兩區各自向氣象署抓資料，不跨區同步**：同一個觀測時間的數值、`forecast` 的
+`updateTime` 與 ETag 都可能不同，換區後的回應要當成獨立的一份，不能假設兩區
+逐位元組相同。各區的歷史也各自累積：`tnn1` 從 2026-11-26 15:00 才開始，約
+11-29 15:00 補滿 3 天；之後任何一區停機也會留下缺口。所以一區 `/list` 裡的時間點
+在另一區的 static 可能 404 —— `getAt` 帶 `notFoundFailsOver`，404 時會再問另一區，
+兩區都沒有才算 404（不計入主機健康度）。
 
 時間軸與數值皆為**差量／哨符編碼**，由 `core/network/meteor_decode.dart` 還原：
 `ts` 是 `[baseSec, Δ, …]`，數值序列中的 `-99` 代表 null（缺值），不是讀數。
@@ -238,20 +249,20 @@ typhoon）共用同一組形狀：`/api/v5/meteor/{family}` 是最新快照、`/
 
 | 類別.方法 | 路徑 | 層級 |
 |---|---|---|
-| `MeteorSnapshotApi.getStation` | `/api/v5/meteor/{family}/station` | `coreExclusiveApi` |
-| `MeteorSnapshotApi.getLatest` | `/api/v5/meteor/{family}` | `coreExclusiveApi` |
-| `MeteorSnapshotApi.getList` | `/api/v5/meteor/{family}/list` | `coreExclusiveApi` |
-| `MeteorSnapshotApi.getAt` | `/api/v5/meteor/{family}/{sec}` | `coreStaticExclusive` |
-| `MeteorSnapshotApi.getTrend` | `/api/v5/meteor/{family}/trend/{id}?range=24h\|7d` | `coreExclusiveApi` |
-| `MeteorWeatherApi.getRealtime` | `/api/v5/meteor/weather/realtime/{lat},{lng}` | `coreExclusiveApi` |
-| `MeteorWeatherApi.getForecast` | `/api/v5/meteor/weather/forecast/{code}` | `coreExclusiveApi` |
-| `MeteorTyphoonApi.getCyclones` | `/api/v5/meteor/typhoon` | `coreExclusiveApi` |
-| `MeteorTyphoonApi.getTrack` | `/api/v5/meteor/typhoon/track` | `coreExclusiveApi` |
-| `MeteorTyphoonApi.getPotential` | `/api/v5/meteor/typhoon/potential` | `coreExclusiveApi` |
-| `MeteorTyphoonApi.getProbability` | `/api/v5/meteor/typhoon/probability` | `coreExclusiveApi` |
-| `MeteorTyphoonApi.getWarning` | `/api/v5/meteor/typhoon/warning` | `coreExclusiveApi` |
-| `MeteorTyphoonApi.getList` | `/api/v5/meteor/typhoon/{kind}/list` | `coreExclusiveApi` |
-| `MeteorTyphoonApi.getAt` | `/api/v5/meteor/typhoon/{kind}/{sec}` | `coreStaticExclusive` |
+| `MeteorSnapshotApi.getStation` | `/api/v5/meteor/{family}/station` | `coreApi` |
+| `MeteorSnapshotApi.getLatest` | `/api/v5/meteor/{family}` | `coreApi` |
+| `MeteorSnapshotApi.getList` | `/api/v5/meteor/{family}/list` | `coreApi` |
+| `MeteorSnapshotApi.getAt` | `/api/v5/meteor/{family}/{sec}` | `coreStatic` |
+| `MeteorSnapshotApi.getTrend` | `/api/v5/meteor/{family}/trend/{id}?range=24h\|7d` | `coreApi` |
+| `MeteorWeatherApi.getRealtime` | `/api/v5/meteor/weather/realtime/{lat},{lng}` | `coreApi` |
+| `MeteorWeatherApi.getForecast` | `/api/v5/meteor/weather/forecast/{code}` | `coreApi` |
+| `MeteorTyphoonApi.getCyclones` | `/api/v5/meteor/typhoon` | `coreApi` |
+| `MeteorTyphoonApi.getTrack` | `/api/v5/meteor/typhoon/track` | `coreApi` |
+| `MeteorTyphoonApi.getPotential` | `/api/v5/meteor/typhoon/potential` | `coreApi` |
+| `MeteorTyphoonApi.getProbability` | `/api/v5/meteor/typhoon/probability` | `coreApi` |
+| `MeteorTyphoonApi.getWarning` | `/api/v5/meteor/typhoon/warning` | `coreApi` |
+| `MeteorTyphoonApi.getList` | `/api/v5/meteor/typhoon/{kind}/list` | `coreApi` |
+| `MeteorTyphoonApi.getAt` | `/api/v5/meteor/typhoon/{kind}/{sec}` | `coreStatic` |
 
 `{family}` = `weather` \| `rain` \| `lightning`（`station` 只有前兩家有；
 lightning 沒有測站，也沒有 `trend`）。`{kind}` = `track` \| `potential` \|
