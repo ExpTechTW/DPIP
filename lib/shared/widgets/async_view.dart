@@ -30,6 +30,7 @@ class AsyncView<T> extends StatefulWidget {
     this.empty,
     this.isEmpty,
     this.refreshSignal,
+    this.pullToRefresh = false,
   });
 
   /// Produces the request. Re-invoked on retry.
@@ -62,6 +63,16 @@ class AsyncView<T> extends StatefulWidget {
   /// The previous value stays on screen while the new one loads, so a routine
   /// refresh never flashes the screen back to a spinner.
   final Listenable? refreshSignal;
+
+  /// Lets the reader pull the content down to re-run [future], the way
+  /// [refreshSignal] does. The indicator stays until the new result lands —
+  /// success, failure, or a `304` the ETag cache turns back into the saved
+  /// body — and the content already on screen stays under it meanwhile.
+  ///
+  /// The [builder]'s scrollable has to scroll when its content is short
+  /// (`AlwaysScrollableScrollPhysics`), or a list of one card cannot be
+  /// pulled. The empty state is made pullable here.
+  final bool pullToRefresh;
 
   @override
   State<AsyncView<T>> createState() => _AsyncViewState<T>();
@@ -118,17 +129,45 @@ class _AsyncViewState<T> extends State<AsyncView<T>> {
     });
   }
 
+  /// Re-runs the request for a pull, completing when its result is in.
+  ///
+  /// Repositories return a [Result] and do not throw; a raw error still ends
+  /// the pull rather than leaving the indicator spinning.
+  Future<void> _pull() {
+    _refresh();
+    return _future.then<void>((_) {}, onError: (Object _) {});
+  }
+
+  /// [child], when the reader may pull, filled into an always-scrollable box
+  /// so a view that does not scroll by itself can still be pulled.
+  Widget _pullable(Widget child) {
+    if (!widget.pullToRefresh) return child;
+    return LayoutBuilder(
+      builder: (context, constraints) => SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            minHeight: constraints.hasBoundedHeight ? constraints.maxHeight : 0,
+          ),
+          child: child,
+        ),
+      ),
+    );
+  }
+
   /// The success UI for [value] — the empty state when [AsyncView.isEmpty] says
   /// so, else the caller's builder.
   Widget _content(BuildContext context, T value, Staleness? stale) {
     _loaded = value;
     _loadedStale = stale;
     final content = (widget.isEmpty?.call(value) ?? false)
-        ? widget.empty?.call(context) ??
-              EmptyView(
-                icon: Icons.inbox_outlined,
-                message: AppLocalizations.of(context).commonEmpty,
-              )
+        ? _pullable(
+            widget.empty?.call(context) ??
+                EmptyView(
+                  icon: Icons.inbox_outlined,
+                  message: AppLocalizations.of(context).commonEmpty,
+                ),
+          )
         : widget.builder(context, value);
     if (stale == null) return content;
     final banner = FreshnessBanner.saved(staleness: stale);
@@ -150,7 +189,7 @@ class _AsyncViewState<T> extends State<AsyncView<T>> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    return FutureBuilder<Result<T>>(
+    final view = FutureBuilder<Result<T>>(
       // Key by attempt so a retry re-subscribes to the fresh future rather than
       // retaining the prior snapshot.
       key: ValueKey(_attempt),
@@ -176,5 +215,10 @@ class _AsyncViewState<T> extends State<AsyncView<T>> {
         };
       },
     );
+    // Outside the FutureBuilder: a refresh keys it anew and rebuilds what is
+    // under it, and the indicator has to outlive that until the pull ends.
+    return widget.pullToRefresh
+        ? RefreshIndicator(onRefresh: _pull, child: view)
+        : view;
   }
 }

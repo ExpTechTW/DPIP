@@ -225,4 +225,109 @@ void main() {
       expect(find.byType(FreshnessBanner), findsNothing);
     });
   });
+
+  group('pull to refresh', () {
+    /// A list of one line, short enough that only always-scrollable physics
+    /// lets it be pulled.
+    Widget list(int value) => ListView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      children: [Text('v $value')],
+    );
+
+    Future<void> pull(WidgetTester tester, Finder target) async {
+      await tester.fling(target, const Offset(0, 400), 1000);
+      // Past the drag and the indicator's snap, into its refresh phase.
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 1));
+    }
+
+    testWidgets('re-runs the request and ends when the result lands', (
+      tester,
+    ) async {
+      var calls = 0;
+      late Completer<Result<int>> pending;
+      await tester.pumpWidget(
+        _wrap(
+          AsyncView<int>(
+            pullToRefresh: true,
+            future: () {
+              calls++;
+              if (calls == 1) return Future.value(const Ok(1));
+              return (pending = Completer<Result<int>>()).future;
+            },
+            builder: (_, value) => list(value),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await pull(tester, find.text('v 1'));
+      expect(calls, 2);
+      // The content stays under the indicator while the request is out.
+      expect(find.text('v 1'), findsOneWidget);
+      expect(find.byType(RefreshProgressIndicator), findsOneWidget);
+
+      // The same value again, as a 304 served from the cache reads.
+      pending.complete(const Ok(1));
+      await tester.pumpAndSettle();
+      expect(find.text('v 1'), findsOneWidget);
+      expect(find.byType(RefreshProgressIndicator), findsNothing);
+    });
+
+    testWidgets('a failed pull still ends the indicator', (tester) async {
+      var calls = 0;
+      await tester.pumpWidget(
+        _wrap(
+          AsyncView<int>(
+            pullToRefresh: true,
+            future: () async => ++calls == 1
+                ? const Ok(1)
+                : const Err<int>(NetworkFailure('offline')),
+            builder: (_, value) => list(value),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await pull(tester, find.text('v 1'));
+      await tester.pumpAndSettle();
+      expect(calls, 2);
+      expect(find.byType(RefreshProgressIndicator), findsNothing);
+    });
+
+    testWidgets('an empty result can be pulled', (tester) async {
+      var calls = 0;
+      await tester.pumpWidget(
+        _wrap(
+          AsyncView<List<int>>(
+            pullToRefresh: true,
+            future: () async => Ok(++calls == 1 ? const <int>[] : const [7]),
+            isEmpty: (value) => value.isEmpty,
+            builder: (_, value) => list(value.single),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+      expect(find.text(l10n.commonEmpty), findsOneWidget);
+
+      await pull(tester, find.text(l10n.commonEmpty));
+      await tester.pumpAndSettle();
+      expect(calls, 2);
+      expect(find.text('v 7'), findsOneWidget);
+    });
+
+    testWidgets('is off unless asked for', (tester) async {
+      await tester.pumpWidget(
+        _wrap(
+          AsyncView<int>(
+            future: () async => const Ok(1),
+            builder: (_, value) => list(value),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byType(RefreshIndicator), findsNothing);
+    });
+  });
 }
