@@ -54,44 +54,52 @@ enum EventHazardTone {
 /// [EventHazard.unknown] share the generic notice mark and the "other" label:
 /// a card of a type this build does not know is still listed, never dropped.
 extension EventHazardStyle on EventHazard {
-  /// The leading icon. Weather hazards use the bundled weather glyphs, the
-  /// rest Material [Icons].
+  /// The leading icon: one per hazard, so the badge alone says what
+  /// happened.
+  ///
+  /// Material [Icons] where Flutter's bundled font has a fitting glyph, else
+  /// the bundled Material Symbols subset (`core/weather/weather_icons.dart`):
+  /// rain, wind, fog and thunderstorms, and the hazards the bundled font has
+  /// no picture for — an earthquake, heat, a siren, a valve. Where hazards
+  /// share a glyph it is because they are the same picture: a debris flow, a
+  /// rockfall and a large landslide all come down a slope, and a storm surge
+  /// is the sea over land, a flood.
   IconData get icon => switch (this) {
-    EventHazard.earthquake => Icons.crisis_alert,
+    EventHazard.earthquake => weather.earthquake,
     EventHazard.tsunami => Icons.tsunami_outlined,
     EventHazard.wind => weather.air,
-    EventHazard.heavyRain => weather.rainyHeavy,
+    EventHazard.heavyRain => weather.rainy,
     EventHazard.flood => Icons.flood_outlined,
     EventHazard.riverRise => Icons.water_outlined,
-    EventHazard.damRelease => Icons.water_drop_outlined,
-    EventHazard.swell => Icons.waves_outlined,
+    EventHazard.damRelease => weather.valve,
+    EventHazard.swell => Icons.surfing_outlined,
     EventHazard.debrisFlow => Icons.landslide_outlined,
-    EventHazard.landslideDam => Icons.terrain_outlined,
+    EventHazard.landslideDam => Icons.landscape_outlined,
     EventHazard.thunderstorm => weather.thunderstorm,
     EventHazard.fog => weather.foggy,
     EventHazard.roadClosure => Icons.remove_road_outlined,
     EventHazard.announcement => Icons.campaign_outlined,
     EventHazard.closure => Icons.school_outlined,
-    EventHazard.liquefaction ||
-    EventHazard.volcano ||
-    EventHazard.typhoon ||
-    EventHazard.stormSurge ||
-    EventHazard.largeLandslide ||
-    EventHazard.rockfall ||
-    EventHazard.heat ||
-    EventHazard.cold ||
-    EventHazard.drought ||
-    EventHazard.fire ||
-    EventHazard.wildfire ||
-    EventHazard.hazmat ||
-    EventHazard.powerOutage ||
-    EventHazard.waterOutage ||
-    EventHazard.trafficAccident ||
-    EventHazard.airQuality ||
-    EventHazard.radiation ||
-    EventHazard.evacuation ||
-    EventHazard.civilDefense ||
-    EventHazard.unknown => Icons.notifications_outlined,
+    EventHazard.liquefaction => Icons.foundation_outlined,
+    EventHazard.volcano => Icons.volcano_outlined,
+    EventHazard.typhoon => weather.storm,
+    EventHazard.stormSurge => Icons.flood_outlined,
+    EventHazard.largeLandslide => Icons.landslide_outlined,
+    EventHazard.rockfall => Icons.landslide_outlined,
+    EventHazard.heat => weather.heat,
+    EventHazard.cold => Icons.severe_cold_outlined,
+    EventHazard.drought => weather.clearDay,
+    EventHazard.fire => Icons.local_fire_department_outlined,
+    EventHazard.wildfire => Icons.forest_outlined,
+    EventHazard.hazmat => Icons.science_outlined,
+    EventHazard.powerOutage => Icons.power_off_outlined,
+    EventHazard.waterOutage => Icons.format_color_reset_outlined,
+    EventHazard.trafficAccident => Icons.car_crash_outlined,
+    EventHazard.airQuality => Icons.masks_outlined,
+    EventHazard.radiation => Icons.dangerous_outlined,
+    EventHazard.evacuation => Icons.directions_run_outlined,
+    EventHazard.civilDefense => weather.siren,
+    EventHazard.unknown => Icons.warning_amber_outlined,
   };
 
   /// The colour family of the badge.

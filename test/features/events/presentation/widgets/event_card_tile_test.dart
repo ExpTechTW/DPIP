@@ -229,7 +229,7 @@ void main() {
     );
   });
 
-  testWidgets('an unknown hazard is listed with the generic mark', (
+  testWidgets('an unknown hazard is listed with the warning mark', (
     tester,
   ) async {
     await _pump(
@@ -246,7 +246,7 @@ void main() {
     expect(tester.takeException(), isNull);
     expect(find.text('Something new'), findsOneWidget);
     expect(find.text(_l10n.eventHazardOther), findsOneWidget);
-    expect(find.byIcon(Icons.notifications_outlined), findsOneWidget);
+    expect(find.byIcon(Icons.warning_amber_outlined), findsOneWidget);
   });
 
   testWidgets('a tap opens the detail with the card id and township', (
@@ -274,9 +274,11 @@ void main() {
       expect(hazard.icon, isNotNull, reason: hazard.name);
       expect(hazard.tone, isNotNull, reason: hazard.name);
     }
-    // Reserved codes and unknown share the generic look.
+    // Reserved codes keep the "other" name but draw their own picture; an
+    // unknown code is a warning triangle.
     expect(EventHazard.typhoon.label(_l10n), _l10n.eventHazardOther);
-    expect(EventHazard.unknown.icon, Icons.notifications_outlined);
+    expect(EventHazard.typhoon.icon, isNot(EventHazard.unknown.icon));
+    expect(EventHazard.unknown.icon, Icons.warning_amber_outlined);
     expect(EventHazard.earthquake.tone, EventHazardTone.seismic);
   });
 

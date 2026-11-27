@@ -93,6 +93,11 @@ GLYPHS: list[tuple[str, str, str]] = [
     ("storm", "storm", "A cyclonic storm."),
     # — Wind-borne —
     ("air", "air", "Wind or blowing dust."),
+    # — Event hazards Flutter's bundled font has no glyph for —
+    ("earthquake", "earthquake", "Earthquake — a seismogram trace."),
+    ("heat", "heat", "Extreme heat — rising heat waves."),
+    ("siren", "siren", "Civil defence — an alarm siren."),
+    ("valve", "valve", "Reservoir release — a pipe valve."),
 ]
 
 HEADER = '''/// Weather glyphs, from the bundled `DpipWeatherIcons` subset font.
