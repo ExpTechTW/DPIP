@@ -1,0 +1,59 @@
+{
+  "lang": "zh-TW",
+  "cards": [
+    {
+      "id": 1717214401,
+      "serial": 1,
+      "kind": "issue",
+      "type": "thunderstorm",
+      "hazard": "thunderstorm",
+      "status": 1,
+      "author": "cwa",
+      "lang": "zh-TW",
+      "title": "龍捲風注意",
+      "subtitle": "龍捲風注意",
+      "send": 1717213800000,
+      "expires": 1717217400000,
+      "area": [],
+      "hasPolygon": true,
+      "description": "如遇上龍捲風，應立即躲入堅固的建築物內。要遠離窗戶、蹲伏在地上並用手或厚墊保護頭部。如在室外，應遠離樹木、汽車或其他可被龍捲風吹起的物件。",
+      "polygon": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "properties": {},
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [120.663, 24.1436],
+                  [120.663, 24.1664],
+                  [120.687, 24.1664],
+                  [120.687, 24.1436],
+                  [120.663, 24.1436]
+                ]
+              ]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {},
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [121.553, 25.0236],
+                  [121.553, 25.0464],
+                  [121.577, 25.0464],
+                  [121.577, 25.0236],
+                  [121.553, 25.0236]
+                ]
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "lang": "zh-TW",
+  "cards": [
+    {
+      "id": 1785069442,
+      "serial": 2,
+      "kind": "update",
+      "type": "earthquake.detection",
+      "hazard": "earthquake",
+      "status": 1,
+      "author": "trem",
+      "lang": "zh-TW",
+      "title": "檢知取消",
+      "subtitle": "強震監視器 [20:37]",
+      "send": 1785069441000,
+      "expires": 1785155841000,
+      "hasPolygon": false
+    }
+  ]
+}

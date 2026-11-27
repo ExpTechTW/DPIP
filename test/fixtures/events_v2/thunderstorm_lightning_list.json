@@ -1,0 +1,20 @@
+{
+  "lang": "zh-TW",
+  "cards": [
+    {
+      "id": 1794998700,
+      "serial": 1,
+      "kind": "issue",
+      "type": "thunderstorm.lightning",
+      "hazard": "thunderstorm",
+      "status": 1,
+      "author": "cwa",
+      "lang": "zh-TW",
+      "title": "雷擊",
+      "subtitle": "臺北市萬華區附近 等 3 處",
+      "send": 1794997800000,
+      "expires": 1795008600000,
+      "hasPolygon": true
+    }
+  ]
+}

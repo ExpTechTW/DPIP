@@ -1,0 +1,6 @@
+{"lang":"en","cards":[
+  {"id":1001,"serial":1,"kind":"issue","type":"thunderstorm","hazard":"thunderstorm","status":1,"author":"test","lang":"en","title":"Taipei thunderstorm","subtitle":"Xinyi alert","send":1699996400000,"expires":1700003600000,"hasPolygon":false},
+  {"id":1002,"serial":1,"kind":"issue","type":"heavy-rain","hazard":"heavy_rain","status":1,"author":"test","lang":"en","title":"Heavy rain advisory","subtitle":"Northern Taiwan","send":1699992800000,"expires":1700007200000,"hasPolygon":true},
+  {"id":1003,"serial":1,"kind":"issue","type":"earthquake","hazard":"earthquake","status":1,"author":"test","lang":"zh-TW","title":"地震報告","subtitle":"規模 4.5","send":1699998800000,"expires":1700010800000,"hasPolygon":true},
+  {"id":1008,"serial":1,"kind":"issue","type":"tsunami","hazard":"tsunami","status":1,"author":"test","lang":"zh-TW","title":"海嘯警報","subtitle":"東部沿海","send":1699999520000,"expires":1700021600000,"hasPolygon":false}
+]}

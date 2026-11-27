@@ -3988,4 +3988,187 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get locationModeManualBadge => 'Vị trí do bạn tự chọn';
+
+  @override
+  String get eventHazardEarthquake => 'Động đất';
+
+  @override
+  String get eventHazardTsunami => 'Sóng thần';
+
+  @override
+  String get eventHazardWind => 'Gió mạnh';
+
+  @override
+  String get eventHazardHeavyRain => 'Mưa lớn';
+
+  @override
+  String get eventHazardFlood => 'Ngập lụt';
+
+  @override
+  String get eventHazardRiverRise => 'Nước sông dâng';
+
+  @override
+  String get eventHazardDamRelease => 'Xả lũ hồ chứa';
+
+  @override
+  String get eventHazardSwell => 'Sóng lớn';
+
+  @override
+  String get eventHazardDebrisFlow => 'Lũ bùn đá';
+
+  @override
+  String get eventHazardLandslideDam => 'Hồ chắn do sạt lở';
+
+  @override
+  String get eventHazardThunderstorm => 'Dông';
+
+  @override
+  String get eventHazardFog => 'Sương mù dày';
+
+  @override
+  String get eventHazardRoadClosure => 'Cấm đường';
+
+  @override
+  String get eventHazardAnnouncement => 'Thông báo';
+
+  @override
+  String get eventHazardClosure => 'Nghỉ làm, nghỉ học';
+
+  @override
+  String get eventHazardOther => 'Khác';
+
+  @override
+  String get eventStatusCancelled => 'Đã hủy';
+
+  @override
+  String get eventStatusOpenEnded => 'Chưa có giờ kết thúc';
+
+  @override
+  String get eventStatusActive => 'Đang hiệu lực';
+
+  @override
+  String get eventStatusEnded => 'Đã kết thúc';
+
+  @override
+  String eventReportSerial(int serial) {
+    return 'Bản tin $serial';
+  }
+
+  @override
+  String get eventReportKindIssue => 'Phát hành';
+
+  @override
+  String get eventReportKindUpdate => 'Cập nhật';
+
+  @override
+  String get eventReportKindCorrect => 'Đính chính';
+
+  @override
+  String get eventReportKindCancel => 'Hủy';
+
+  @override
+  String get eventReportKindUnknown => 'Không rõ';
+
+  @override
+  String get eventDetailTitle => 'Chi tiết sự kiện';
+
+  @override
+  String get eventDetailReports => 'Tất cả bản tin';
+
+  @override
+  String eventDetailEnds(String time) {
+    return 'Kết thúc: $time';
+  }
+
+  @override
+  String get eventDetailEndsUndetermined => 'chưa xác định';
+
+  @override
+  String get eventDetailShowOriginal => 'Hiện bản gốc';
+
+  @override
+  String get eventDetailShowTranslation => 'Hiện bản dịch';
+
+  @override
+  String eventDetailShowAll(int count) {
+    return 'Hiện tất cả ($count)';
+  }
+
+  @override
+  String get eventDetailShowLess => 'Thu gọn';
+
+  @override
+  String get eventDetailEewLatest => 'Ước tính mới nhất';
+
+  @override
+  String get eventDetailIntensityByArea => 'Cường độ theo khu vực';
+
+  @override
+  String get eventDetailMissingStations => 'Trạm chưa gửi dữ liệu';
+
+  @override
+  String get eventDetailTsunamiByArea => 'Dự báo theo khu vực';
+
+  @override
+  String get eventDetailTsunamiObserved => 'Quan trắc thực tế';
+
+  @override
+  String get eventDetailAffectedAreas => 'Khu vực bị ảnh hưởng';
+
+  @override
+  String get eventDetailStations => 'Trạm đo';
+
+  @override
+  String get eventFactMagnitude => 'Độ lớn';
+
+  @override
+  String get eventFactDepth => 'Độ sâu';
+
+  @override
+  String get eventFactMaxIntensity => 'Cường độ tối đa';
+
+  @override
+  String get eventFactEpicenter => 'Tâm chấn';
+
+  @override
+  String get eventFactOriginTime => 'Thời gian xảy ra';
+
+  @override
+  String get eventFactSerial => 'Bản tin';
+
+  @override
+  String get eventFactWaveHeight => 'Độ cao sóng';
+
+  @override
+  String get eventFactArrivalTime => 'Thời gian đến';
+
+  @override
+  String get eventFactRainfall => 'Mưa 1 giờ';
+
+  @override
+  String get eventFactWindSpeed => 'Tốc độ gió';
+
+  @override
+  String get eventFactGust => 'Gió giật';
+
+  @override
+  String get eventFactVisibility => 'Tầm nhìn';
+
+  @override
+  String get eventFactWaterLevel => 'Mực nước';
+
+  @override
+  String get eventFactWarningLevel => 'Mức cảnh báo';
+
+  @override
+  String get eventFactLightningStrikes => 'Số lần sét';
+
+  @override
+  String get eventFactRoad => 'Đường';
+
+  @override
+  String get eventFactLocation => 'Địa điểm';
+
+  @override
+  String get eventFactStation => 'Trạm';
 }

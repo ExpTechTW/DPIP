@@ -1,0 +1,59 @@
+{
+  "lang": "zh-TW",
+  "cards": [
+    {
+      "id": 1717214400,
+      "serial": 1,
+      "kind": "issue",
+      "type": "thunderstorm",
+      "hazard": "thunderstorm",
+      "status": 1,
+      "author": "cwa",
+      "lang": "zh-TW",
+      "title": "大雷雨即時訊息",
+      "subtitle": "雷雨即時訊息",
+      "send": 1717213800000,
+      "expires": 1717217400000,
+      "area": [],
+      "hasPolygon": true,
+      "description": "大雷雨即時訊息：雲林縣、嘉義縣有大雷雨",
+      "polygon": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "properties": {},
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [120.663, 24.1436],
+                  [120.663, 24.1664],
+                  [120.687, 24.1664],
+                  [120.687, 24.1436],
+                  [120.663, 24.1436]
+                ]
+              ]
+            }
+          },
+          {
+            "type": "Feature",
+            "properties": {},
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [121.553, 25.0236],
+                  [121.553, 25.0464],
+                  [121.577, 25.0464],
+                  [121.577, 25.0236],
+                  [121.553, 25.0236]
+                ]
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

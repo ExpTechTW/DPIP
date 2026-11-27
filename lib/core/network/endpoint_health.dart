@@ -70,7 +70,7 @@ enum EndpointService {
         path.startsWith('/api/v1/trem/')) {
       return tremStation;
     }
-    if (path.startsWith('/api/v1/dpip')) return event;
+    if (path.startsWith('/api/v2/dpip/')) return event;
     if (path.startsWith('/api/v2/location')) return location;
     if (path.startsWith('/api/v2/notify')) return notify;
     return other;

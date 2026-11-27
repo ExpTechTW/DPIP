@@ -1,0 +1,20 @@
+{
+  "lang": "zh-TW",
+  "cards": [
+    {
+      "id": 1717214400,
+      "serial": 1,
+      "kind": "issue",
+      "type": "heavy-rain",
+      "hazard": "heavy_rain",
+      "status": 1,
+      "author": "cwa",
+      "lang": "zh-TW",
+      "title": "大雨特報",
+      "subtitle": "低壓帶影響，易有短延時強降雨，請注意 (雷擊) 與強陣風",
+      "send": 1717213800000,
+      "expires": 1717254000000,
+      "hasPolygon": false
+    }
+  ]
+}

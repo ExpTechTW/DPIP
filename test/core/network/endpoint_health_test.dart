@@ -237,4 +237,16 @@ void main() {
       );
     }
   });
+
+  test('every App API v2 card route counts as the event service', () {
+    for (final path in [
+      '/api/v2/dpip/zh-TW/realtime',
+      '/api/v2/dpip/en/realtime/100',
+      '/api/v2/dpip/ja/history',
+      '/api/v2/dpip/zh-Hant-HK/history/100',
+      '/api/v2/dpip/zh-TW/event/1800000000/0',
+    ]) {
+      expect(EndpointService.ofPath(path), EndpointService.event, reason: path);
+    }
+  });
 }

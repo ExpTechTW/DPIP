@@ -4925,5 +4925,254 @@
   "@locationModeSwitchedToAuto": {"description": "Confirmation after returning to the GPS location."},
   "@homeManualLocationHint": {"description": "Tappable hint under the place name on the home screen while the location is set by hand."},
   "@locationModeWarningDismiss": {"description": "Tooltip of the close button on the More page's warning that the location is set by hand; the warning comes back after days.", "placeholders": {"days": {"type": "int"}}},
-  "@locationModeManualBadge": {"description": "Screen-reader label of the yellow exclamation mark on the notification settings row while the location is set by hand."}
+  "@locationModeManualBadge": {"description": "Screen-reader label of the yellow exclamation mark on the notification settings row while the location is set by hand."},
+  "eventHazardEarthquake": "Earthquake",
+  "@eventHazardEarthquake": {
+    "description": "Hazard label of an event card: earthquake"
+  },
+  "eventHazardTsunami": "Tsunami",
+  "@eventHazardTsunami": {
+    "description": "Hazard label of an event card: tsunami"
+  },
+  "eventHazardWind": "Strong wind",
+  "@eventHazardWind": {
+    "description": "Hazard label of an event card: strong or damaging wind"
+  },
+  "eventHazardHeavyRain": "Heavy rain",
+  "@eventHazardHeavyRain": {
+    "description": "Hazard label of an event card: heavy rain advisories and short-duration downpours"
+  },
+  "eventHazardFlood": "Flooding",
+  "@eventHazardFlood": {
+    "description": "Hazard label of an event card: flooding reported by a flood sensor"
+  },
+  "eventHazardRiverRise": "River rise",
+  "@eventHazardRiverRise": {
+    "description": "Hazard label of an event card: a river rising toward its alert stage"
+  },
+  "eventHazardDamRelease": "Dam release",
+  "@eventHazardDamRelease": {
+    "description": "Hazard label of an event card: water released from a reservoir"
+  },
+  "eventHazardSwell": "High waves",
+  "@eventHazardSwell": {
+    "description": "Hazard label of an event card: high sea waves at the coast"
+  },
+  "eventHazardDebrisFlow": "Debris flow",
+  "@eventHazardDebrisFlow": {
+    "description": "Hazard label of an event card: debris flow (mudslide) alert"
+  },
+  "eventHazardLandslideDam": "Landslide dam",
+  "@eventHazardLandslideDam": {
+    "description": "Hazard label of an event card: a lake dammed by a landslide"
+  },
+  "eventHazardThunderstorm": "Thunderstorm",
+  "@eventHazardThunderstorm": {
+    "description": "Hazard label of an event card: thunderstorm or lightning"
+  },
+  "eventHazardFog": "Dense fog",
+  "@eventHazardFog": {
+    "description": "Hazard label of an event card: low visibility in fog"
+  },
+  "eventHazardRoadClosure": "Road closure",
+  "@eventHazardRoadClosure": {
+    "description": "Hazard label of an event card: a road closed or reopened"
+  },
+  "eventHazardAnnouncement": "Announcement",
+  "@eventHazardAnnouncement": {
+    "description": "Hazard label of an event card: a manual announcement, not a hazard"
+  },
+  "eventHazardClosure": "Work & school closure",
+  "@eventHazardClosure": {
+    "description": "Hazard label of an event card: work and school closures, not a hazard"
+  },
+  "eventHazardOther": "Other",
+  "@eventHazardOther": {
+    "description": "Hazard label for an event card whose hazard this version does not know"
+  },
+  "eventStatusCancelled": "Cancelled",
+  "@eventStatusCancelled": {
+    "description": "Status pill of an event card whose latest report is a cancellation by the issuer"
+  },
+  "eventStatusOpenEnded": "No end time yet",
+  "@eventStatusOpenEnded": {
+    "description": "Status pill of an event card in force with no end time yet (e.g. a tsunami warning before it is lifted)"
+  },
+  "eventStatusActive": "In effect",
+  "@eventStatusActive": {
+    "description": "Status pill of an event card in force until a known end time"
+  },
+  "eventStatusEnded": "Ended",
+  "@eventStatusEnded": {
+    "description": "Status pill of an event card past its end time"
+  },
+  "eventReportSerial": "Report {serial}",
+  "@eventReportSerial": {
+    "description": "Which report of an event card this is, e.g. 'Report 3'",
+    "placeholders": {
+      "serial": {
+        "type": "int"
+      }
+    }
+  },
+  "eventReportKindIssue": "Issued",
+  "@eventReportKindIssue": {
+    "description": "Kind of an event report: the first report"
+  },
+  "eventReportKindUpdate": "Update",
+  "@eventReportKindUpdate": {
+    "description": "Kind of an event report: a later report"
+  },
+  "eventReportKindCorrect": "Correction",
+  "@eventReportKindCorrect": {
+    "description": "Kind of an event report: a correction"
+  },
+  "eventReportKindCancel": "Cancellation",
+  "@eventReportKindCancel": {
+    "description": "Kind of an event report: the issuer withdrew the event"
+  },
+  "eventReportKindUnknown": "Unknown",
+  "@eventReportKindUnknown": {
+    "description": "Kind of an event report this version does not recognise"
+  },
+  "eventDetailTitle": "Event details",
+  "@eventDetailTitle": {
+    "description": "App bar title of the event detail page"
+  },
+  "eventDetailReports": "All reports",
+  "@eventDetailReports": {
+    "description": "Section header above every report of an event card, newest first"
+  },
+  "eventDetailEnds": "Ends: {time}",
+  "@eventDetailEnds": {
+    "description": "When an event report ends; {time} is a date and time, or the 'not yet set' word",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "eventDetailEndsUndetermined": "not yet set",
+  "@eventDetailEndsUndetermined": {
+    "description": "Fills {time} in eventDetailEnds when the end time is not known yet"
+  },
+  "eventDetailShowOriginal": "Show original",
+  "@eventDetailShowOriginal": {
+    "description": "Button that shows a translated event report in its original Traditional Chinese"
+  },
+  "eventDetailShowTranslation": "Show translation",
+  "eventDetailShowAll": "Show all ({count})",
+  "eventDetailShowLess": "Show less",
+  "eventDetailEewLatest": "Latest estimate",
+  "eventDetailIntensityByArea": "Intensity by area",
+  "eventDetailMissingStations": "Stations not reporting",
+  "eventDetailTsunamiByArea": "Forecast by area",
+  "eventDetailTsunamiObserved": "Observed",
+  "eventDetailAffectedAreas": "Affected areas",
+  "eventDetailStations": "Stations",
+  "@eventDetailEewLatest": {
+    "description": "Title of the card-level block with the newest EEW estimate on the event detail page."
+  },
+  "@eventDetailIntensityByArea": {
+    "description": "Title of the list of townships and their seismic intensity on the event detail page."
+  },
+  "@eventDetailMissingStations": {
+    "description": "Title of the list of seismic stations that did not report on the event detail page."
+  },
+  "@eventDetailTsunamiByArea": {
+    "description": "Title of the list of tsunami wave height and arrival time per coastal area."
+  },
+  "@eventDetailTsunamiObserved": {
+    "description": "Title of the list of tsunami heights actually measured at stations."
+  },
+  "@eventDetailAffectedAreas": {
+    "description": "Title of the list of places a weather or disaster alert covers."
+  },
+  "@eventDetailStations": {
+    "description": "Title of the list of weather stations and their readings on the event detail page."
+  },
+  "@eventDetailShowAll": {
+    "description": "Expands a long list on the event detail page; count is how many lines it has in all.",
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "@eventDetailShowLess": {
+    "description": "Collapses an expanded list on the event detail page back to its first lines."
+  },
+  "@eventDetailShowTranslation": {
+    "description": "Button that switches an event report back from its original text to the translation"
+  },
+  "eventFactMagnitude": "Magnitude",
+  "@eventFactMagnitude": {
+    "description": "Label before an earthquake's magnitude on an event report"
+  },
+  "eventFactDepth": "Depth",
+  "@eventFactDepth": {
+    "description": "Label before an earthquake's depth on an event report"
+  },
+  "eventFactMaxIntensity": "Max intensity",
+  "@eventFactMaxIntensity": {
+    "description": "Label before an earthquake's maximum seismic intensity on an event report"
+  },
+  "eventFactEpicenter": "Epicenter",
+  "@eventFactEpicenter": {
+    "description": "Label before an earthquake's epicentre place name on an event report"
+  },
+  "eventFactOriginTime": "Origin time",
+  "@eventFactOriginTime": {
+    "description": "Label before an earthquake's origin time on an event report"
+  },
+  "eventFactSerial": "Report",
+  "@eventFactSerial": {
+    "description": "Label before the source's own report number (e.g. #2) on an event report"
+  },
+  "eventFactWaveHeight": "Wave height",
+  "@eventFactWaveHeight": {
+    "description": "Label before a tsunami's wave height on an event report"
+  },
+  "eventFactArrivalTime": "Arrival",
+  "@eventFactArrivalTime": {
+    "description": "Label before a tsunami's arrival time on an event report"
+  },
+  "eventFactRainfall": "Hourly rain",
+  "@eventFactRainfall": {
+    "description": "Label before the highest one-hour rainfall on an event report"
+  },
+  "eventFactWindSpeed": "Wind speed",
+  "@eventFactWindSpeed": {
+    "description": "Label before the highest mean wind speed on an event report"
+  },
+  "eventFactGust": "Gust",
+  "@eventFactGust": {
+    "description": "Label before the highest gust speed on an event report"
+  },
+  "eventFactVisibility": "Visibility",
+  "@eventFactVisibility": {
+    "description": "Label before the lowest visibility on an event report"
+  },
+  "eventFactWaterLevel": "Water level",
+  "@eventFactWaterLevel": {
+    "description": "Label before a river's water level on an event report"
+  },
+  "eventFactWarningLevel": "Alert level",
+  "@eventFactWarningLevel": {
+    "description": "Label before the alert stage a river has crossed on an event report"
+  },
+  "eventFactLightningStrikes": "Lightning strikes",
+  "@eventFactLightningStrikes": {
+    "description": "Label before the number of lightning strikes on an event report"
+  },
+  "eventFactRoad": "Road",
+  "@eventFactRoad": {
+    "description": "Label before the name of a closed road on an event report"
+  },
+  "eventFactLocation": "Location",
+  "@eventFactLocation": {
+    "description": "Label before a place name on an event report"
+  },
+  "eventFactStation": "Station",
+  "@eventFactStation": {
+    "description": "Label before a sensor station name on an event report"
+  }
 }

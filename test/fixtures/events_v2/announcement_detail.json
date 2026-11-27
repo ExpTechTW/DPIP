@@ -1,0 +1,45 @@
+{
+  "lang": "zh-TW",
+  "cards": [
+    {
+      "id": 1795737600,
+      "serial": 1,
+      "kind": "issue",
+      "type": "announcement",
+      "hazard": "announcement",
+      "status": 1,
+      "author": "exptech",
+      "lang": "zh-TW",
+      "title": "【演練】地震避難演練",
+      "subtitle": "臺北市 10:00 地震避難演練",
+      "send": 1795737600000,
+      "expires": 1795824000000,
+      "area": [100, 103, 104, 105, 106, 108, 110, 111, 112, 114, 115, 116],
+      "hasPolygon": false,
+      "addition": {
+        "code": "drill-20261127"
+      },
+      "description": "臺北市今天 10:00 進行地震避難演練，屆時請依現場指示就地避難。這是演練訊息。"
+    },
+    {
+      "id": 1795737600,
+      "serial": 2,
+      "kind": "cancel",
+      "type": "announcement",
+      "hazard": "announcement",
+      "status": 1,
+      "author": "exptech",
+      "lang": "zh-TW",
+      "title": "【演練】地震避難演練",
+      "subtitle": "演練取消",
+      "send": 1795741200000,
+      "expires": 1795741200000,
+      "area": [100, 103, 104, 105, 106, 108, 110, 111, 112, 114, 115, 116],
+      "hasPolygon": false,
+      "addition": {
+        "code": "drill-20261127"
+      },
+      "description": "今天的地震避難演練取消。"
+    }
+  ]
+}

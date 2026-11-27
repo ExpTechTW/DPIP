@@ -5,17 +5,22 @@ import 'package:dpip/features/ai_chat/presentation/pages/ai_settings_page.dart';
 import 'package:dpip/app/router/route_params.dart';
 import 'package:dpip/app/router/widget_location_routes.dart';
 import 'package:dpip/core/geo/town.dart';
+import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/settings/onboarding_store.dart';
 import 'package:dpip/features/data/presentation/pages/data_page.dart';
 import 'package:dpip/features/earthquake/presentation/pages/earthquake_page.dart';
 import 'package:dpip/features/earthquake/presentation/pages/report_detail_page.dart';
 import 'package:dpip/features/earthquake/presentation/pages/report_list_page.dart';
 import 'package:dpip/features/earthquake/presentation/pages/report_replay_page.dart';
+import 'package:dpip/features/events/domain/event_card.dart';
+import 'package:dpip/features/events/presentation/pages/event_detail_page.dart';
 import 'package:dpip/features/events/presentation/pages/events_page.dart';
+import 'package:dpip/features/events/presentation/widgets/event_card_tile.dart';
 import 'package:dpip/features/home/presentation/home_weather_controller.dart';
 import 'package:dpip/features/home/presentation/pages/home_page.dart';
 import 'package:dpip/features/location/presentation/pages/location_mode_page.dart';
 import 'package:dpip/features/location/presentation/pages/location_town_picker_page.dart';
+import 'package:dpip/features/home/presentation/widgets/home_active_events_section.dart';
 import 'package:dpip/features/location/presentation/pages/region_city_page.dart';
 import 'package:dpip/features/location/presentation/pages/region_manage_page.dart';
 import 'package:dpip/features/location/presentation/pages/region_select_page.dart';
@@ -107,8 +112,12 @@ final GoRouter appRouter = GoRouter(
         _branch(
           AppRoutes.homePath,
           AppRoutes.home,
-          (_, _) =>
-              HomePage(widgetLocationRequests: _widgetLocationRoutes.requests),
+          (_, _) => Provider<HomeEventRowBuilder>.value(
+            value: _homeEventRow,
+            child: HomePage(
+              widgetLocationRequests: _widgetLocationRoutes.requests,
+            ),
+          ),
         ),
         _branch(
           AppRoutes.eventsPath,
@@ -270,6 +279,18 @@ final GoRouter appRouter = GoRouter(
               context.select<HomeWeatherController, int?>(
                 (controller) => controller.weather?.data.weatherCode,
               ),
+        ),
+      ),
+    ),
+    GoRoute(
+      path: AppRoutes.eventDetailPath,
+      name: AppRoutes.eventDetail,
+      redirect: eventDetailRedirect,
+      pageBuilder: (_, state) => MaterialPage<void>(
+        key: state.pageKey,
+        child: EventDetailPage(
+          id: eventDetailIdOf(state) ?? 0,
+          regionCode: eventDetailRegionOf(state),
         ),
       ),
     ),
@@ -459,6 +480,24 @@ final GoRouter appRouter = GoRouter(
       ],
     ),
   ],
+);
+
+/// The home sheet's active-event row: the Events tab's own row, compact and
+/// in the ink of the sky it is drawn over. The home feature may not import the
+/// events feature's widgets, so it is handed this through [HomeEventRowBuilder].
+Widget _homeEventRow(
+  BuildContext context,
+  EventCard card, {
+  required String? regionCode,
+  required Color foreground,
+  required Color secondary,
+}) => EventCardTile(
+  card: card,
+  regionCode: regionCode,
+  compact: true,
+  foreground: foreground,
+  secondary: secondary,
+  padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
 );
 
 /// Builds a single-route branch for the bottom-navigation shell.

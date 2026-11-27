@@ -1,0 +1,20 @@
+{
+  "lang": "zh-TW",
+  "cards": [
+    {
+      "id": 1717214400,
+      "serial": 1,
+      "kind": "issue",
+      "type": "floodSensor",
+      "hazard": "flood",
+      "status": 1,
+      "author": "wra",
+      "lang": "zh-TW",
+      "title": "淹水感測",
+      "subtitle": "淹水感測",
+      "send": 1717213800000,
+      "expires": 1717236000000,
+      "hasPolygon": true
+    }
+  ]
+}

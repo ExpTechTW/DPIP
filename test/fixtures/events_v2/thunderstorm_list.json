@@ -1,0 +1,35 @@
+{
+  "lang": "zh-TW",
+  "cards": [
+    {
+      "id": 1717214400,
+      "serial": 1,
+      "kind": "issue",
+      "type": "thunderstorm",
+      "hazard": "thunderstorm",
+      "status": 1,
+      "author": "cwa",
+      "lang": "zh-TW",
+      "title": "大雷雨即時訊息",
+      "subtitle": "雷雨即時訊息",
+      "send": 1717213800000,
+      "expires": 1717217400000,
+      "hasPolygon": true
+    },
+    {
+      "id": 1717214401,
+      "serial": 1,
+      "kind": "issue",
+      "type": "thunderstorm",
+      "hazard": "thunderstorm",
+      "status": 1,
+      "author": "cwa",
+      "lang": "zh-TW",
+      "title": "龍捲風注意",
+      "subtitle": "龍捲風注意",
+      "send": 1717213800000,
+      "expires": 1717217400000,
+      "hasPolygon": true
+    }
+  ]
+}

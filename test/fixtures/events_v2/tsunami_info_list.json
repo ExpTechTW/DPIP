@@ -1,0 +1,20 @@
+{
+  "lang": "zh-TW",
+  "cards": [
+    {
+      "id": 1717214400,
+      "serial": 2,
+      "kind": "update",
+      "type": "tsunami.info",
+      "hazard": "tsunami",
+      "status": 1,
+      "author": "cwa",
+      "lang": "zh-TW",
+      "title": "海嘯消息",
+      "subtitle": "海嘯消息 [114001]",
+      "send": 1717214415000,
+      "expires": 1717300815000,
+      "hasPolygon": false
+    }
+  ]
+}

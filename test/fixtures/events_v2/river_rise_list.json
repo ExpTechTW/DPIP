@@ -1,0 +1,35 @@
+{
+  "lang": "zh-TW",
+  "cards": [
+    {
+      "id": 1718434800,
+      "serial": 1,
+      "kind": "issue",
+      "type": "river_rise.watch",
+      "hazard": "river_rise",
+      "status": 1,
+      "author": "wra",
+      "lang": "zh-TW",
+      "title": "河川水位注意",
+      "subtitle": "臺北市信義區 大甲溪零級",
+      "send": 1718434800000,
+      "expires": 1718445600000,
+      "hasPolygon": true
+    },
+    {
+      "id": 1718434801,
+      "serial": 1,
+      "kind": "issue",
+      "type": "river_rise.warning",
+      "hazard": "river_rise",
+      "status": 1,
+      "author": "wra",
+      "lang": "zh-TW",
+      "title": "河川水位警戒",
+      "subtitle": "臺中市北區 高屏溪里嶺 等 2 站",
+      "send": 1718434800000,
+      "expires": 1718445600000,
+      "hasPolygon": true
+    }
+  ]
+}

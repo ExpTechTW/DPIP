@@ -1,0 +1,35 @@
+{
+  "lang": "zh-TW",
+  "cards": [
+    {
+      "id": 1717200000,
+      "serial": 1,
+      "kind": "issue",
+      "type": "wind.strong",
+      "hazard": "wind",
+      "status": 1,
+      "author": "cwa",
+      "lang": "zh-TW",
+      "title": "強風注意",
+      "subtitle": "臺北市信義區 信義",
+      "send": 1717200000000,
+      "expires": 1717209000000,
+      "hasPolygon": true
+    },
+    {
+      "id": 1717200001,
+      "serial": 1,
+      "kind": "issue",
+      "type": "wind.damaging",
+      "hazard": "wind",
+      "status": 1,
+      "author": "cwa",
+      "lang": "zh-TW",
+      "title": "致災強風",
+      "subtitle": "臺中市梧棲區 梧棲 等 2 站",
+      "send": 1717200000000,
+      "expires": 1717209000000,
+      "hasPolygon": true
+    }
+  ]
+}

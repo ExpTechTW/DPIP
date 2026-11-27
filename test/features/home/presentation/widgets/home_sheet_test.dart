@@ -1,4 +1,5 @@
 import 'package:dpip/core/settings/locale_config.dart';
+import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/geo/town.dart';
 import 'package:dpip/core/geo/town_directory.dart';
@@ -14,7 +15,7 @@ import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/core/settings/sky_time_mode.dart';
 import 'package:dpip/core/settings/weather_mode.dart';
 import 'package:dpip/features/earthquake/domain/eew.dart';
-import 'package:dpip/features/events/domain/event.dart';
+import 'package:dpip/features/events/domain/event_card.dart';
 import 'package:dpip/features/events/domain/event_repository.dart';
 import 'package:dpip/features/home/presentation/home_active_events_controller.dart';
 import 'package:dpip/features/home/presentation/home_sheet_extent.dart';
@@ -54,12 +55,18 @@ class _FakeHourTrendRepository implements RainHourTrendRepository {
 
 class _FakeEventRepository implements EventRepository {
   @override
-  Future<Result<List<Event>>> events({String? regionCode}) async =>
+  Future<Result<List<EventCard>>> events({String? regionCode}) async =>
       const Ok([]);
 
   @override
-  Future<Result<List<Event>>> activeEvents({String? regionCode}) async =>
+  Future<Result<List<EventCard>>> activeEvents({String? regionCode}) async =>
       const Ok([]);
+
+  @override
+  Future<Result<EventCardDetail>> detail({
+    required int id,
+    String? regionCode,
+  }) async => const Err(NetworkFailure('offline'));
 }
 
 /// A never-started EEW channel (connecting, no data) — the calm state, so the

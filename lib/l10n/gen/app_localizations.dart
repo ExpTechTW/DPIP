@@ -7367,6 +7367,360 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Location set by hand'**
   String get locationModeManualBadge;
+
+  /// Hazard label of an event card: earthquake
+  ///
+  /// In en, this message translates to:
+  /// **'Earthquake'**
+  String get eventHazardEarthquake;
+
+  /// Hazard label of an event card: tsunami
+  ///
+  /// In en, this message translates to:
+  /// **'Tsunami'**
+  String get eventHazardTsunami;
+
+  /// Hazard label of an event card: strong or damaging wind
+  ///
+  /// In en, this message translates to:
+  /// **'Strong wind'**
+  String get eventHazardWind;
+
+  /// Hazard label of an event card: heavy rain advisories and short-duration downpours
+  ///
+  /// In en, this message translates to:
+  /// **'Heavy rain'**
+  String get eventHazardHeavyRain;
+
+  /// Hazard label of an event card: flooding reported by a flood sensor
+  ///
+  /// In en, this message translates to:
+  /// **'Flooding'**
+  String get eventHazardFlood;
+
+  /// Hazard label of an event card: a river rising toward its alert stage
+  ///
+  /// In en, this message translates to:
+  /// **'River rise'**
+  String get eventHazardRiverRise;
+
+  /// Hazard label of an event card: water released from a reservoir
+  ///
+  /// In en, this message translates to:
+  /// **'Dam release'**
+  String get eventHazardDamRelease;
+
+  /// Hazard label of an event card: high sea waves at the coast
+  ///
+  /// In en, this message translates to:
+  /// **'High waves'**
+  String get eventHazardSwell;
+
+  /// Hazard label of an event card: debris flow (mudslide) alert
+  ///
+  /// In en, this message translates to:
+  /// **'Debris flow'**
+  String get eventHazardDebrisFlow;
+
+  /// Hazard label of an event card: a lake dammed by a landslide
+  ///
+  /// In en, this message translates to:
+  /// **'Landslide dam'**
+  String get eventHazardLandslideDam;
+
+  /// Hazard label of an event card: thunderstorm or lightning
+  ///
+  /// In en, this message translates to:
+  /// **'Thunderstorm'**
+  String get eventHazardThunderstorm;
+
+  /// Hazard label of an event card: low visibility in fog
+  ///
+  /// In en, this message translates to:
+  /// **'Dense fog'**
+  String get eventHazardFog;
+
+  /// Hazard label of an event card: a road closed or reopened
+  ///
+  /// In en, this message translates to:
+  /// **'Road closure'**
+  String get eventHazardRoadClosure;
+
+  /// Hazard label of an event card: a manual announcement, not a hazard
+  ///
+  /// In en, this message translates to:
+  /// **'Announcement'**
+  String get eventHazardAnnouncement;
+
+  /// Hazard label of an event card: work and school closures, not a hazard
+  ///
+  /// In en, this message translates to:
+  /// **'Work & school closure'**
+  String get eventHazardClosure;
+
+  /// Hazard label for an event card whose hazard this version does not know
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get eventHazardOther;
+
+  /// Status pill of an event card whose latest report is a cancellation by the issuer
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get eventStatusCancelled;
+
+  /// Status pill of an event card in force with no end time yet (e.g. a tsunami warning before it is lifted)
+  ///
+  /// In en, this message translates to:
+  /// **'No end time yet'**
+  String get eventStatusOpenEnded;
+
+  /// Status pill of an event card in force until a known end time
+  ///
+  /// In en, this message translates to:
+  /// **'In effect'**
+  String get eventStatusActive;
+
+  /// Status pill of an event card past its end time
+  ///
+  /// In en, this message translates to:
+  /// **'Ended'**
+  String get eventStatusEnded;
+
+  /// Which report of an event card this is, e.g. 'Report 3'
+  ///
+  /// In en, this message translates to:
+  /// **'Report {serial}'**
+  String eventReportSerial(int serial);
+
+  /// Kind of an event report: the first report
+  ///
+  /// In en, this message translates to:
+  /// **'Issued'**
+  String get eventReportKindIssue;
+
+  /// Kind of an event report: a later report
+  ///
+  /// In en, this message translates to:
+  /// **'Update'**
+  String get eventReportKindUpdate;
+
+  /// Kind of an event report: a correction
+  ///
+  /// In en, this message translates to:
+  /// **'Correction'**
+  String get eventReportKindCorrect;
+
+  /// Kind of an event report: the issuer withdrew the event
+  ///
+  /// In en, this message translates to:
+  /// **'Cancellation'**
+  String get eventReportKindCancel;
+
+  /// Kind of an event report this version does not recognise
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get eventReportKindUnknown;
+
+  /// App bar title of the event detail page
+  ///
+  /// In en, this message translates to:
+  /// **'Event details'**
+  String get eventDetailTitle;
+
+  /// Section header above every report of an event card, newest first
+  ///
+  /// In en, this message translates to:
+  /// **'All reports'**
+  String get eventDetailReports;
+
+  /// When an event report ends; {time} is a date and time, or the 'not yet set' word
+  ///
+  /// In en, this message translates to:
+  /// **'Ends: {time}'**
+  String eventDetailEnds(String time);
+
+  /// Fills {time} in eventDetailEnds when the end time is not known yet
+  ///
+  /// In en, this message translates to:
+  /// **'not yet set'**
+  String get eventDetailEndsUndetermined;
+
+  /// Button that shows a translated event report in its original Traditional Chinese
+  ///
+  /// In en, this message translates to:
+  /// **'Show original'**
+  String get eventDetailShowOriginal;
+
+  /// Button that switches an event report back from its original text to the translation
+  ///
+  /// In en, this message translates to:
+  /// **'Show translation'**
+  String get eventDetailShowTranslation;
+
+  /// Expands a long list on the event detail page; count is how many lines it has in all.
+  ///
+  /// In en, this message translates to:
+  /// **'Show all ({count})'**
+  String eventDetailShowAll(int count);
+
+  /// Collapses an expanded list on the event detail page back to its first lines.
+  ///
+  /// In en, this message translates to:
+  /// **'Show less'**
+  String get eventDetailShowLess;
+
+  /// Title of the card-level block with the newest EEW estimate on the event detail page.
+  ///
+  /// In en, this message translates to:
+  /// **'Latest estimate'**
+  String get eventDetailEewLatest;
+
+  /// Title of the list of townships and their seismic intensity on the event detail page.
+  ///
+  /// In en, this message translates to:
+  /// **'Intensity by area'**
+  String get eventDetailIntensityByArea;
+
+  /// Title of the list of seismic stations that did not report on the event detail page.
+  ///
+  /// In en, this message translates to:
+  /// **'Stations not reporting'**
+  String get eventDetailMissingStations;
+
+  /// Title of the list of tsunami wave height and arrival time per coastal area.
+  ///
+  /// In en, this message translates to:
+  /// **'Forecast by area'**
+  String get eventDetailTsunamiByArea;
+
+  /// Title of the list of tsunami heights actually measured at stations.
+  ///
+  /// In en, this message translates to:
+  /// **'Observed'**
+  String get eventDetailTsunamiObserved;
+
+  /// Title of the list of places a weather or disaster alert covers.
+  ///
+  /// In en, this message translates to:
+  /// **'Affected areas'**
+  String get eventDetailAffectedAreas;
+
+  /// Title of the list of weather stations and their readings on the event detail page.
+  ///
+  /// In en, this message translates to:
+  /// **'Stations'**
+  String get eventDetailStations;
+
+  /// Label before an earthquake's magnitude on an event report
+  ///
+  /// In en, this message translates to:
+  /// **'Magnitude'**
+  String get eventFactMagnitude;
+
+  /// Label before an earthquake's depth on an event report
+  ///
+  /// In en, this message translates to:
+  /// **'Depth'**
+  String get eventFactDepth;
+
+  /// Label before an earthquake's maximum seismic intensity on an event report
+  ///
+  /// In en, this message translates to:
+  /// **'Max intensity'**
+  String get eventFactMaxIntensity;
+
+  /// Label before an earthquake's epicentre place name on an event report
+  ///
+  /// In en, this message translates to:
+  /// **'Epicenter'**
+  String get eventFactEpicenter;
+
+  /// Label before an earthquake's origin time on an event report
+  ///
+  /// In en, this message translates to:
+  /// **'Origin time'**
+  String get eventFactOriginTime;
+
+  /// Label before the source's own report number (e.g. #2) on an event report
+  ///
+  /// In en, this message translates to:
+  /// **'Report'**
+  String get eventFactSerial;
+
+  /// Label before a tsunami's wave height on an event report
+  ///
+  /// In en, this message translates to:
+  /// **'Wave height'**
+  String get eventFactWaveHeight;
+
+  /// Label before a tsunami's arrival time on an event report
+  ///
+  /// In en, this message translates to:
+  /// **'Arrival'**
+  String get eventFactArrivalTime;
+
+  /// Label before the highest one-hour rainfall on an event report
+  ///
+  /// In en, this message translates to:
+  /// **'Hourly rain'**
+  String get eventFactRainfall;
+
+  /// Label before the highest mean wind speed on an event report
+  ///
+  /// In en, this message translates to:
+  /// **'Wind speed'**
+  String get eventFactWindSpeed;
+
+  /// Label before the highest gust speed on an event report
+  ///
+  /// In en, this message translates to:
+  /// **'Gust'**
+  String get eventFactGust;
+
+  /// Label before the lowest visibility on an event report
+  ///
+  /// In en, this message translates to:
+  /// **'Visibility'**
+  String get eventFactVisibility;
+
+  /// Label before a river's water level on an event report
+  ///
+  /// In en, this message translates to:
+  /// **'Water level'**
+  String get eventFactWaterLevel;
+
+  /// Label before the alert stage a river has crossed on an event report
+  ///
+  /// In en, this message translates to:
+  /// **'Alert level'**
+  String get eventFactWarningLevel;
+
+  /// Label before the number of lightning strikes on an event report
+  ///
+  /// In en, this message translates to:
+  /// **'Lightning strikes'**
+  String get eventFactLightningStrikes;
+
+  /// Label before the name of a closed road on an event report
+  ///
+  /// In en, this message translates to:
+  /// **'Road'**
+  String get eventFactRoad;
+
+  /// Label before a place name on an event report
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get eventFactLocation;
+
+  /// Label before a sensor station name on an event report
+  ///
+  /// In en, this message translates to:
+  /// **'Station'**
+  String get eventFactStation;
 }
 
 class _AppLocalizationsDelegate

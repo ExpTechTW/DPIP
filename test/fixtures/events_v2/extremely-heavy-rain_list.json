@@ -1,0 +1,20 @@
+{
+  "lang": "zh-TW",
+  "cards": [
+    {
+      "id": 1717214430,
+      "serial": 1,
+      "kind": "issue",
+      "type": "extremely-heavy-rain",
+      "hazard": "heavy_rain",
+      "status": 1,
+      "author": "cwa",
+      "lang": "zh-TW",
+      "title": "豪雨特報",
+      "subtitle": "雨勢增強，臺北市中正區有豪雨，請注意積水",
+      "send": 1717214400000,
+      "expires": 1717254000000,
+      "hasPolygon": false
+    }
+  ]
+}

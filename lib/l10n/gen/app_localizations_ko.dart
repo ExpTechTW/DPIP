@@ -3895,4 +3895,187 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get locationModeManualBadge => '위치를 직접 지정함';
+
+  @override
+  String get eventHazardEarthquake => '지진';
+
+  @override
+  String get eventHazardTsunami => '쓰나미';
+
+  @override
+  String get eventHazardWind => '강풍';
+
+  @override
+  String get eventHazardHeavyRain => '호우';
+
+  @override
+  String get eventHazardFlood => '침수';
+
+  @override
+  String get eventHazardRiverRise => '하천 수위';
+
+  @override
+  String get eventHazardDamRelease => '댐 방류';
+
+  @override
+  String get eventHazardSwell => '높은 파도';
+
+  @override
+  String get eventHazardDebrisFlow => '토석류';
+
+  @override
+  String get eventHazardLandslideDam => '언색호';
+
+  @override
+  String get eventHazardThunderstorm => '뇌우';
+
+  @override
+  String get eventHazardFog => '짙은 안개';
+
+  @override
+  String get eventHazardRoadClosure => '도로 통제';
+
+  @override
+  String get eventHazardAnnouncement => '공지';
+
+  @override
+  String get eventHazardClosure => '휴업·휴교';
+
+  @override
+  String get eventHazardOther => '기타';
+
+  @override
+  String get eventStatusCancelled => '취소됨';
+
+  @override
+  String get eventStatusOpenEnded => '종료 시각 미정';
+
+  @override
+  String get eventStatusActive => '발효 중';
+
+  @override
+  String get eventStatusEnded => '종료됨';
+
+  @override
+  String eventReportSerial(int serial) {
+    return '제 $serial 보';
+  }
+
+  @override
+  String get eventReportKindIssue => '발표';
+
+  @override
+  String get eventReportKindUpdate => '갱신';
+
+  @override
+  String get eventReportKindCorrect => '정정';
+
+  @override
+  String get eventReportKindCancel => '취소';
+
+  @override
+  String get eventReportKindUnknown => '알 수 없음';
+
+  @override
+  String get eventDetailTitle => '이벤트 상세';
+
+  @override
+  String get eventDetailReports => '전체 보고';
+
+  @override
+  String eventDetailEnds(String time) {
+    return '종료 시각: $time';
+  }
+
+  @override
+  String get eventDetailEndsUndetermined => '미정';
+
+  @override
+  String get eventDetailShowOriginal => '원문 보기';
+
+  @override
+  String get eventDetailShowTranslation => '번역 보기';
+
+  @override
+  String eventDetailShowAll(int count) {
+    return '모두 보기 ($count)';
+  }
+
+  @override
+  String get eventDetailShowLess => '접기';
+
+  @override
+  String get eventDetailEewLatest => '최신 추정';
+
+  @override
+  String get eventDetailIntensityByArea => '지역별 진도';
+
+  @override
+  String get eventDetailMissingStations => '미수신 관측소';
+
+  @override
+  String get eventDetailTsunamiByArea => '지역별 예상';
+
+  @override
+  String get eventDetailTsunamiObserved => '실제 관측';
+
+  @override
+  String get eventDetailAffectedAreas => '영향 지역';
+
+  @override
+  String get eventDetailStations => '관측소';
+
+  @override
+  String get eventFactMagnitude => '규모';
+
+  @override
+  String get eventFactDepth => '깊이';
+
+  @override
+  String get eventFactMaxIntensity => '최대 진도';
+
+  @override
+  String get eventFactEpicenter => '진앙';
+
+  @override
+  String get eventFactOriginTime => '발생 시각';
+
+  @override
+  String get eventFactSerial => '회차';
+
+  @override
+  String get eventFactWaveHeight => '파고';
+
+  @override
+  String get eventFactArrivalTime => '도달 시각';
+
+  @override
+  String get eventFactRainfall => '시간 강우량';
+
+  @override
+  String get eventFactWindSpeed => '풍속';
+
+  @override
+  String get eventFactGust => '돌풍';
+
+  @override
+  String get eventFactVisibility => '시정';
+
+  @override
+  String get eventFactWaterLevel => '수위';
+
+  @override
+  String get eventFactWarningLevel => '경계 수위';
+
+  @override
+  String get eventFactLightningStrikes => '낙뢰 횟수';
+
+  @override
+  String get eventFactRoad => '도로';
+
+  @override
+  String get eventFactLocation => '위치';
+
+  @override
+  String get eventFactStation => '관측소';
 }

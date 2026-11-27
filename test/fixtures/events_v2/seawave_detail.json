@@ -1,0 +1,95 @@
+{
+  "lang": "zh-TW",
+  "cards": [
+    {
+      "id": 1717214400,
+      "serial": 1,
+      "kind": "issue",
+      "type": "seawave",
+      "hazard": "swell",
+      "status": 1,
+      "author": "ncdr",
+      "lang": "zh-TW",
+      "title": "海浪觀測",
+      "subtitle": "龍洞 - 巨浪",
+      "send": 1717214400000,
+      "expires": 1717225200000,
+      "area": [],
+      "hasPolygon": true,
+      "description": "波高: 8.0 公尺\n波向: 東 (90°)\n週期: 7 秒\n",
+      "polygon": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "id": 0,
+            "properties": {
+              "sensor": "46694A"
+            },
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [121.983, 25.0053],
+                  [122.5419, 25.0774],
+                  [122.2575, 25.389],
+                  [121.8992, 25.1096],
+                  [121.8957, 25.0958],
+                  [121.9031, 25.0629],
+                  [121.9089, 25.0349],
+                  [121.9561, 25.0027],
+                  [121.983, 25.0053]
+                ]
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": 1717214400,
+      "serial": 2,
+      "kind": "update",
+      "type": "seawave",
+      "hazard": "swell",
+      "status": 1,
+      "author": "ncdr",
+      "lang": "zh-TW",
+      "title": "海浪觀測",
+      "subtitle": "龍洞 - 巨浪",
+      "send": 1717225200000,
+      "expires": 1717236000000,
+      "area": [],
+      "hasPolygon": true,
+      "description": "波高: 8.0 公尺\n波向: 東 (90°)\n週期: 7 秒\n",
+      "polygon": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "id": 0,
+            "properties": {
+              "sensor": "46694A"
+            },
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [121.983, 25.0053],
+                  [122.5419, 25.0774],
+                  [122.2575, 25.389],
+                  [121.8992, 25.1096],
+                  [121.8957, 25.0958],
+                  [121.9031, 25.0629],
+                  [121.9089, 25.0349],
+                  [121.9561, 25.0027],
+                  [121.983, 25.0053]
+                ]
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

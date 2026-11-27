@@ -5,14 +5,26 @@ import 'package:dpip/app/theme/app_glass.dart';
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/settings/weather_mode.dart';
-import 'package:dpip/features/events/domain/event.dart';
+import 'package:dpip/features/events/domain/event_card.dart';
 import 'package:dpip/features/home/presentation/home_active_events_controller.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
-import 'package:dpip/shared/widgets/event_icon.dart';
 import 'package:dpip/shared/widgets/loading_view.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+
+/// Builds the row of one active [card]: how an event card is drawn belongs to
+/// the events feature, which this feature may not import, so the app layer
+/// provides this (`app_router.dart` hands it the events list's own row, which
+/// opens the card's detail with [regionCode]'s text).
+///
+/// [foreground] and [secondary] are the inks of the sky the row is drawn over.
+typedef HomeEventRowBuilder = Widget Function(
+  BuildContext context,
+  EventCard card, {
+  required String? regionCode,
+  required Color foreground,
+  required Color secondary,
+});
 
 /// Active (realtime) disaster notices under the home header. While the sheet is
 /// at rest the list sits flush on the sheet (no card fill); once flush
@@ -66,6 +78,7 @@ class HomeActiveEventsSection extends StatelessWidget {
       skyIsLight: skyIsLight,
     );
     final controller = context.watch<HomeActiveEventsController>();
+    final events = controller.events;
 
     final body = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -90,8 +103,10 @@ class HomeActiveEventsSection extends StatelessWidget {
             if (controller.loading) InlineLoading(size: 14, color: secondary),
           ],
         ),
-        const SizedBox(height: AppSpacing.md),
-        if (controller.failure != null && controller.events.isEmpty)
+        // Each row pads itself by AppSpacing.xs above and below (see
+        // `_homeEventRow` in app_router.dart), which makes up the rest.
+        SizedBox(height: events.isEmpty ? AppSpacing.md : AppSpacing.sm),
+        if (controller.failure != null && events.isEmpty)
           Row(
             children: [
               Expanded(
@@ -106,20 +121,20 @@ class HomeActiveEventsSection extends StatelessWidget {
               ),
             ],
           )
-        else if (controller.events.isEmpty)
+        else if (events.isEmpty)
           Text(
             l10n.homeActiveEventsEmpty,
             style: theme.textTheme.bodyMedium?.copyWith(color: secondary),
           )
         else
-          for (var i = 0; i < controller.events.length; i++) ...[
-            if (i > 0) const SizedBox(height: AppSpacing.sm),
-            _ActiveEventRow(
-              event: controller.events[i],
+          for (final card in events)
+            context.watch<HomeEventRowBuilder>()(
+              context,
+              card,
+              regionCode: controller.regionCode,
               foreground: foreground,
               secondary: secondary,
             ),
-          ],
       ],
     );
 
@@ -131,83 +146,6 @@ class HomeActiveEventsSection extends StatelessWidget {
         borderRadius: AppRadius.medium,
       ),
       child: Padding(padding: const EdgeInsets.all(AppSpacing.lg), child: body),
-    );
-  }
-}
-
-class _ActiveEventRow extends StatelessWidget {
-  const _ActiveEventRow({
-    required this.event,
-    required this.foreground,
-    required this.secondary,
-  });
-
-  final Event event;
-  final Color foreground;
-  final Color secondary;
-
-  static final DateFormat _clockFormat = DateFormat('HH:mm');
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colors = theme.colorScheme;
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          width: 32,
-          height: 32,
-          decoration: BoxDecoration(
-            color: colors.primaryContainer,
-            shape: BoxShape.circle,
-          ),
-          child: Icon(
-            eventTypeIcon(event.type.iconKey),
-            size: 18,
-            color: colors.onPrimaryContainer,
-          ),
-        ),
-        const SizedBox(width: AppSpacing.md),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      event.title.isEmpty ? '—' : event.title,
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        color: foreground,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.sm),
-                  Text(
-                    _clockFormat.format(event.time),
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      color: secondary,
-                    ),
-                  ),
-                ],
-              ),
-              if (event.description.isNotEmpty) ...[
-                const SizedBox(height: AppSpacing.xs),
-                Text(
-                  event.description,
-                  style: theme.textTheme.bodySmall?.copyWith(color: secondary),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ],
-          ),
-        ),
-      ],
     );
   }
 }

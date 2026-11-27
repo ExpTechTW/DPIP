@@ -1,0 +1,52 @@
+{
+  "lang": "zh-TW",
+  "cards": [
+    {
+      "id": 1717214400,
+      "serial": 1,
+      "kind": "issue",
+      "type": "floodSensor",
+      "hazard": "flood",
+      "status": 1,
+      "author": "wra",
+      "lang": "zh-TW",
+      "title": "淹水感測",
+      "subtitle": "淹水感測",
+      "send": 1717213800000,
+      "expires": 1717236000000,
+      "area": [],
+      "hasPolygon": true,
+      "addition": {
+        "areaDesc": "臺南市安南區",
+        "polygon": "24.1500,120.6700 24.1600,120.6700 24.1600,120.6800 24.1500,120.6800 24.1500,120.6700",
+        "geocode": "6703500",
+        "county": "",
+        "town": "",
+        "waterLevelStation": "",
+        "waterLevel": ""
+      },
+      "description": "水利署訊: 臺南市安南區溪頂里水位站水位0.85公尺，請遠離低窪處。",
+      "polygon": {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "type": "Feature",
+            "properties": {},
+            "geometry": {
+              "type": "Polygon",
+              "coordinates": [
+                [
+                  [120.663, 24.1436],
+                  [120.663, 24.1664],
+                  [120.687, 24.1664],
+                  [120.687, 24.1436],
+                  [120.663, 24.1436]
+                ]
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

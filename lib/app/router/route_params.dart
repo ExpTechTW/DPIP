@@ -35,6 +35,22 @@ int? replayTimestampOf(GoRouterState state) =>
 int? bugThreadIdOf(GoRouterState state) =>
     positiveIntParam(state.pathParameters['id']);
 
+/// The card id (`:id`) of an [AppRoutes.eventDetail] location.
+int? eventDetailIdOf(GoRouterState state) =>
+    positiveIntParam(state.pathParameters['id']);
+
+/// The township code (`?region=`) of an [AppRoutes.eventDetail] location, or
+/// null for the nationwide text.
+String? eventDetailRegionOf(GoRouterState state) =>
+    nonBlankParam(state.uri.queryParameters['region'])?.trim();
+
+/// An event link whose id is not a card number opens the Events tab, rather
+/// than asking the server for card 0.
+String? eventDetailRedirect(BuildContext context, GoRouterState state) =>
+    eventDetailIdOf(state) == null
+    ? state.namedLocation(AppRoutes.events)
+    : null;
+
 /// A replay without a usable start instant opens the report it hangs off
 /// instead — the page that has the 重播 chip, so the user is one tap from a
 /// working replay rather than on a crash screen.

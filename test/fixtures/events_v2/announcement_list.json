@@ -1,0 +1,20 @@
+{
+  "lang": "zh-TW",
+  "cards": [
+    {
+      "id": 1795737600,
+      "serial": 1,
+      "kind": "issue",
+      "type": "announcement",
+      "hazard": "announcement",
+      "status": 1,
+      "author": "exptech",
+      "lang": "zh-TW",
+      "title": "【演練】地震避難演練",
+      "subtitle": "臺北市 10:00 地震避難演練",
+      "send": 1795737600000,
+      "expires": 1795824000000,
+      "hasPolygon": false
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "lang": "zh-TW",
+  "cards": [
+    {
+      "id": 1700000000,
+      "serial": 1,
+      "kind": "issue",
+      "type": "torrential-rain",
+      "hazard": "heavy_rain",
+      "status": 1,
+      "author": "test",
+      "lang": "zh-TW",
+      "title": "豪雨等級提升",
+      "subtitle": "新北市",
+      "send": 1699999700000,
+      "expires": 1700007200000,
+      "hasPolygon": false
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "lang": "zh-TW",
+  "cards": [
+    {
+      "id": 1794976200,
+      "serial": 1,
+      "kind": "issue",
+      "type": "heavy_rain.short",
+      "hazard": "heavy_rain",
+      "status": 1,
+      "author": "cwa",
+      "lang": "zh-TW",
+      "title": "短時強降雨紀錄",
+      "subtitle": "臺北市信義區 測試站",
+      "send": 1794974400000,
+      "expires": 1794978000000,
+      "hasPolygon": true
+    },
+    {
+      "id": 1794977700,
+      "serial": 1,
+      "kind": "issue",
+      "type": "heavy_rain.short_extreme",
+      "hazard": "heavy_rain",
+      "status": 1,
+      "author": "cwa",
+      "lang": "zh-TW",
+      "title": "短時極端降雨紀錄",
+      "subtitle": "臺北市信義區 測試站",
+      "send": 1794976800000,
+      "expires": 1794980400000,
+      "hasPolygon": true
+    }
+  ]
+}

@@ -3998,4 +3998,187 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get locationModeManualBadge => 'Lokasi diatur manual';
+
+  @override
+  String get eventHazardEarthquake => 'Gempa bumi';
+
+  @override
+  String get eventHazardTsunami => 'Tsunami';
+
+  @override
+  String get eventHazardWind => 'Angin kencang';
+
+  @override
+  String get eventHazardHeavyRain => 'Hujan lebat';
+
+  @override
+  String get eventHazardFlood => 'Banjir';
+
+  @override
+  String get eventHazardRiverRise => 'Kenaikan air sungai';
+
+  @override
+  String get eventHazardDamRelease => 'Pelepasan air bendungan';
+
+  @override
+  String get eventHazardSwell => 'Gelombang tinggi';
+
+  @override
+  String get eventHazardDebrisFlow => 'Aliran debris';
+
+  @override
+  String get eventHazardLandslideDam => 'Bendungan longsor';
+
+  @override
+  String get eventHazardThunderstorm => 'Badai petir';
+
+  @override
+  String get eventHazardFog => 'Kabut tebal';
+
+  @override
+  String get eventHazardRoadClosure => 'Penutupan jalan';
+
+  @override
+  String get eventHazardAnnouncement => 'Pengumuman';
+
+  @override
+  String get eventHazardClosure => 'Libur kerja & sekolah';
+
+  @override
+  String get eventHazardOther => 'Lainnya';
+
+  @override
+  String get eventStatusCancelled => 'Dibatalkan';
+
+  @override
+  String get eventStatusOpenEnded => 'Waktu berakhir belum ditentukan';
+
+  @override
+  String get eventStatusActive => 'Berlaku';
+
+  @override
+  String get eventStatusEnded => 'Telah berakhir';
+
+  @override
+  String eventReportSerial(int serial) {
+    return 'Laporan $serial';
+  }
+
+  @override
+  String get eventReportKindIssue => 'Diterbitkan';
+
+  @override
+  String get eventReportKindUpdate => 'Pembaruan';
+
+  @override
+  String get eventReportKindCorrect => 'Koreksi';
+
+  @override
+  String get eventReportKindCancel => 'Pembatalan';
+
+  @override
+  String get eventReportKindUnknown => 'Tidak diketahui';
+
+  @override
+  String get eventDetailTitle => 'Detail kejadian';
+
+  @override
+  String get eventDetailReports => 'Semua laporan';
+
+  @override
+  String eventDetailEnds(String time) {
+    return 'Berakhir: $time';
+  }
+
+  @override
+  String get eventDetailEndsUndetermined => 'belum ditentukan';
+
+  @override
+  String get eventDetailShowOriginal => 'Tampilkan teks asli';
+
+  @override
+  String get eventDetailShowTranslation => 'Tampilkan terjemahan';
+
+  @override
+  String eventDetailShowAll(int count) {
+    return 'Tampilkan semua ($count)';
+  }
+
+  @override
+  String get eventDetailShowLess => 'Tampilkan lebih sedikit';
+
+  @override
+  String get eventDetailEewLatest => 'Perkiraan terbaru';
+
+  @override
+  String get eventDetailIntensityByArea => 'Intensitas per wilayah';
+
+  @override
+  String get eventDetailMissingStations => 'Stasiun tidak melapor';
+
+  @override
+  String get eventDetailTsunamiByArea => 'Perkiraan per wilayah';
+
+  @override
+  String get eventDetailTsunamiObserved => 'Pengamatan';
+
+  @override
+  String get eventDetailAffectedAreas => 'Wilayah terdampak';
+
+  @override
+  String get eventDetailStations => 'Stasiun';
+
+  @override
+  String get eventFactMagnitude => 'Magnitudo';
+
+  @override
+  String get eventFactDepth => 'Kedalaman';
+
+  @override
+  String get eventFactMaxIntensity => 'Intensitas maksimum';
+
+  @override
+  String get eventFactEpicenter => 'Episentrum';
+
+  @override
+  String get eventFactOriginTime => 'Waktu kejadian';
+
+  @override
+  String get eventFactSerial => 'Laporan';
+
+  @override
+  String get eventFactWaveHeight => 'Tinggi gelombang';
+
+  @override
+  String get eventFactArrivalTime => 'Waktu tiba';
+
+  @override
+  String get eventFactRainfall => 'Hujan per jam';
+
+  @override
+  String get eventFactWindSpeed => 'Kecepatan angin';
+
+  @override
+  String get eventFactGust => 'Hembusan';
+
+  @override
+  String get eventFactVisibility => 'Jarak pandang';
+
+  @override
+  String get eventFactWaterLevel => 'Muka air';
+
+  @override
+  String get eventFactWarningLevel => 'Batas siaga';
+
+  @override
+  String get eventFactLightningStrikes => 'Jumlah petir';
+
+  @override
+  String get eventFactRoad => 'Jalan';
+
+  @override
+  String get eventFactLocation => 'Lokasi';
+
+  @override
+  String get eventFactStation => 'Stasiun';
 }

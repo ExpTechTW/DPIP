@@ -1,0 +1,20 @@
+{
+  "lang": "zh-TW",
+  "cards": [
+    {
+      "id": 1717214400,
+      "serial": 1,
+      "kind": "issue",
+      "type": "roadClose",
+      "hazard": "road_closure",
+      "status": 1,
+      "author": "thb",
+      "lang": "zh-TW",
+      "title": "道路封閉",
+      "subtitle": "臺中市西屯區道路封閉",
+      "send": 1717213800000,
+      "expires": 1717236000000,
+      "hasPolygon": true
+    }
+  ]
+}

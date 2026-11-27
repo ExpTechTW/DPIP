@@ -67,7 +67,7 @@ import 'package:dpip/features/changelog/domain/changelog_repository.dart';
 import 'package:dpip/features/changelog/domain/release_note.dart';
 import 'package:dpip/features/earthquake/domain/eew.dart';
 import 'package:dpip/features/earthquake/domain/seismic_travel_time.dart';
-import 'package:dpip/features/events/domain/event.dart';
+import 'package:dpip/features/events/domain/event_card.dart';
 import 'package:dpip/features/events/domain/event_repository.dart';
 import 'package:dpip/features/events/events_providers.dart';
 import 'package:dpip/features/home/home_providers.dart';
@@ -173,6 +173,7 @@ void main() {
         AppRoutes.earthquakeReplay,
         AppRoutes.regionSelectCity,
         AppRoutes.bugThread,
+        AppRoutes.eventDetail,
       ]),
     );
   });
@@ -862,12 +863,18 @@ class _NoEew extends RealtimeSource<List<Eew>> {
 
 class _Events implements EventRepository {
   @override
-  Future<Result<List<Event>>> events({String? regionCode}) async =>
+  Future<Result<List<EventCard>>> events({String? regionCode}) async =>
       const Ok([]);
 
   @override
-  Future<Result<List<Event>>> activeEvents({String? regionCode}) async =>
+  Future<Result<List<EventCard>>> activeEvents({String? regionCode}) async =>
       const Ok([]);
+
+  @override
+  Future<Result<EventCardDetail>> detail({
+    required int id,
+    String? regionCode,
+  }) async => const Err(NetworkFailure('offline'));
 }
 
 class _Notes implements ChangelogRepository {

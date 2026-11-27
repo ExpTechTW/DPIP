@@ -1,0 +1,22 @@
+{
+  "lang": "zh-TW",
+  "cards": [
+    {
+      "id": 1717214400,
+      "serial": 1,
+      "kind": "issue",
+      "type": "workSchlClos",
+      "hazard": "closure",
+      "status": 1,
+      "author": "dgpa",
+      "lang": "zh-TW",
+      "title": "停班停課",
+      "subtitle": "指定鄉鎮停班停課",
+      "send": 1717213800000,
+      "expires": 1717236000000,
+      "area": [300, 601, 600],
+      "hasPolygon": false,
+      "description": "新竹市北區、嘉義市部分行政區停班停課"
+    }
+  ]
+}
