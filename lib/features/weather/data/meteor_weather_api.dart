@@ -37,5 +37,7 @@ class MeteorWeatherApi {
       (await _client.get(_api, '/api/v5/meteor/weather/forecast/$code'))
           as Map<String, dynamic>;
 
-  static const ApiTier _api = ApiTier.coreExclusiveApi;
+  /// Both core regions answer these (verified 2026-11-28); see
+  /// [MeteorSnapshotApi] for the shared contract.
+  static const ApiTier _api = ApiTier.coreApi;
 }

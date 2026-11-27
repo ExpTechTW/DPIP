@@ -46,13 +46,21 @@ class ApiClient {
   final EndpointHealthMonitor? _health;
 
   /// GET [path] on [tier] with failover; returns the decoded body.
+  ///
+  /// [notFoundFailsOver] as in [request].
   Future<dynamic> get(
     ApiTier tier,
     String path, {
     Map<String, dynamic>? query,
     CancelToken? cancelToken,
-  }) async =>
-      (await request(tier, path, query: query, cancelToken: cancelToken)).data;
+    bool notFoundFailsOver = false,
+  }) async => (await request(
+    tier,
+    path,
+    query: query,
+    cancelToken: cancelToken,
+    notFoundFailsOver: notFoundFailsOver,
+  )).data;
 
   /// GET [path] as raw bytes (MVT / WebP / …) with ETag revalidation.
   ///
@@ -166,6 +174,12 @@ class ApiClient {
   /// the next host. Every failover is logged so a silent region switch is
   /// visible, and reported to [_health] so the server-status dot can show it.
   /// Pass a [cancelToken] to abort a superseded request.
+  ///
+  /// [notFoundFailsOver] makes a 404 move on to the next region too, for an
+  /// immutable resource one region may simply not hold: each core region
+  /// keeps its own history, and an outage leaves a gap in one of them. The
+  /// 404 is still not charged to the host — the region lacks the item, it is
+  /// not sick — and a 404 from the last region is the answer.
   Future<Response<dynamic>> request(
     ApiTier tier,
     String path, {
@@ -174,6 +188,7 @@ class ApiClient {
     Map<String, dynamic>? query,
     Options? options,
     CancelToken? cancelToken,
+    bool notFoundFailsOver = false,
   }) async {
     final hosts = hostsFor(tier);
     for (var i = 0; i < hosts.length; i++) {
@@ -195,8 +210,9 @@ class ApiClient {
         // retention 404s once a second, and charging those to the host parked
         // `api-1` at `down` for the rest of the session.
         if (retryable) _health?.failure(tier, hosts[i], path);
+        final missing = notFoundFailsOver && e.response?.statusCode == 404;
         final isLastHost = i == hosts.length - 1;
-        if (isLastHost || !retryable) rethrow;
+        if (isLastHost || !(retryable || missing)) rethrow;
         Log.warning(
           'ApiClient: ${tier.name} ${hosts[i]} failed (${_describe(e)}); '
           'failing over to ${hosts[i + 1]}',
