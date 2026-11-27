@@ -1505,9 +1505,6 @@ class AppLocalizationsVi extends AppLocalizations {
   String get regionNationwide => 'Toàn quốc';
 
   @override
-  String get moreNotifyLog => 'Nhật ký thông báo DPIP';
-
-  @override
   String get regionCurrent => 'Vị trí';
 
   @override

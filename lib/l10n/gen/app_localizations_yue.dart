@@ -1470,9 +1470,6 @@ class AppLocalizationsYue extends AppLocalizations {
   String get regionNationwide => '全國';
 
   @override
-  String get moreNotifyLog => 'DPIP 通知發送記錄';
-
-  @override
   String get regionCurrent => '所在地';
 
   @override

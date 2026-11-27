@@ -1479,9 +1479,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get regionNationwide => '전국';
 
   @override
-  String get moreNotifyLog => 'DPIP 알림 발송 기록';
-
-  @override
   String get regionCurrent => '현재 위치';
 
   @override

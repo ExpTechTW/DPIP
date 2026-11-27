@@ -1516,9 +1516,6 @@ class AppLocalizationsFil extends AppLocalizations {
   String get regionNationwide => 'Bansa';
 
   @override
-  String get moreNotifyLog => 'Log ng notipikasyon ng DPIP';
-
-  @override
   String get regionCurrent => 'Lokasyon';
 
   @override

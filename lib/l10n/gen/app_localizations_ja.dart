@@ -1479,9 +1479,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get regionNationwide => '全国';
 
   @override
-  String get moreNotifyLog => 'DPIP 通知送信履歴';
-
-  @override
   String get regionCurrent => '現在地';
 
   @override

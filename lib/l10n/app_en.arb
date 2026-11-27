@@ -347,9 +347,6 @@
   "@onboardingIntroTitle": {
     "description": "Onboarding intro page title"
   },
-  "@moreNotifyLog": {
-    "description": "More-menu link to the DPIP notification send-record website"
-  },
   "@reportFilterOrderAsc": {
     "description": "Sort order: oldest / smallest first"
   },
@@ -2025,7 +2022,6 @@
     "description": "Himawari longwave-infrared channel (B15, 12.4 µm) layer name"
   },
   "regionNationwide": "National",
-  "moreNotifyLog": "DPIP notification log",
   "@mapLayerStyleBdTooltip": {
     "description": "Explains the Dvorak BD band rendering"
   },

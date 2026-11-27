@@ -91,15 +91,6 @@ class MorePage extends StatelessWidget {
                   ),
                   onTap: () => context.pushNamed(AppRoutes.permissions),
                 ),
-                // What the system says actually went out — a status page, kept
-                // in the notification group because that is where you look when
-                // an alert did not arrive.
-                _MoreLinkTile(
-                  icon: Icons.notifications_active_outlined,
-                  title: l10n.moreNotifyLog,
-                  host: 'status.exptech.com.tw',
-                  url: 'https://status.exptech.com.tw/notify',
-                ),
               ],
             ),
             SectionHeader(l10n.moreSectionDisplay),
