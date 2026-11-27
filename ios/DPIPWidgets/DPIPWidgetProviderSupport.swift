@@ -77,6 +77,7 @@ enum WidgetWeatherRefreshDiagnostics {
 struct DPIPWidgetSnapshotContent: Sendable {
     let snapshot: CurrentWeatherWidgetSnapshot?
     let forecast: ForecastWidgetSnapshot?
+    var rain: RainTrendWidgetSnapshot? = nil
 }
 
 enum DPIPWidgetGalleryPreview {
@@ -147,17 +148,21 @@ enum DPIPWidgetGalleryPreview {
 struct DPIPWidgetProviderDependencies: Sendable {
     typealias LoadSnapshot = DPIPWidgetTimelinePlanner.LoadSnapshot
     typealias LoadForecast = DPIPWidgetTimelinePlanner.LoadForecast
+    typealias LoadRain = DPIPWidgetTimelinePlanner.LoadRain
 
     let loadSnapshot: LoadSnapshot
     let timelinePlanner: DPIPWidgetTimelinePlanner
     let loadForecast: LoadForecast
+    let loadRain: LoadRain
 
     init(loadSnapshot: @escaping LoadSnapshot,
          timelinePlanner: DPIPWidgetTimelinePlanner,
-         loadForecast: @escaping LoadForecast = { _, _, _ in nil }) {
+         loadForecast: @escaping LoadForecast = { _, _, _ in nil },
+         loadRain: @escaping LoadRain = { _, _ in nil }) {
         self.loadSnapshot = loadSnapshot
         self.timelinePlanner = timelinePlanner
         self.loadForecast = loadForecast
+        self.loadRain = loadRain
     }
 
     func snapshot(
@@ -178,7 +183,14 @@ struct DPIPWidgetProviderDependencies: Sendable {
         let forecast = forecastSnapshot(
             for: target, currentSnapshot: current, at: date, family: family
         )
-        let cached = DPIPWidgetSnapshotContent(snapshot: current, forecast: forecast)
+        var rain: RainTrendWidgetSnapshot?
+        if ForecastWidgetFamilyPolicy.supportsForecast(family),
+           let current, target.matches(snapshot: current) {
+            rain = loadRain(target, current.regionCode)
+        }
+        let cached = DPIPWidgetSnapshotContent(
+            snapshot: current, forecast: forecast, rain: rain
+        )
         guard isPreview, target.sourceIdentifier != nil else { return cached }
 
         // Small has no forecast: only the current-weather half needs a sample,
@@ -243,6 +255,9 @@ enum DPIPWidgetProviderRuntime {
         let loadSnapshot: DPIPWidgetTimelinePlanner.LoadSnapshot = { target in
             store?.loadCurrent(for: target)
         }
+        let loadRain: DPIPWidgetTimelinePlanner.LoadRain = { target, regionCode in
+            store?.loadRain(for: target, regionCode: regionCode)
+        }
         let loadForecast: DPIPWidgetTimelinePlanner.LoadForecast = {
             target, regionCode, date in
             guard let store,
@@ -276,6 +291,7 @@ enum DPIPWidgetProviderRuntime {
                 ),
                 loadSnapshot: loadSnapshot,
                 loadForecast: loadForecast,
+                loadRain: loadRain,
                 refresh: { target, family in
                     guard let refresher else {
                         #if DEBUG
@@ -293,7 +309,8 @@ enum DPIPWidgetProviderRuntime {
                 },
                 now: { Date.now }
             ),
-            loadForecast: loadForecast
+            loadForecast: loadForecast,
+            loadRain: loadRain
         )
     }()
 }
@@ -302,6 +319,7 @@ extension WidgetRefresher.Dependencies {
     static func live(containerURL: URL) -> Self {
         let weatherClient = CurrentWeatherClient()
         let forecastClient = ForecastClient()
+        let rainClient = RainTrendClient()
         let clock = WidgetServerClock(
             anchorStore: WidgetFileClockAnchorStore(containerURL: containerURL)
         )
@@ -333,6 +351,9 @@ extension WidgetRefresher.Dependencies {
             },
             fetchForecast: { regionCode in
                 try await forecastClient.fetch(regionCode: regionCode)
+            },
+            fetchRain: { regionCode, now in
+                try await rainClient.fetch(regionCode: regionCode, now: now)
             },
             synchronizeClock: { _ = await clock.synchronize() },
             sampleClock: { await clock.currentWeatherSnapshotTime() },

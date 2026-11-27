@@ -158,9 +158,33 @@ private struct WeatherScenario {
         case current, stale
     }
 
+    /// The next-hour rain trend, starting one minute before the entry.
+    private enum Rain: String {
+        case none, light, heavy, dry
+
+        func snapshot(origin: Date) -> RainTrendWidgetSnapshot? {
+            let mm: [Double]
+            switch self {
+            case .none: return nil
+            // 6 mm a minute for twenty minutes: light rain that stops.
+            case .light: mm = Array(repeating: 6, count: 20) + Array(repeating: 0, count: 40)
+            // 20 mm a minute all hour: the longest summary, heavy rain that continues.
+            case .heavy: mm = Array(repeating: 20, count: 60)
+            case .dry: mm = Array(repeating: 0, count: 60)
+            }
+            return RainTrendWidgetSnapshot(
+                sourceIdentifier: "current-location", regionCode: "407",
+                trend: RainHourTrend(
+                    startSecond: Int64(origin.timeIntervalSince1970), mm: mm
+                )!
+            )
+        }
+    }
+
     static let timeZone = TimeZone(identifier: "Asia/Taipei")!
     private let forecast: Forecast
     private let observationAge: ObservationAge
+    private let rain: Rain
     private let language: Language
     private let textSize: TextSize
     private let location: Location
@@ -176,6 +200,7 @@ private struct WeatherScenario {
         location = Self.option("DPIP_FIXTURE_LOCATION", default: .short, environment: environment)
         smallObservation = Self.option("DPIP_FIXTURE_SMALL_OBSERVATION", default: .regular, environment: environment)
         observationAge = Self.option("DPIP_FIXTURE_OBSERVATION_AGE", default: .current, environment: environment)
+        rain = Self.option("DPIP_FIXTURE_RAIN", default: .none, environment: environment)
         card = Self.option("DPIP_FIXTURE_CARD", default: Card.narrow, environment: environment).size(for: family)
     }
 
@@ -224,7 +249,9 @@ private struct WeatherScenario {
                 }
             )!
         }
-        return DPIPWidgetEntry(date: date, snapshot: snapshot, isStale: observationAge == .stale, isNight: false,
-                               forecast: forecastSnapshot)
+        return DPIPWidgetEntry(
+            date: date, snapshot: snapshot, isStale: observationAge == .stale, isNight: false,
+            forecast: forecastSnapshot, rain: rain.snapshot(origin: date.addingTimeInterval(-60))
+        )
     }
 }

@@ -7,6 +7,7 @@ struct DPIPWidgetEntry: TimelineEntry {
     let isStale: Bool
     let isNight: Bool
     let forecast: ForecastWidgetSnapshot?
+    let rain: RainTrendWidgetSnapshot?
     let locationTarget: WidgetLocationTarget
 
     var widgetURL: URL { locationTarget.widgetURL }
@@ -55,7 +56,10 @@ struct DPIPWidgetEntry: TimelineEntry {
         if snapshot != nil, isStale {
             return .staleObservation
         }
-        if forecastFreshness == .stale,
+        // The rain chart takes the hourly row's place, and with it the
+        // forecast's warning.
+        if visibleRainTrend(for: family) == nil,
+           forecastFreshness == .stale,
            !upcomingForecastPoints(for: family).isEmpty {
             return .outdatedForecast
         }
@@ -65,13 +69,40 @@ struct DPIPWidgetEntry: TimelineEntry {
     init(date: Date, snapshot: CurrentWeatherWidgetSnapshot?,
          isStale: Bool, isNight: Bool,
          forecast: ForecastWidgetSnapshot? = nil,
+         rain: RainTrendWidgetSnapshot? = nil,
          locationTarget: WidgetLocationTarget = .currentLocation) {
         self.date = date
         self.snapshot = snapshot
         self.isStale = isStale
         self.isNight = isNight
         self.forecast = forecast
+        self.rain = rain
         self.locationTarget = locationTarget
+    }
+
+    /// The rain trend to chart in place of the hourly row: Medium and Large
+    /// only, the same township as the current weather, and rain still ahead
+    /// of this entry's instant — once the minutes left are dry, or the hour
+    /// is over, the hourly row comes back. Anything else shows the hourly
+    /// row, never an empty or invented chart.
+    ///
+    /// The instant is the entry's own date, which WidgetKit draws it at,
+    /// put through the snapshot's calibration: the forecast's origin is a
+    /// server stamp. It is never the fetch time — an entry may be drawn up
+    /// to an hour after it.
+    func visibleRainTrend(for family: WidgetFamily) -> RainHourTrend? {
+        guard ForecastWidgetFamilyPolicy.supportsForecast(family),
+              let snapshot, let rain,
+              rain.sourceIdentifier == snapshot.sourceIdentifier,
+              rain.regionCode == snapshot.regionCode,
+              !rain.trend.isDry(
+                  at: CurrentWeatherWidgetTimeCalibration(snapshot: snapshot)
+                      .calibratedDate(fromDeviceDate: date)
+              )
+        else {
+            return nil
+        }
+        return rain.trend
     }
 
     /// Fail closed at the display boundary as well as the cache boundary.

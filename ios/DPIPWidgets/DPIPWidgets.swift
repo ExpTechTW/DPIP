@@ -62,6 +62,7 @@ struct DPIPWidgetProvider: IntentTimelineProvider {
             isStale: state.isStale,
             isNight: state.isNight,
             forecast: content.forecast,
+            rain: content.rain,
             locationTarget: target
         )
 
@@ -109,6 +110,7 @@ struct DPIPWidgetProvider: IntentTimelineProvider {
                     isStale: state.isStale,
                     isNight: state.isNight,
                     forecast: plan.forecast(at: state.date),
+                    rain: plan.rain(at: state.date),
                     locationTarget: target
                 )
             }
@@ -525,12 +527,23 @@ private struct WeatherWidgetLayout: View {
         forecastContent(compactAccessibility: false)
     }
 
+    /// The hourly row, or the next-hour rain chart in its place while rain
+    /// is coming. The two never share the card.
+    @ViewBuilder
     private func forecastContent(compactAccessibility: Bool) -> some View {
-        HourlyForecastSection(
-            entry: entry, family: family, calibratedDate: calibratedDate,
-            isCurrentlyNight: entry.isNight, nextTransitionTime: snapshot.nextDayNightTransitionTime,
-            localizationBundle: localizationBundle, compactAccessibility: compactAccessibility
-        )
+        if let trend = entry.visibleRainTrend(for: family) {
+            RainTrendSection(
+                trend: trend, calibratedDate: calibratedDate, family: family,
+                localizationBundle: localizationBundle,
+                compactAccessibility: compactAccessibility
+            )
+        } else {
+            HourlyForecastSection(
+                entry: entry, family: family, calibratedDate: calibratedDate,
+                isCurrentlyNight: entry.isNight, nextTransitionTime: snapshot.nextDayNightTransitionTime,
+                localizationBundle: localizationBundle, compactAccessibility: compactAccessibility
+            )
+        }
     }
 
     @ViewBuilder

@@ -4,8 +4,20 @@ import WidgetKit
 struct DPIPWidgetTimelinePlan: Sendable {
     let snapshot: CurrentWeatherWidgetSnapshot?
     let forecast: ForecastWidgetSnapshot?
+    var rain: RainTrendWidgetSnapshot? = nil
     let states: [CurrentWeatherWidgetTimelineState]
     let reloadDate: Date
+
+    /// The rain trend while its hour still covers `date`; removed after.
+    func rain(at date: Date) -> RainTrendWidgetSnapshot? {
+        guard let rain, let snapshot,
+              CurrentWeatherWidgetTimeCalibration(snapshot: snapshot)
+                  .calibratedDate(fromDeviceDate: date) < rain.trend.endDate
+        else {
+            return nil
+        }
+        return rain
+    }
 
     func forecast(at date: Date) -> ForecastWidgetSnapshot? {
         guard let forecast, let snapshot,
@@ -26,7 +38,8 @@ struct DPIPWidgetTimelinePlan: Sendable {
 /// Entries are free; reloads are rationed by WidgetKit and may run late. So
 /// every change the cache already implies gets its own entry — the stale
 /// boundary, the day/night transition, the forecast's soft and hard expiry,
-/// each whole hour of the hourly row — and the reload is only for new data.
+/// each whole hour of the hourly row, every five minutes of a rain chart —
+/// and the reload is only for new data.
 struct WidgetTimelineBuilder: Sendable {
     let staleAfter: TimeInterval
     /// After a refresh that delivered, or could not have delivered, anything.
@@ -44,6 +57,9 @@ struct WidgetTimelineBuilder: Sendable {
         self.refreshInterval = refreshInterval
         self.retryInterval = retryInterval ?? refreshInterval
     }
+
+    /// How often the rain chart shifts along its hour.
+    static let rainStep: TimeInterval = 5 * 60
 
     /// The wait after `count` failed refreshes in a row: `retryInterval` for
     /// the first, one more for each after it, never longer than a successful
@@ -63,6 +79,7 @@ struct WidgetTimelineBuilder: Sendable {
     func plan(
         snapshot: CurrentWeatherWidgetSnapshot?,
         forecast: ForecastWidgetSnapshot?,
+        rain: RainTrendWidgetSnapshot? = nil,
         outcome: WidgetRefreshOutcome?,
         consecutiveFailures: Int = 1,
         deviceNow: Date
@@ -95,6 +112,7 @@ struct WidgetTimelineBuilder: Sendable {
             reloadDate = min(reloadDate, staleAt)
         }
 
+        var boundaries: [Date] = []
         if let forecast {
             let offset = snapshot.calibratedTimeOffsetMilliseconds
             let expiry = ForecastWidgetExpiry.date(
@@ -107,7 +125,7 @@ struct WidgetTimelineBuilder: Sendable {
             )
             // Reload eligibility is not an execution guarantee. Schedule both
             // publication transitions even beyond the requested reload.
-            let boundaries = [
+            boundaries += [
                 ForecastWidgetExpiry.staleDate(
                     for: forecast, calibratedTimeOffsetMilliseconds: offset
                 ),
@@ -115,22 +133,55 @@ struct WidgetTimelineBuilder: Sendable {
             ] + CurrentWeatherWidgetTimeline.hourBoundaries(
                 for: snapshot, after: deviceNow, before: expiry
             )
-            for boundary in boundaries
-            where boundary > deviceNow
-                && !states.contains(where: { $0.date == boundary }) {
-                states.append(CurrentWeatherWidgetTimeline.state(
-                    snapshot: snapshot, at: boundary, staleAfter: staleAfter
-                ))
-            }
-            states.sort { $0.date < $1.date }
         }
+        // The app's chart starts at "now"; the widget's moves every five
+        // minutes along the forecast hour, and the chart leaves the moment
+        // no rain is ahead — the minute the last rain ends, or the hour's
+        // end. Nothing is scheduled once the rain is already behind.
+        if let rain,
+           !rain.trend.isDry(
+               at: CurrentWeatherWidgetTimeCalibration(snapshot: snapshot)
+                   .calibratedDate(fromDeviceDate: deviceNow)
+           ) {
+            boundaries += Self.rainBoundaries(
+                for: rain.trend, snapshot: snapshot, after: deviceNow
+            )
+        }
+        for boundary in boundaries
+        where boundary > deviceNow
+            && !states.contains(where: { $0.date == boundary }) {
+            states.append(CurrentWeatherWidgetTimeline.state(
+                snapshot: snapshot, at: boundary, staleAfter: staleAfter
+            ))
+        }
+        states.sort { $0.date < $1.date }
 
         return DPIPWidgetTimelinePlan(
             snapshot: snapshot,
             forecast: forecast,
+            rain: rain,
             states: states,
             reloadDate: reloadDate
         )
+    }
+
+    /// Device dates of `start + 5k` minutes through `start + 60`, and of the
+    /// minute the last rain ends, after `deviceDate`. The origin is a server
+    /// stamp, so each instant is converted with the snapshot's calibration.
+    static func rainBoundaries(
+        for trend: RainHourTrend,
+        snapshot: CurrentWeatherWidgetSnapshot,
+        after deviceDate: Date
+    ) -> [Date] {
+        let calibration = CurrentWeatherWidgetTimeCalibration(snapshot: snapshot)
+        let steps = Int(trend.endDate.timeIntervalSince(trend.startDate) / rainStep)
+        let instants = (1...steps).map {
+            trend.startDate.addingTimeInterval(Double($0) * rainStep)
+        } + [trend.rainEndDate].compactMap { $0 }
+        return instants.compactMap { instant in
+            let device = calibration.deviceDate(forCalibratedDate: instant)
+            return device > deviceDate ? device : nil
+        }
     }
 }
 
@@ -143,6 +194,8 @@ struct DPIPWidgetTimelinePlanner: Sendable {
         -> CurrentWeatherWidgetSnapshot?
     typealias LoadForecast = @Sendable (WidgetLocationTarget, String, Date)
         -> ForecastWidgetSnapshot?
+    typealias LoadRain = @Sendable (WidgetLocationTarget, String)
+        -> RainTrendWidgetSnapshot?
     typealias Refresh = @Sendable (WidgetLocationTarget, WidgetFamily) async
         -> WidgetRefreshOutcome
     /// Remembers a refresh's outcome against its target and returns the
@@ -154,6 +207,7 @@ struct DPIPWidgetTimelinePlanner: Sendable {
     let builder: WidgetTimelineBuilder
     let loadSnapshot: LoadSnapshot
     var loadForecast: LoadForecast = { _, _, _ in nil }
+    var loadRain: LoadRain = { _, _ in nil }
     let refresh: Refresh
     /// Remembers nothing by default: every failure is the first.
     var recordOutcome: RecordOutcome = { _, outcome in
@@ -176,14 +230,17 @@ struct DPIPWidgetTimelinePlanner: Sendable {
         let deviceNow = now()
         let snapshot = loadSnapshot(target)
         let forecast: ForecastWidgetSnapshot?
+        let rain: RainTrendWidgetSnapshot?
         if ForecastWidgetFamilyPolicy.supportsForecast(family),
            let snapshot, target.matches(snapshot: snapshot) {
             forecast = loadForecast(target, snapshot.regionCode, deviceNow)
+            rain = loadRain(target, snapshot.regionCode)
         } else {
             forecast = nil
+            rain = nil
         }
         let plan = builder.plan(
-            snapshot: snapshot, forecast: forecast,
+            snapshot: snapshot, forecast: forecast, rain: rain,
             outcome: outcome, consecutiveFailures: failures,
             deviceNow: deviceNow
         )

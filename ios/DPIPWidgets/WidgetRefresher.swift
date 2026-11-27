@@ -30,12 +30,18 @@ protocol WidgetRefreshStoring: Sendable {
         _ snapshot: ForecastWidgetSnapshot,
         for target: WidgetLocationTarget
     ) throws -> Bool
+    func writeRain(
+        _ snapshot: RainTrendWidgetSnapshot,
+        for target: WidgetLocationTarget
+    ) throws
 }
 
 extension WidgetTargetStore: WidgetRefreshStoring {}
 
 /// The one refresh path behind every timeline: resolve the target's place,
-/// fetch its parts in parallel, and commit each part as soon as it arrives.
+/// fetch its parts — current weather, and for Medium and Large the hourly
+/// forecast and the next-hour rain — in parallel, and commit each part as
+/// soon as it arrives.
 ///
 /// Everything runs under one budget. WidgetKit gives `getTimeline` a limited
 /// time and does not say how long, and a serial chain of location, clock,
@@ -58,6 +64,8 @@ struct WidgetRefresher: Sendable {
         var fetchWeather: @Sendable (Double, Double) async throws
             -> CurrentWeatherRemoteDTO?
         var fetchForecast: @Sendable (String) async throws -> ForecastRemoteDTO
+        /// The next hour's rain for a township; the date is a dry hour's origin.
+        var fetchRain: @Sendable (String, Date) async throws -> RainHourTrend
         /// Starts or joins a server-time synchronization.
         var synchronizeClock: @Sendable () async -> Void
         /// The best time sample available now: calibrated when any anchor is
@@ -143,6 +151,9 @@ struct WidgetRefresher: Sendable {
 
         async let observation = fetchObservation(location)
         async let forecast = fetchForecast(wantsForecast ? regionCode : nil)
+        // The rain chart shares the hourly row's place, so it follows the
+        // same families.
+        async let rain = fetchRain(wantsForecast ? regionCode : nil)
 
         var outcome = locationOutcome ?? .failed
         if let location {
@@ -165,6 +176,9 @@ struct WidgetRefresher: Sendable {
 
         if let response = await forecast, let regionCode {
             commitForecast(response, target: target, regionCode: regionCode)
+        }
+        if let trend = await rain, let regionCode {
+            commitRain(trend, target: target, regionCode: regionCode)
         }
         return outcome
     }
@@ -306,6 +320,42 @@ struct WidgetRefresher: Sendable {
             return
         }
         _ = try? store.writeForecast(snapshot, for: target)
+    }
+}
+
+extension WidgetRefresher {
+    // MARK: Rain
+
+    fileprivate func fetchRain(_ regionCode: String?) async -> RainHourTrend? {
+        guard let regionCode else { return nil }
+        do {
+            return try await dependencies.fetchRain(regionCode, dependencies.now())
+        } catch {
+            #if DEBUG
+            WidgetWeatherRefreshDiagnostics.log("rain trend failed")
+            #endif
+            return nil
+        }
+    }
+
+    /// Same township rule as the forecast. The newest fetch always replaces
+    /// the cache: a dry answer must clear an earlier rainy one.
+    fileprivate func commitRain(
+        _ trend: RainHourTrend,
+        target: WidgetLocationTarget,
+        regionCode: String
+    ) {
+        guard let source = target.sourceIdentifier,
+              store.loadCurrent(for: target)?.regionCode == regionCode
+        else {
+            return
+        }
+        try? store.writeRain(
+            RainTrendWidgetSnapshot(
+                sourceIdentifier: source, regionCode: regionCode, trend: trend
+            ),
+            for: target
+        )
     }
 }
 

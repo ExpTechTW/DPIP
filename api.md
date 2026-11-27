@@ -349,7 +349,7 @@ ETag 重新驗證。
 |---|---|
 | `ChangelogApi.getReleases` | `https://api.github.com/repos/ExpTechTW/DPIP/releases`（ETag；`per_page=30`） |
 | `ChangelogApi.getAvatarBytes` | `https://avatars.githubusercontent.com/…`（貢獻者頭像，內容定址故長快取） |
-| `RainHourTrendApi.getForecast` | `https://exptech.dingbot.tw/api/weather/rainforecast/{code}`（`{code}` = 鄉鎮 3 碼；回應為單 series 信封 `{"<系列名>": [{"start": 秒, "rain": [60 × mm]}]}`；空 series `[]` = 該小時無雨，卡片隱藏） |
+| `RainHourTrendApi.getForecast` | `https://exptech.dingbot.tw/api/weather/rainforecast/{code}`（`{code}` = 鄉鎮 3 碼；回應為單 series 信封 `{"<系列名>": [{"start": 秒, "rain": [60 × mm]}]}`；空 series `[]` = 該小時無雨，卡片隱藏）。iOS 中、大型天氣小工具也呼叫同一端點（`RainTrendClient.swift`），有雨時以圖表取代逐時預報列 |
 | `ServerStatusApi.getStatus` | `https://status.exptech.dev/api/ds/query`（**POST**，Grafana datasource query；伺服器狀態頁） |
 | `CloudflareStatusApi.getComponents` | `https://www.cloudflarestatus.com/api/v2/components.json`（Cloudflare 元件狀態） |
 | `HasteApi.upload` | `https://haste.exptech.dev/api/pastes`（**POST**，上傳 App 日誌；回應的 `key` 組成 `https://haste.exptech.dev/<key>`） |

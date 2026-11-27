@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		34F8D505E1E9FE7E64BC0839 /* RainTrendWidgetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64777E099F07A403443CFC4D /* RainTrendWidgetTests.swift */; };
+		4F54785572D8C158E0DE0189 /* RainTrendSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E8A54AC66A6A01D1A417B99 /* RainTrendSection.swift */; };
+		750C91FCE5931C2369E928CE /* RainHourTrend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AF6044AA505F2930C792AF5 /* RainHourTrend.swift */; };
 		CB1D558384919E9D1E382D48 /* WidgetTimelineBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9720B5F6362D80DED8D25A81 /* WidgetTimelineBuilder.swift */; };
 		EADC644EC69F0D1118E5EF3D /* WidgetRefresher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46E5604F9953266AF7439DD0 /* WidgetRefresher.swift */; };
 		05A9E1F31DB4B19A7C04393F /* rain.aiff in Resources */ = {isa = PBXBuildFile; fileRef = A382CD9DEA741E45DBF741D7 /* rain.aiff */; };
@@ -184,6 +187,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		64777E099F07A403443CFC4D /* RainTrendWidgetTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RainTrendWidgetTests.swift; sourceTree = "<group>"; };
+		9E8A54AC66A6A01D1A417B99 /* RainTrendSection.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RainTrendSection.swift; path = DPIPWidgets/RainTrendSection.swift; sourceTree = "<group>"; };
+		8AF6044AA505F2930C792AF5 /* RainHourTrend.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RainHourTrend.swift; path = DPIPWidgets/RainHourTrend.swift; sourceTree = "<group>"; };
 		9720B5F6362D80DED8D25A81 /* WidgetTimelineBuilder.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WidgetTimelineBuilder.swift; path = DPIPWidgets/WidgetTimelineBuilder.swift; sourceTree = "<group>"; };
 		46E5604F9953266AF7439DD0 /* WidgetRefresher.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WidgetRefresher.swift; path = DPIPWidgets/WidgetRefresher.swift; sourceTree = "<group>"; };
 		07B4AE57C7A28415CBCDB754 /* NativeLog.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = NativeLog.swift; path = Shared/NativeLog.swift; sourceTree = "<group>"; };
@@ -396,6 +402,8 @@
 				ForecastWidgetSelection.swift,
 				ForecastWidgetSnapshot.swift,
 				Localizable.xcstrings,
+				RainHourTrend.swift,
+				RainTrendSection.swift,
 				RefreshForecastIntent.swift,
 				SavedWidgetLocationResolver.swift,
 				WeatherWidgetConfiguration.intentdefinition,
@@ -600,6 +608,7 @@
 				E7A200000000000000000002 /* WidgetRefresherTests.swift */,
 				F4E200000000000000000002 /* DPIPWidgetProviderTests.swift */,
 				E9F000000000000000000002 /* ForecastWidgetTests.swift */,
+				64777E099F07A403443CFC4D /* RainTrendWidgetTests.swift */,
 				E9F000000000000000000012 /* WidgetHTTPTimeSourceTests.swift */,
 				F4F200000000000000000002 /* WidgetTownshipResolverTests.swift */,
 			);
@@ -705,6 +714,8 @@
 		F39A1E8EB7D22C2BD0DA39C1 /* WidgetFixture Infrastructure */ = {
 			isa = PBXGroup;
 			children = (
+				9E8A54AC66A6A01D1A417B99 /* RainTrendSection.swift */,
+				8AF6044AA505F2930C792AF5 /* RainHourTrend.swift */,
 				9720B5F6362D80DED8D25A81 /* WidgetTimelineBuilder.swift */,
 				46E5604F9953266AF7439DD0 /* WidgetRefresher.swift */,
 				3401BB0014DA175AB450CB29 /* WidgetHTTPTimeSource.swift */,
@@ -1127,6 +1138,7 @@
 				E7A200000000000000000001 /* WidgetRefresherTests.swift in Sources */,
 				F4E200000000000000000001 /* DPIPWidgetProviderTests.swift in Sources */,
 				E9F000000000000000000001 /* ForecastWidgetTests.swift in Sources */,
+				34F8D505E1E9FE7E64BC0839 /* RainTrendWidgetTests.swift in Sources */,
 				E9F000000000000000000011 /* WidgetHTTPTimeSourceTests.swift in Sources */,
 				F4F200000000000000000001 /* WidgetTownshipResolverTests.swift in Sources */,
 			);
@@ -1136,6 +1148,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4F54785572D8C158E0DE0189 /* RainTrendSection.swift in Sources */,
+				750C91FCE5931C2369E928CE /* RainHourTrend.swift in Sources */,
 				CB1D558384919E9D1E382D48 /* WidgetTimelineBuilder.swift in Sources */,
 				EADC644EC69F0D1118E5EF3D /* WidgetRefresher.swift in Sources */,
 				0E479A7A0BF081C9094B1BDA /* WidgetHTTPTimeSource.swift in Sources */,

@@ -2523,6 +2523,7 @@ private struct ForecastRefreshHarness: Sendable {
                 resolveTownship: { _ in location },
                 fetchWeather: { _, _ in throw URLError(.notConnectedToInternet) },
                 fetchForecast: fetch,
+                fetchRain: { _, _ in throw URLError(.notConnectedToInternet) },
                 synchronizeClock: {},
                 sampleClock: {
                     CurrentWeatherSnapshotTime(
@@ -2566,4 +2567,8 @@ private struct ClosureRefreshStore: WidgetRefreshStoring {
     ) throws -> Bool {
         try write(snapshot, target)
     }
+
+    func writeRain(
+        _ snapshot: RainTrendWidgetSnapshot, for target: WidgetLocationTarget
+    ) throws {}
 }

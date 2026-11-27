@@ -88,6 +88,14 @@ final class WidgetRefresherTests: XCTestCase {
         ))
         XCTAssertTrue(try store.writeForecast(forecast, for: removed))
         store.recordRefreshOutcome(.failed, for: removed)
+        try store.writeRain(
+            RainTrendWidgetSnapshot(
+                sourceIdentifier: "region:999", regionCode: "999",
+                trend: RainHourTrend(startSecond: 1_710_907_200, mm: Array(repeating: 6, count: 60))!
+            ),
+            for: removed
+        )
+        XCTAssertNotNil(store.loadRain(for: removed, regionCode: "999"))
         let forecastFile = try XCTUnwrap(store.forecastURL(for: removed))
 
         let calls = RefreshCalls()
@@ -99,6 +107,7 @@ final class WidgetRefresherTests: XCTestCase {
         XCTAssertNil(store.loadCurrent(for: removed))
         XCTAssertFalse(FileManager.default.fileExists(atPath: forecastFile.path))
         XCTAssertEqual(store.refreshFailures(for: removed), 0)
+        XCTAssertNil(store.loadRain(for: removed, regionCode: "999"))
         XCTAssertTrue(calls.weatherCoordinates.isEmpty)
         XCTAssertTrue(calls.forecastRegions.isEmpty)
         // Every other target keeps its own.
@@ -432,6 +441,96 @@ final class WidgetRefresherTests: XCTestCase {
         XCTAssertEqual(calls.forecastRegions, ["407"])
     }
 
+    // MARK: Rain
+
+    func testMediumAndLargeCacheTheRainTrendForTheirTownship() async throws {
+        for family: WidgetFamily in [.systemMedium, .systemLarge] {
+            try? FileManager.default.removeItem(at: container)
+            let calls = RefreshCalls()
+
+            _ = await makeRefresher(calls: calls).refresh(
+                target: .saved(regionCode: "242"), family: family
+            )
+
+            XCTAssertEqual(calls.rainRegions, ["242"], "\(family)")
+            let rain = try XCTUnwrap(
+                store.loadRain(for: .saved(regionCode: "242"), regionCode: "242")
+            )
+            XCTAssertEqual(rain.trend.startSecond, 1_710_907_200)
+            XCTAssertEqual(rain.trend.summary.grade, .light)
+            XCTAssertNil(store.loadRain(for: .saved(regionCode: "242"), regionCode: "433"))
+        }
+    }
+
+    func testSmallNeverRequestsTheRainTrend() async {
+        let calls = RefreshCalls()
+
+        _ = await makeRefresher(calls: calls).refresh(
+            target: .saved(regionCode: "242"), family: .systemSmall
+        )
+
+        XCTAssertTrue(calls.rainRegions.isEmpty)
+        XCTAssertNil(store.rainURL(for: .saved(regionCode: "242")).flatMap {
+            try? Data(contentsOf: $0)
+        })
+    }
+
+    func testRainFailureKeepsTheCachedTrendAndTheWeather() async throws {
+        let target = WidgetLocationTarget.saved(regionCode: "242")
+        let cached = RainTrendWidgetSnapshot(
+            sourceIdentifier: "region:242", regionCode: "242",
+            trend: RainHourTrend(
+                startSecond: 1_710_906_000, mm: Array(repeating: 1, count: 60)
+            )!
+        )
+        try store.writeRain(cached, for: target)
+        var dependencies = makeDependencies(calls: RefreshCalls())
+        dependencies.fetchRain = { _, _ in throw WidgetRefreshTestError.scripted }
+
+        let outcome = await WidgetRefresher(store: store, dependencies: dependencies)
+            .refresh(target: target, family: .systemLarge)
+
+        XCTAssertEqual(outcome, .refreshed)
+        XCTAssertEqual(store.loadRain(for: target, regionCode: "242"), cached)
+    }
+
+    func testRainForAnotherTownshipThanTheSnapshotIsDropped() async throws {
+        _ = try seed(.currentLocation, regionCode: "433")
+        var dependencies = makeDependencies(calls: RefreshCalls())
+        dependencies.fetchWeather = { _, _ in throw WidgetRefreshTestError.scripted }
+
+        _ = await WidgetRefresher(store: store, dependencies: dependencies)
+            .refresh(target: .currentLocation, family: .systemMedium)
+
+        XCTAssertNil(store.rainURL(for: .currentLocation).flatMap {
+            try? Data(contentsOf: $0)
+        })
+    }
+
+    func testADryHourReplacesAnEarlierRainyOne() async throws {
+        let target = WidgetLocationTarget.saved(regionCode: "242")
+        try store.writeRain(
+            RainHourTrend(startSecond: 1_710_906_000, mm: Array(repeating: 9, count: 60))
+                .map {
+                    RainTrendWidgetSnapshot(
+                        sourceIdentifier: "region:242", regionCode: "242", trend: $0
+                    )
+                }!,
+            for: target
+        )
+        var dependencies = makeDependencies(calls: RefreshCalls())
+        dependencies.fetchRain = { _, now in
+            try RainHourTrend.decode(
+                Data(#"{"rainfallWarnings-rkai":[]}"#.utf8), now: now
+            )
+        }
+
+        _ = await WidgetRefresher(store: store, dependencies: dependencies)
+            .refresh(target: target, family: .systemMedium)
+
+        XCTAssertEqual(store.loadRain(for: target, regionCode: "242")?.trend.isDry, true)
+    }
+
     // MARK: Budget
 
     func testBudgetEndsAHungRefreshAsARetry() async {
@@ -568,6 +667,13 @@ final class WidgetRefresherTests: XCTestCase {
                 calls.recordForecast(regionCode)
                 return try forecastDTO()
             },
+            fetchRain: { regionCode, _ in
+                calls.recordRain(regionCode)
+                return RainHourTrend(
+                    startSecond: 1_710_907_200,
+                    mm: Array(repeating: 0, count: 50) + Array(repeating: 6, count: 10)
+                )!
+            },
             synchronizeClock: { calls.recordClock() },
             sampleClock: { CurrentWeatherWidgetTestFixtures.snapshotTime() },
             now: { Date(timeIntervalSince1970: 1_710_907_200) }
@@ -638,11 +744,17 @@ private final class RefreshCalls: @unchecked Sendable {
     private let lock = NSLock()
     private var weather: [[Double]] = []
     private var forecasts: [String] = []
+    private var rains: [String] = []
     private var clocks = 0
 
     var weatherCoordinates: [[Double]] { lock.withLock { weather } }
     var forecastRegions: [String] { lock.withLock { forecasts } }
+    var rainRegions: [String] { lock.withLock { rains } }
     var clockSynchronizations: Int { lock.withLock { clocks } }
+
+    func recordRain(_ regionCode: String) {
+        lock.withLock { rains.append(regionCode) }
+    }
 
     func recordWeather(_ latitude: Double, _ longitude: Double) {
         lock.withLock { weather.append([latitude, longitude]) }
@@ -685,5 +797,11 @@ private struct FailingCommitStore: WidgetRefreshStoring {
         _ snapshot: ForecastWidgetSnapshot, for target: WidgetLocationTarget
     ) throws -> Bool {
         try base.writeForecast(snapshot, for: target)
+    }
+
+    func writeRain(
+        _ snapshot: RainTrendWidgetSnapshot, for target: WidgetLocationTarget
+    ) throws {
+        try base.writeRain(snapshot, for: target)
     }
 }

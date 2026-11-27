@@ -11,6 +11,7 @@ import Foundation
 ///   device upgraded from a version that only wrote that;
 /// - the hourly forecast, one file per target under
 ///   `ForecastSnapshotLocation`;
+/// - the next-hour rain trend, one file per target under `rain-trend`;
 /// - how many refreshes in a row have failed, one file per target under
 ///   `refresh-failures`, so the retry backs off across widget processes.
 struct WidgetTargetStore: Sendable {
@@ -162,6 +163,63 @@ struct WidgetTargetStore: Sendable {
         }
     }
 
+    // MARK: Rain trend
+
+    func rainURL(for target: WidgetLocationTarget) -> URL? {
+        guard let source = target.sourceIdentifier,
+              let address = CurrentWeatherSnapshotAddress(
+                  sourceIdentifier: source
+              )
+        else {
+            return nil
+        }
+        return containerURL
+            .appendingPathComponent("WidgetSnapshots", isDirectory: true)
+            .appendingPathComponent("rain-trend", isDirectory: true)
+            .appendingPathComponent(address.filename)
+    }
+
+    /// The target's rain trend for `regionCode`, whatever its age; the
+    /// timeline decides how long its hour stays on screen.
+    func loadRain(
+        for target: WidgetLocationTarget,
+        regionCode: String
+    ) -> RainTrendWidgetSnapshot? {
+        guard let url = rainURL(for: target),
+              let data = try? Data(contentsOf: url),
+              data.count <= Self.maximumPayloadSize,
+              let snapshot = try? JSONDecoder().decode(
+                  RainTrendWidgetSnapshot.self, from: data
+              ),
+              snapshot.schemaVersion == RainTrendWidgetSnapshot.schemaVersion,
+              snapshot.sourceIdentifier == target.sourceIdentifier,
+              snapshot.regionCode == regionCode
+        else {
+            return nil
+        }
+        return snapshot
+    }
+
+    func writeRain(
+        _ snapshot: RainTrendWidgetSnapshot,
+        for target: WidgetLocationTarget
+    ) throws {
+        guard snapshot.sourceIdentifier == target.sourceIdentifier,
+              let url = rainURL(for: target)
+        else {
+            return
+        }
+        let data = try JSONEncoder().encode(snapshot)
+        try FileManager.default.createDirectory(
+            at: url.deletingLastPathComponent(),
+            withIntermediateDirectories: true
+        )
+        _ = try Self.coordinatedReplace(at: url) { coordinatedURL in
+            try data.write(to: coordinatedURL, options: .atomic)
+            return true
+        }
+    }
+
     private static func decodeForecast(at url: URL) -> ForecastWidgetSnapshot? {
         guard let size = (try? FileManager.default.attributesOfItem(
                   atPath: url.path
@@ -277,8 +335,8 @@ struct WidgetTargetStore: Sendable {
     // MARK: Removed targets
 
     /// Deletes every file kept for `target`: its current weather, the
-    /// pre-per-target file when that holds this target, its forecast and its
-    /// failure count.
+    /// pre-per-target file when that holds this target, its forecast, its
+    /// rain trend and its failure count.
     func removeAll(for target: WidgetLocationTarget) throws {
         guard let source = target.sourceIdentifier,
               let address = CurrentWeatherSnapshotAddress(sourceIdentifier: source)
@@ -293,7 +351,10 @@ struct WidgetTargetStore: Sendable {
            target.matches(snapshot: legacy) {
             try Self.coordinatedRemove(at: legacyCurrentWeatherURL)
         }
-        for url in [forecastURL(for: target), refreshFailuresURL(for: target)] {
+        for url in [
+            forecastURL(for: target), rainURL(for: target),
+            refreshFailuresURL(for: target),
+        ] {
             if let url { try Self.coordinatedRemove(at: url) }
         }
     }
