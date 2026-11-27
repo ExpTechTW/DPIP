@@ -8,6 +8,7 @@ import 'package:dpip/features/events/presentation/detail/event_type_details.dart
 import 'package:dpip/features/events/presentation/event_hazard_style.dart';
 import 'package:dpip/features/events/presentation/event_labels.dart';
 import 'package:dpip/features/events/presentation/widgets/event_status_chip.dart';
+import 'package:dpip/features/events/presentation/widgets/event_untranslated.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/async_view.dart';
 import 'package:dpip/shared/widgets/section_header.dart';
@@ -245,6 +246,10 @@ class _ReportEntryState extends State<_ReportEntry> {
                 ),
               ],
             ),
+            if (report.untranslated) ...[
+              const SizedBox(height: AppSpacing.md),
+              const EventUntranslatedNotice(),
+            ],
             const SizedBox(height: AppSpacing.md),
             Text(
               title.isEmpty ? '—' : title,

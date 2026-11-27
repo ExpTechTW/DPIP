@@ -4181,4 +4181,11 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get eventFactStation => 'Stasiun';
+
+  @override
+  String get eventUntranslatedTag => 'Belum diterjemahkan';
+
+  @override
+  String get eventUntranslatedNotice =>
+      'Ini belum diterjemahkan ke bahasa Anda, jadi ditampilkan dalam bahasa Mandarin aslinya.';
 }

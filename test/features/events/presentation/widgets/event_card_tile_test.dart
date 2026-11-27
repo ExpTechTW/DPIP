@@ -229,6 +229,33 @@ void main() {
     );
   });
 
+  testWidgets('a card in its original text carries the untranslated tag', (
+    tester,
+  ) async {
+    await _pump(
+      tester,
+      eventCard(
+        send: now.subtract(const Duration(hours: 1)),
+        expires: now.add(const Duration(hours: 1)),
+        lang: 'zh-TW',
+        requestedLang: 'en',
+      ),
+    );
+    expect(find.text(_l10n.eventUntranslatedTag), findsOneWidget);
+  });
+
+  testWidgets('a translated card has no untranslated tag', (tester) async {
+    await _pump(
+      tester,
+      eventCard(
+        send: now.subtract(const Duration(hours: 1)),
+        expires: now.add(const Duration(hours: 1)),
+        requestedLang: 'en',
+      ),
+    );
+    expect(find.text(_l10n.eventUntranslatedTag), findsNothing);
+  });
+
   testWidgets('an unknown hazard is listed with the warning mark', (
     tester,
   ) async {

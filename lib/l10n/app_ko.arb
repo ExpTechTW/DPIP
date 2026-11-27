@@ -2269,5 +2269,7 @@
   "eventFactLightningStrikes": "낙뢰 횟수",
   "eventFactRoad": "도로",
   "eventFactLocation": "위치",
-  "eventFactStation": "관측소"
+  "eventFactStation": "관측소",
+  "eventUntranslatedTag": "번역 전",
+  "eventUntranslatedNotice": "아직 사용 중인 언어로 번역되지 않아 중국어 원문을 표시합니다."
 }

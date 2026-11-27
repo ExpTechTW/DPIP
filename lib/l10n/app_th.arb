@@ -2269,5 +2269,7 @@
   "eventFactLightningStrikes": "จำนวนฟ้าผ่า",
   "eventFactRoad": "ถนน",
   "eventFactLocation": "สถานที่",
-  "eventFactStation": "สถานี"
+  "eventFactStation": "สถานี",
+  "eventUntranslatedTag": "ยังไม่ได้แปล",
+  "eventUntranslatedNotice": "เนื้อหานี้ยังไม่ได้แปลเป็นภาษาของคุณ จึงแสดงต้นฉบับภาษาจีนไว้ก่อน"
 }

@@ -4159,4 +4159,11 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get eventFactStation => 'สถานี';
+
+  @override
+  String get eventUntranslatedTag => 'ยังไม่ได้แปล';
+
+  @override
+  String get eventUntranslatedNotice =>
+      'เนื้อหานี้ยังไม่ได้แปลเป็นภาษาของคุณ จึงแสดงต้นฉบับภาษาจีนไว้ก่อน';
 }

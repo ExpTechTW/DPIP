@@ -4195,4 +4195,11 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get eventFactStation => 'Istasyon';
+
+  @override
+  String get eventUntranslatedTag => 'Hindi pa naisasalin';
+
+  @override
+  String get eventUntranslatedNotice =>
+      'Hindi pa ito naisasalin sa iyong wika, kaya ipinapakita ang orihinal na Chinese.';
 }

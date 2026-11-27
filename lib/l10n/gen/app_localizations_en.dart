@@ -4170,4 +4170,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get eventFactStation => 'Station';
+
+  @override
+  String get eventUntranslatedTag => 'Not translated';
+
+  @override
+  String get eventUntranslatedNotice =>
+      'This hasn\'t been translated into your language yet, so it\'s shown in the original Chinese.';
 }

@@ -2269,5 +2269,7 @@
   "eventFactLightningStrikes": "落雷数",
   "eventFactRoad": "道路",
   "eventFactLocation": "場所",
-  "eventFactStation": "観測所"
+  "eventFactStation": "観測所",
+  "eventUntranslatedTag": "未翻訳",
+  "eventUntranslatedNotice": "まだお使いの言語に翻訳されていないため、中国語の原文を表示しています。"
 }

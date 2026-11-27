@@ -221,6 +221,41 @@ void main() {
     expect(find.text('臺北市有大雨'), findsNothing);
   });
 
+  testWidgets('only a report in its original text says it is untranslated', (
+    tester,
+  ) async {
+    final now = AppTime.utc;
+    await _pump(
+      tester,
+      _Repo(
+        Ok(
+          EventCardDetail(
+            lang: 'en',
+            reports: [
+              eventReport(
+                serial: 1,
+                kind: EventReportKind.issue,
+                title: 'First',
+                send: now.subtract(const Duration(hours: 2)),
+                expires: now.add(const Duration(hours: 1)),
+                requestedLang: 'en',
+              ),
+              eventReport(
+                serial: 2,
+                title: '第二報',
+                lang: 'zh-TW',
+                send: now.subtract(const Duration(hours: 1)),
+                expires: now.add(const Duration(hours: 1)),
+                requestedLang: 'en',
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    expect(find.text(_l10n.eventUntranslatedNotice), findsOneWidget);
+  });
+
   testWidgets('headline facts are chips, and an earthquake has no end time', (
     tester,
   ) async {
