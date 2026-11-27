@@ -3556,4 +3556,11 @@ class AppLocalizationsTh extends AppLocalizations {
   @override
   String get seismometerAlgorithm =>
       'คำนวณด้วยวิธีความรุนแรงที่วัดด้วยเครื่องมือของ JMA ซึ่ง ES-Net ใช้';
+
+  @override
+  String get trendRainPastHour => 'ปริมาณฝนใน 1 ชั่วโมงที่ผ่านมา';
+
+  @override
+  String get trendRainHourLastReading =>
+      'ปริมาณฝน 1 ชั่วโมงถึงการวัดครั้งสุดท้ายของชั่วโมงนี้';
 }

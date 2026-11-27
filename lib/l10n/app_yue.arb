@@ -2090,5 +2090,7 @@
   "seismometerSampleRate": "取樣率",
   "seismometerReset": "重設",
   "seismometerDisclaimer": "請將手機平放喺穩固嘅平面上面。手機感測器精度有限，量測結果只供參考，唔代表中央氣象署發布嘅震度。",
-  "seismometerAlgorithm": "用 ES-Net 嗰套 JMA 計測震度演算法計"
+  "seismometerAlgorithm": "用 ES-Net 嗰套 JMA 計測震度演算法計",
+  "trendRainPastHour": "過去 1 個鐘雨量",
+  "trendRainHourLastReading": "截至呢個鐘最後一筆嘅 1 個鐘雨量"
 }

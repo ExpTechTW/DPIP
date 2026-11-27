@@ -3568,4 +3568,11 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get seismometerAlgorithm =>
       'Tính bằng phương pháp cường độ đo bằng máy của JMA mà ES-Net dùng';
+
+  @override
+  String get trendRainPastHour => 'Lượng mưa trong 1 giờ qua';
+
+  @override
+  String get trendRainHourLastReading =>
+      'Lượng mưa 1 giờ tính đến lần đo cuối của giờ này';
 }

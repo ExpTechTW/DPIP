@@ -3490,4 +3490,10 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get seismometerAlgorithm => 'ES-Net が用いる気象庁の計測震度の方法で計算しています';
+
+  @override
+  String get trendRainPastHour => '過去1時間の雨量';
+
+  @override
+  String get trendRainHourLastReading => 'この時間帯の最終観測までの1時間雨量';
 }

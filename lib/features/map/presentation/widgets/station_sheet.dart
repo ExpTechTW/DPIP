@@ -687,6 +687,9 @@ class _TrendChart extends StatelessWidget {
   /// same reasoning as the timeline's `HH:mm` / `yyyy/MM/dd` statics.
   static final DateFormat _monthDay = DateFormat('M/d');
 
+  /// A 24-hour rain bar's time in its tooltip — the sample's own minute.
+  static final DateFormat _clock = DateFormat('HH:mm');
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -936,13 +939,9 @@ class _TrendChart extends StatelessWidget {
           ),
       ];
       // Running total (mm) at each bar — the overlaid 累計 curve, and the extra
-      // line in the bar tooltip. Gaps (skipped null samples) advance it by 0.
-      final cumulative = <double>[];
-      var runningTotal = 0.0;
-      for (final spot in spots) {
-        runningTotal += spot.y;
-        cumulative.add(runningTotal);
-      }
+      // line in the bar tooltip. Each hour of rain counted once; see
+      // [rainRunningTotals].
+      final cumulative = rainRunningTotals(spots);
       final cumulativeColor = colors.tertiary;
       final cumulativeMax = cumulative.isEmpty ? 0.0 : cumulative.last;
 
@@ -1025,39 +1024,21 @@ class _TrendChart extends StatelessWidget {
                             fitInsideHorizontally: true,
                             fitInsideVertically: true,
                             getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                              final x =
-                                  (groupIndex >= 0 && groupIndex < spots.length)
-                                  ? spots[groupIndex].x
-                                  : 0.0;
-                              return BarTooltipItem(
-                                '${rod.toY.toStringAsFixed(1)} $unit',
-                                theme.textTheme.titleSmall!.copyWith(
-                                  color: lineColor,
-                                  fontWeight: FontWeight.w600,
-                                  height: 1.2,
-                                ),
-                                textAlign: TextAlign.start,
-                                children: [
-                                  if (groupIndex >= 0 &&
-                                      groupIndex < cumulative.length)
-                                    TextSpan(
-                                      text:
-                                          '\n${l10n.trendCumulativeTotal(cumulative[groupIndex].toStringAsFixed(1))}',
-                                      style: theme.textTheme.labelSmall
-                                          ?.copyWith(
-                                            color: cumulativeColor,
-                                            fontWeight: FontWeight.w600,
-                                            height: 1.4,
-                                          ),
-                                    ),
-                                  TextSpan(
-                                    text: '\n${timeLabel(x)}',
-                                    style: theme.textTheme.labelSmall?.copyWith(
-                                      color: colors.onSurfaceVariant,
-                                      height: 1.4,
-                                    ),
-                                  ),
-                                ],
+                              final inRange =
+                                  groupIndex >= 0 && groupIndex < spots.length;
+                              return rainBarTooltipItem(
+                                value: rod.toY,
+                                x: inRange ? spots[groupIndex].x : 0.0,
+                                runningTotal: inRange
+                                    ? cumulative[groupIndex]
+                                    : null,
+                                range: range,
+                                unit: unit,
+                                l10n: l10n,
+                                valueColor: lineColor,
+                                totalColor: cumulativeColor,
+                                colors: colors,
+                                textTheme: theme.textTheme,
                               );
                             },
                           ),
@@ -1493,4 +1474,124 @@ double barSlotCenterX(int index, int count, double barWidth, double plotWidth) {
   if (count <= 1) return barWidth / 2;
   final eachSpace = (plotWidth - count * barWidth) / (count - 1);
   return barWidth / 2 + index * (barWidth + eachSpace);
+}
+
+/// The running rain total (mm) at each bar of a station's rain trend, with
+/// every stretch of rain counted once.
+///
+/// Each sample is the rain of the 60 minutes before its time. The 24-hour
+/// range has one every 10 minutes — about 143, the odd one missing — so every
+/// 10 minutes of rain is in six bars, and adding every bar counted each shower
+/// about six times: at C1SA50 on 2026-11-28 the bars added up to 53 mm against
+/// CWA's own 24-hour total of 9.5 mm. The 7-day range has one sample an hour,
+/// on the hour.
+///
+/// So only samples at least an hour apart are added, walking back from the
+/// newest: it is counted, then the latest sample at or before an hour before
+/// the last one counted, until the samples run out. The counted hours never
+/// overlap, and the newest ends where the series does. Adding the last sample
+/// of each clock hour instead went wrong at both ends whenever the newest
+/// sample was not at :50: it overlapped the previous clock hour's :50 sample
+/// by up to 50 minutes, and the oldest clock hour, cut short by the series'
+/// start, still added its :50 sample, which could hold rain from before the
+/// 24 hours.
+///
+/// With no sample missing, a series reaching back between 23 and 24 hours —
+/// as the 24-hour range's does — gives exactly the 24 hours up to the newest
+/// sample, CWA's own 24-hour figure; on 2026-11-28 it matched CWA at 20 of the
+/// 25 wettest stations, and the other five were missing samples. When the
+/// sample an hour back is missing, the latest one before it stands in: the
+/// minutes between go uncounted, and every older hour shifts that much
+/// earlier, so the oldest can reach as far back past the 24 hours. Nothing is
+/// ever counted twice. The 7-day range's samples are already an hour apart,
+/// so every one is added, as before. Only differences between times are used,
+/// so the time zone plays no part.
+///
+/// A counted bar's total includes itself; any other bar carries the total of
+/// the last counted bar at or before it, or 0 before the first. The newest bar
+/// is always counted, so the last total — the legend — is the whole series'.
+/// [spots] are in time order, `x` in Unix seconds.
+@visibleForTesting
+List<double> rainRunningTotals(List<FlSpot> spots) {
+  const hourSec = 3600;
+  final counted = List.filled(spots.length, false);
+  for (var i = spots.length - 1; i >= 0;) {
+    counted[i] = true;
+    final edge = spots[i].x - hourSec;
+    do {
+      i--;
+    } while (i >= 0 && spots[i].x > edge);
+  }
+  final totals = <double>[];
+  var total = 0.0;
+  for (var i = 0; i < spots.length; i++) {
+    if (counted[i]) total += spots[i].y;
+    totals.add(total);
+  }
+  return totals;
+}
+
+/// A rain bar's tooltip: its value, which hour of rain that is, the running
+/// total there ([rainRunningTotals]; null leaves the line out), and its time.
+///
+/// Every bar is the rain of the hour before its reading, so the tooltip has to
+/// say which hour. A 24-hour bar is a 10-minute reading: its time is given to
+/// the minute, and the rain is that of the hour up to it. A 7-day bar is the
+/// server's hourly value, the last 10-minute reading of the clock hour it is
+/// drawn at — about 13:50–14:50 for 14:00, not 13:00–14:00 — and the series
+/// carries only the hour, so it says so instead of naming a minute it does not
+/// have. Times are Taipei wall clock, as on the axis.
+@visibleForTesting
+BarTooltipItem rainBarTooltipItem({
+  required double value,
+  required double x,
+  required double? runningTotal,
+  required String range,
+  required String unit,
+  required AppLocalizations l10n,
+  required Color valueColor,
+  required Color totalColor,
+  required ColorScheme colors,
+  required TextTheme textTheme,
+}) {
+  final t = AppTime.taipei(
+    DateTime.fromMillisecondsSinceEpoch(x.toInt() * 1000, isUtc: true),
+  );
+  final hourly = range == '7d';
+  final meta = textTheme.labelSmall?.copyWith(
+    color: colors.onSurfaceVariant,
+    height: 1.4,
+  );
+  return BarTooltipItem(
+    '${value.toStringAsFixed(1)} $unit',
+    textTheme.titleSmall!.copyWith(
+      color: valueColor,
+      fontWeight: FontWeight.w600,
+      height: 1.2,
+    ),
+    textAlign: TextAlign.start,
+    children: [
+      TextSpan(
+        text:
+            '\n${hourly ? l10n.trendRainHourLastReading : l10n.trendRainPastHour}',
+        style: meta,
+      ),
+      if (runningTotal != null)
+        TextSpan(
+          text:
+              '\n${l10n.trendCumulativeTotal(runningTotal.toStringAsFixed(1))}',
+          style: textTheme.labelSmall?.copyWith(
+            color: totalColor,
+            fontWeight: FontWeight.w600,
+            height: 1.4,
+          ),
+        ),
+      TextSpan(
+        text: hourly
+            ? '\n${_TrendChart._monthDay.format(t)} ${l10n.chartHourLabel(t.hour)}'
+            : '\n${_TrendChart._clock.format(t)}',
+        style: meta,
+      ),
+    ],
+  );
 }

@@ -3467,4 +3467,10 @@ class AppLocalizationsYue extends AppLocalizations {
 
   @override
   String get seismometerAlgorithm => '用 ES-Net 嗰套 JMA 計測震度演算法計';
+
+  @override
+  String get trendRainPastHour => '過去 1 個鐘雨量';
+
+  @override
+  String get trendRainHourLastReading => '截至呢個鐘最後一筆嘅 1 個鐘雨量';
 }

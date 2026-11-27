@@ -3467,6 +3467,12 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get seismometerAlgorithm => '依 ES-Net 的 JMA 計測震度演算法計算';
+
+  @override
+  String get trendRainPastHour => '過去 1 小時雨量';
+
+  @override
+  String get trendRainHourLastReading => '截至該小時最後一筆的 1 小時雨量';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -6928,6 +6934,12 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get seismometerAlgorithm => '依 ES-Net 的 JMA 计测震度算法计算';
+
+  @override
+  String get trendRainPastHour => '过去 1 小时雨量';
+
+  @override
+  String get trendRainHourLastReading => '截至该小时最后一笔的 1 小时雨量';
 }
 
 /// The translations for Chinese, as used in Hong Kong, using the Han script (`zh_Hant_HK`).
@@ -10390,6 +10402,12 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get seismometerAlgorithm => '依 ES-Net 的 JMA 計測震度演算法計算';
+
+  @override
+  String get trendRainPastHour => '過去 1 小時雨量';
+
+  @override
+  String get trendRainHourLastReading => '截至該小時最後一筆的 1 小時雨量';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -13852,4 +13870,10 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get seismometerAlgorithm => '依 ES-Net 的 JMA 計測震度演算法計算';
+
+  @override
+  String get trendRainPastHour => '過去 1 小時雨量';
+
+  @override
+  String get trendRainHourLastReading => '截至該小時最後一筆的 1 小時雨量';
 }

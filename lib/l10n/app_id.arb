@@ -2090,5 +2090,7 @@
   "seismometerSampleRate": "Laju sampel",
   "seismometerReset": "Atur ulang",
   "seismometerDisclaimer": "Letakkan ponsel rata di permukaan yang stabil. Sensor ponsel tidak presisi, jadi pembacaan ini hanya referensi dan bukan intensitas resmi CWA.",
-  "seismometerAlgorithm": "Dihitung dengan metode intensitas instrumental JMA yang dipakai ES-Net"
+  "seismometerAlgorithm": "Dihitung dengan metode intensitas instrumental JMA yang dipakai ES-Net",
+  "trendRainPastHour": "Curah hujan 1 jam terakhir",
+  "trendRainHourLastReading": "Curah hujan 1 jam hingga pengukuran terakhir jam ini"
 }

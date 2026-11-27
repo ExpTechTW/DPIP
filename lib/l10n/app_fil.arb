@@ -2090,5 +2090,7 @@
   "seismometerSampleRate": "Rate ng sampling",
   "seismometerReset": "I-reset",
   "seismometerDisclaimer": "Ihiga nang patag ang telepono sa matatag na ibabaw. Limitado ang katumpakan ng sensor ng telepono, kaya sanggunian lang ang pagbasang ito at hindi ito opisyal na intensidad ng CWA.",
-  "seismometerAlgorithm": "Kinukuwenta gamit ang paraan ng instrumental intensity ng JMA na ginagamit ng ES-Net"
+  "seismometerAlgorithm": "Kinukuwenta gamit ang paraan ng instrumental intensity ng JMA na ginagamit ng ES-Net",
+  "trendRainPastHour": "Ulan sa nakaraang 1 oras",
+  "trendRainHourLastReading": "Ulan sa 1 oras hanggang sa huling sukat ng oras na ito"
 }
