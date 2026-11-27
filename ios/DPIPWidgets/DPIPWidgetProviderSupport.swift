@@ -125,6 +125,7 @@ struct DPIPWidgetTimelinePlanner: Sendable {
 
     private let staleAfter: TimeInterval
     private let refreshInterval: TimeInterval
+    private let retryInterval: TimeInterval
     private let loadSnapshot: LoadSnapshot
     private let refreshSaved: RefreshSaved
     private let refreshCurrent: RefreshCurrent
@@ -132,9 +133,14 @@ struct DPIPWidgetTimelinePlanner: Sendable {
     private let refreshForecast: RefreshForecast
     private let now: Now
 
+    /// - Parameter refreshInterval: reload after a refresh that delivered, or
+    ///   could not have delivered, anything newer.
+    /// - Parameter retryInterval: reload after a refresh that failed; the
+    ///   same as `refreshInterval` when omitted.
     init(
         staleAfter: TimeInterval,
         refreshInterval: TimeInterval,
+        retryInterval: TimeInterval? = nil,
         loadSnapshot: @escaping LoadSnapshot,
         refreshSaved: @escaping RefreshSaved,
         refreshCurrent: @escaping RefreshCurrent,
@@ -144,6 +150,7 @@ struct DPIPWidgetTimelinePlanner: Sendable {
     ) {
         self.staleAfter = staleAfter
         self.refreshInterval = refreshInterval
+        self.retryInterval = retryInterval ?? refreshInterval
         self.loadSnapshot = loadSnapshot
         self.refreshSaved = refreshSaved
         self.refreshCurrent = refreshCurrent
@@ -172,6 +179,7 @@ struct DPIPWidgetTimelinePlanner: Sendable {
         }
         #endif
 
+        let refreshResult: CurrentWeatherWidgetRefreshResult?
         switch target {
         case .saved:
             #if DEBUG
@@ -180,30 +188,24 @@ struct DPIPWidgetTimelinePlanner: Sendable {
                     + WidgetWeatherRefreshDiagnostics.targetIdentifier(target)
             )
             #endif
-
-            #if DEBUG
-            let refreshResult = await refreshSaved(target)
-            WidgetWeatherRefreshDiagnostics.log(
-                "refresh result=\(refreshResult.diagnosticName)"
-            )
-            #else
-            _ = await refreshSaved(target)
-            #endif
+            refreshResult = await refreshSaved(target)
         case .currentLocation:
             #if DEBUG
             WidgetWeatherRefreshDiagnostics.log(
                 "refresh began target=current-location"
             )
-            let refreshResult = await refreshCurrent()
+            #endif
+            refreshResult = await refreshCurrent()
+        case .invalid:
+            refreshResult = nil
+        }
+        #if DEBUG
+        if let refreshResult {
             WidgetWeatherRefreshDiagnostics.log(
                 "refresh result=\(refreshResult.diagnosticName)"
             )
-            #else
-            _ = await refreshCurrent()
-            #endif
-        case .invalid:
-            break
         }
+        #endif
 
         // Always reload after the refresh attempt. Failed refreshes leave the
         // same-location cache untouched, so this also provides SWR behavior.
@@ -222,7 +224,21 @@ struct DPIPWidgetTimelinePlanner: Sendable {
             deviceNow: deviceNow,
             staleAfter: staleAfter
         )
-        var reloadDate = deviceNow.addingTimeInterval(refreshInterval)
+        // Only a failed attempt retries sooner. A target that cannot resolve
+        // (no permission, not in the catalog) would fail the same way again.
+        var reloadDate = deviceNow.addingTimeInterval(
+            refreshResult == .failed ? retryInterval : refreshInterval
+        )
+        // The stale boundary must bring a real fetch, not merely another
+        // entry drawing the same observation as stale.
+        if let snapshot {
+            let staleAt = CurrentWeatherWidgetTimeline.staleDate(
+                for: snapshot, staleAfter: staleAfter
+            )
+            if staleAt > deviceNow {
+                reloadDate = min(reloadDate, staleAt)
+            }
+        }
         let forecast: ForecastWidgetSnapshot?
         if ForecastWidgetFamilyPolicy.supportsForecast(family),
            let snapshot,
@@ -251,7 +267,10 @@ struct DPIPWidgetTimelinePlanner: Sendable {
                 calibratedTimeOffsetMilliseconds:
                     snapshot.calibratedTimeOffsetMilliseconds
             )
-            for boundary in [stale, expiry] where boundary > deviceNow {
+            let hours = CurrentWeatherWidgetTimeline.hourBoundaries(
+                for: snapshot, after: deviceNow, before: expiry
+            )
+            for boundary in [stale, expiry] + hours where boundary > deviceNow {
                 if !states.contains(where: { $0.date == boundary }) {
                     states.append(CurrentWeatherWidgetTimeline.state(
                         snapshot: snapshot,
@@ -283,7 +302,6 @@ struct DPIPWidgetTimelinePlanner: Sendable {
         let stale = states.first?.isStale ?? false
         WidgetWeatherRefreshDiagnostics.log(
             "timeline entries=\(states.count) stale=\(stale) "
-                + "reloadIntervalSeconds=\(Int(refreshInterval)) "
                 + "reloadDateUnix=\(Int(reloadDate.timeIntervalSince1970))"
         )
         #endif
@@ -454,8 +472,10 @@ enum DPIPWidgetProviderRuntime {
 
     #if DEBUG
     static let refreshInterval: TimeInterval = 60
+    static let retryInterval: TimeInterval = 60
     #else
-    static let refreshInterval: TimeInterval = 20 * 60
+    static let refreshInterval: TimeInterval = 30 * 60
+    static let retryInterval: TimeInterval = 10 * 60
     #endif
 
     // This process-scoped dependency graph retains one clock for every
@@ -509,7 +529,11 @@ enum DPIPWidgetProviderRuntime {
         )
 
         let weatherClient = CurrentWeatherClient()
-        let serverClock = WidgetServerClock()
+        let serverClock = WidgetServerClock(
+            anchorStore: containerURL.map {
+                WidgetFileClockAnchorStore(containerURL: $0)
+            }
+        )
         let writer = containerURL.map {
             CurrentWeatherWidgetSnapshotWriter(containerURL: $0)
         }
@@ -592,6 +616,7 @@ enum DPIPWidgetProviderRuntime {
             timelinePlanner: DPIPWidgetTimelinePlanner(
                 staleAfter: staleAfter,
                 refreshInterval: refreshInterval,
+                retryInterval: retryInterval,
                 loadSnapshot: loadSnapshot,
                 refreshSaved: refreshSaved,
                 refreshCurrent: refreshCurrent,

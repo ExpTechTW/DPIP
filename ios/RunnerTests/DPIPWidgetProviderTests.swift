@@ -3,7 +3,7 @@ import WidgetKit
 import XCTest
 
 final class DPIPWidgetProviderTests: XCTestCase {
-    private let staleAfter: TimeInterval = 30 * 60
+    private let staleAfter: TimeInterval = 60 * 60
     private let now = Date(timeIntervalSince1970: 10_000)
 
     func testSavedTargetInvokesRefresh() async {
@@ -214,6 +214,7 @@ final class DPIPWidgetProviderTests: XCTestCase {
         let plan = await planner(store: store).plan(for: target)
 
         XCTAssertEqual(DPIPWidgetProviderRuntime.refreshInterval, 60)
+        XCTAssertEqual(DPIPWidgetProviderRuntime.retryInterval, 60)
         XCTAssertGreaterThan(plan.reloadDate, now)
         XCTAssertEqual(
             plan.reloadDate,
@@ -221,23 +222,124 @@ final class DPIPWidgetProviderTests: XCTestCase {
         )
     }
     #else
-    func testReleaseTimelineRequestsRefreshAfterTwentyMinutes() async {
+    func testReleaseTimelineRetriesFailuresAfterTenMinutes() async {
         let target = WidgetLocationTarget.currentLocation
         let store = ProviderTimelineTestStore(
             refreshResult: .failed,
+            currentRefreshResult: .failed,
             snapshots: []
         )
 
         let plan = await planner(store: store).plan(for: target)
 
-        XCTAssertEqual(DPIPWidgetProviderRuntime.refreshInterval, 20 * 60)
-        XCTAssertGreaterThan(plan.reloadDate, now)
+        XCTAssertEqual(DPIPWidgetProviderRuntime.refreshInterval, 30 * 60)
+        XCTAssertEqual(DPIPWidgetProviderRuntime.retryInterval, 10 * 60)
         XCTAssertEqual(
             plan.reloadDate,
-            now.addingTimeInterval(20 * 60)
+            now.addingTimeInterval(10 * 60)
         )
     }
     #endif
+
+    func testSuccessfulRefreshReloadsAfterTheRefreshInterval() async {
+        let target = WidgetLocationTarget.saved(regionCode: "407")
+        let store = ProviderTimelineTestStore(
+            refreshResult: .refreshed,
+            snapshots: [(target, snapshot(for: target, observationTime: 10_000))]
+        )
+
+        let plan = await planner(
+            store: store, refreshInterval: 30 * 60, retryInterval: 10 * 60
+        ).plan(for: target)
+
+        XCTAssertEqual(plan.reloadDate, now.addingTimeInterval(30 * 60))
+    }
+
+    func testFailedRefreshRetriesSooner() async {
+        let target = WidgetLocationTarget.saved(regionCode: "407")
+        let store = ProviderTimelineTestStore(
+            refreshResult: .failed,
+            snapshots: [(target, snapshot(for: target, observationTime: 10_000))]
+        )
+
+        let plan = await planner(
+            store: store, refreshInterval: 30 * 60, retryInterval: 10 * 60
+        ).plan(for: target)
+
+        XCTAssertEqual(plan.reloadDate, now.addingTimeInterval(10 * 60))
+    }
+
+    func testUnresolvableTargetDoesNotRetrySooner() async {
+        let target = WidgetLocationTarget.saved(regionCode: "407")
+        let store = ProviderTimelineTestStore(
+            refreshResult: .unavailable,
+            snapshots: []
+        )
+
+        let plan = await planner(
+            store: store, refreshInterval: 30 * 60, retryInterval: 10 * 60
+        ).plan(for: target)
+
+        XCTAssertEqual(plan.reloadDate, now.addingTimeInterval(30 * 60))
+    }
+
+    func testStaleBoundaryBeforeTheNextReloadBringsTheReloadForward() async {
+        let target = WidgetLocationTarget.saved(regionCode: "407")
+        // Observed 45 minutes ago: stale in 15 minutes, before the 30-minute
+        // reload, so that boundary must be a reload rather than an entry only.
+        let store = ProviderTimelineTestStore(
+            refreshResult: .refreshed,
+            snapshots: [(target, snapshot(
+                for: target, observationTime: 10_000 - 45 * 60
+            ))]
+        )
+
+        let plan = await planner(
+            store: store, refreshInterval: 30 * 60, retryInterval: 10 * 60
+        ).plan(for: target)
+
+        XCTAssertEqual(plan.reloadDate, now.addingTimeInterval(15 * 60))
+        XCTAssertEqual(
+            plan.states.map(\.date),
+            [now, now.addingTimeInterval(15 * 60)]
+        )
+        XCTAssertEqual(plan.states.map(\.isStale), [false, true])
+    }
+
+    func testAlreadyStaleObservationKeepsTheNormalInterval() async {
+        let target = WidgetLocationTarget.saved(regionCode: "407")
+        let store = ProviderTimelineTestStore(
+            refreshResult: .refreshed,
+            snapshots: [(target, snapshot(
+                for: target, observationTime: 10_000 - 2 * 60 * 60
+            ))]
+        )
+
+        let plan = await planner(
+            store: store, refreshInterval: 30 * 60, retryInterval: 10 * 60
+        ).plan(for: target)
+
+        XCTAssertEqual(plan.reloadDate, now.addingTimeInterval(30 * 60))
+        XCTAssertEqual(plan.states.map(\.isStale), [true])
+    }
+
+    func testHourBoundariesAreWholeCalibratedHoursOnTheDeviceClock() {
+        // The fixture's calibrated clock is 123 ms ahead of the device.
+        let snapshot = CurrentWeatherWidgetTestFixtures.snapshot(
+            sourceIdentifier: "region:242", regionCode: "242"
+        )
+        let deviceNow = Date(timeIntervalSince1970: 9_000)
+
+        let hours = CurrentWeatherWidgetTimeline.hourBoundaries(
+            for: snapshot,
+            after: deviceNow,
+            before: deviceNow.addingTimeInterval(3 * 3_600)
+        )
+
+        XCTAssertEqual(hours, [3, 4, 5].map {
+            Date(timeIntervalSince1970: Double($0) * 3_600 - 0.123)
+        })
+    }
 
     func testSnapshotPathIsCacheOnlyAndDoesNotInvokeRefresh() {
         let target = WidgetLocationTarget.currentLocation
@@ -260,12 +362,15 @@ final class DPIPWidgetProviderTests: XCTestCase {
     }
 
     private func planner(
-        store: ProviderTimelineTestStore
+        store: ProviderTimelineTestStore,
+        refreshInterval: TimeInterval = DPIPWidgetProviderRuntime.refreshInterval,
+        retryInterval: TimeInterval = DPIPWidgetProviderRuntime.retryInterval
     ) -> DPIPWidgetTimelinePlanner {
         let fixedNow = now
         return DPIPWidgetTimelinePlanner(
             staleAfter: staleAfter,
-            refreshInterval: DPIPWidgetProviderRuntime.refreshInterval,
+            refreshInterval: refreshInterval,
+            retryInterval: retryInterval,
             loadSnapshot: store.load,
             refreshSaved: store.refreshSaved,
             refreshCurrent: store.refreshCurrent,
@@ -275,7 +380,8 @@ final class DPIPWidgetProviderTests: XCTestCase {
 
     private func snapshot(
         for target: WidgetLocationTarget,
-        stationName: String = "station"
+        stationName: String = "station",
+        observationTime: Int = 10_000
     ) -> CurrentWeatherWidgetSnapshot {
         let regionCode: String
         switch target {
@@ -290,7 +396,7 @@ final class DPIPWidgetProviderTests: XCTestCase {
             sourceIdentifier: target.sourceIdentifier,
             regionCode: regionCode,
             regionName: "測試地區",
-            observationTime: 10_000,
+            observationTime: observationTime,
             stationName: stationName,
             weather: "晴",
             weatherCode: 100,

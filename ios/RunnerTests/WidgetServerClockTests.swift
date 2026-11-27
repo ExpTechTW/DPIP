@@ -220,6 +220,156 @@ final class WidgetServerClockTests: XCTestCase {
         XCTAssertEqual(calibratedNow, 10_500)
     }
 
+    func testSuccessfulSyncPersistsAnchorWithOffsetAndBoot() async {
+        let store = InMemoryClockAnchorStore()
+        let monotonic = TestBootMonotonicClock(milliseconds: 400, boot: "boot-a")
+        let clock = WidgetServerClock(
+            deviceClock: TestWallClock(milliseconds: 7_000),
+            monotonicClock: monotonic,
+            serverTimeSource: ScriptedServerTimeSource(results: [.success(10_000)]),
+            timeoutRunner: PassthroughServerClockTimeoutRunner(),
+            anchorStore: store
+        )
+
+        let synchronized = await clock.synchronize()
+
+        XCTAssertTrue(synchronized)
+        XCTAssertEqual(store.anchor, WidgetClockAnchor(
+            serverUnixMilliseconds: 10_000,
+            monotonicMilliseconds: 400,
+            offsetMilliseconds: 3_000,
+            bootSessionIdentifier: "boot-a"
+        ))
+    }
+
+    func testNewProcessReusesPersistedAnchorWithoutSynchronizing() async {
+        let store = InMemoryClockAnchorStore(WidgetClockAnchor(
+            serverUnixMilliseconds: 10_000,
+            monotonicMilliseconds: 400,
+            offsetMilliseconds: 3_000,
+            bootSessionIdentifier: "boot-a"
+        ))
+        let monotonic = TestBootMonotonicClock(milliseconds: 1_400, boot: "boot-a")
+        let clock = makeClock(monotonic: monotonic, store: store)
+
+        let hasSynchronized = await clock.hasSynchronized
+        let sample = await clock.currentWeatherSnapshotTime()
+
+        XCTAssertTrue(hasSynchronized)
+        XCTAssertEqual(sample.calibratedNowUnixMilliseconds, 11_000)
+        XCTAssertEqual(sample.calibratedTimeOffsetMilliseconds, 10_000)
+    }
+
+    func testPersistedAnchorExpiresAfterTwentyFourHours() async {
+        let day: Int64 = 24 * 60 * 60 * 1_000
+        let anchor = WidgetClockAnchor(
+            serverUnixMilliseconds: 10_000,
+            monotonicMilliseconds: 400,
+            offsetMilliseconds: 0,
+            bootSessionIdentifier: "boot-a"
+        )
+        let atLimit = makeClock(
+            monotonic: TestBootMonotonicClock(milliseconds: 400 + day, boot: "boot-a"),
+            store: InMemoryClockAnchorStore(anchor)
+        )
+        let pastLimit = makeClock(
+            monotonic: TestBootMonotonicClock(
+                milliseconds: 400 + day + 1, boot: "boot-a"
+            ),
+            store: InMemoryClockAnchorStore(anchor)
+        )
+
+        let usableAtLimit = await atLimit.hasSynchronized
+        let usablePastLimit = await pastLimit.hasSynchronized
+        let pastSample = await pastLimit.currentWeatherSnapshotTime()
+
+        XCTAssertTrue(usableAtLimit)
+        XCTAssertFalse(usablePastLimit)
+        // No calibration at all still yields a sample, on the device clock.
+        XCTAssertEqual(pastSample.calibratedNowUnixMilliseconds, 1_000)
+        XCTAssertEqual(pastSample.calibratedTimeOffsetMilliseconds, 0)
+    }
+
+    func testRebootInvalidatesPersistedAnchor() async {
+        let anchor = WidgetClockAnchor(
+            serverUnixMilliseconds: 10_000,
+            monotonicMilliseconds: 90_000,
+            offsetMilliseconds: 0,
+            bootSessionIdentifier: "boot-a"
+        )
+        let otherBoot = makeClock(
+            monotonic: TestBootMonotonicClock(milliseconds: 95_000, boot: "boot-b"),
+            store: InMemoryClockAnchorStore(anchor)
+        )
+        let unreadableBoot = makeClock(
+            monotonic: TestBootMonotonicClock(milliseconds: 95_000, boot: nil),
+            store: InMemoryClockAnchorStore(anchor)
+        )
+        // Without a session on either side, the restarted counter gives it away.
+        let restartedCounter = makeClock(
+            monotonic: TestBootMonotonicClock(milliseconds: 5_000, boot: nil),
+            store: InMemoryClockAnchorStore(WidgetClockAnchor(
+                serverUnixMilliseconds: 10_000,
+                monotonicMilliseconds: 90_000,
+                offsetMilliseconds: 0,
+                bootSessionIdentifier: nil
+            ))
+        )
+
+        let otherBootUsable = await otherBoot.hasSynchronized
+        let unreadableBootUsable = await unreadableBoot.hasSynchronized
+        let restartedUsable = await restartedCounter.hasSynchronized
+
+        XCTAssertFalse(otherBootUsable)
+        XCTAssertFalse(unreadableBootUsable)
+        XCTAssertFalse(restartedUsable)
+    }
+
+    func testFileAnchorStoreRoundTripsThroughTheAppGroup() throws {
+        let container = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString, isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: container) }
+        let store = WidgetFileClockAnchorStore(containerURL: container)
+        let anchor = WidgetClockAnchor(
+            serverUnixMilliseconds: 1_795_815_600_000,
+            monotonicMilliseconds: 123_456,
+            offsetMilliseconds: -250,
+            bootSessionIdentifier: "boot-a"
+        )
+
+        XCTAssertNil(store.load())
+        store.save(anchor)
+
+        XCTAssertEqual(store.load(), anchor)
+        XCTAssertTrue(FileManager.default.fileExists(
+            atPath: container.appendingPathComponent(
+                "WidgetSnapshots/server-clock.json"
+            ).path
+        ))
+    }
+
+    func testSystemMonotonicClockReportsABootSession() {
+        let source = WidgetSystemMonotonicTimeSource()
+        let first = source.elapsedMilliseconds()
+        let second = source.elapsedMilliseconds()
+
+        XCTAssertGreaterThanOrEqual(second, first)
+        XCTAssertNotNil(source.bootSessionIdentifier())
+    }
+
+    private func makeClock(
+        monotonic: TestBootMonotonicClock,
+        store: InMemoryClockAnchorStore
+    ) -> WidgetServerClock {
+        WidgetServerClock(
+            deviceClock: TestWallClock(milliseconds: 1_000),
+            monotonicClock: monotonic,
+            serverTimeSource: ScriptedServerTimeSource(results: []),
+            timeoutRunner: PassthroughServerClockTimeoutRunner(),
+            anchorStore: store
+        )
+    }
+
     private func makeClock(
         wallClock: TestWallClock = TestWallClock(milliseconds: 1_000),
         monotonic: TestMonotonicClock =

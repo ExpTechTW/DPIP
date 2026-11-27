@@ -175,16 +175,17 @@ final class ForecastWidgetSelectionTests: XCTestCase {
         }
     }
 
-    func testStaleBoundaryMatchesCurrentWeatherAtExactlyThirtyMinutes() {
+    func testStaleBoundaryMatchesCurrentWeatherAtExactlySixtyMinutes() {
         let observation = instant("2026-09-25T11:50:00Z")
         let points = forecastPoints(times: ["20:00", "21:00"])
         let timestamp = Int(observation.timeIntervalSince1970)
+        XCTAssertEqual(CurrentWeatherWidgetTimeline.defaultStaleAfter, 3_600)
         XCTAssertEqual(ForecastWidgetSelection.upcomingPoints(
-            points, at: observation.addingTimeInterval(1_799),
+            points, at: observation.addingTimeInterval(3_599),
             observationTime: timestamp, limit: 5
         ).first?.time, "20:00")
         XCTAssertEqual(ForecastWidgetSelection.upcomingPoints(
-            points, at: observation.addingTimeInterval(1_800),
+            points, at: observation.addingTimeInterval(3_600),
             observationTime: timestamp, limit: 5
         ).map(\.time), ["21:00"])
     }
@@ -194,7 +195,9 @@ final class ForecastWidgetSelectionTests: XCTestCase {
         let points = forecastPoints(times: ["23:00", "00:00", "01:00", "02:00"])
         for (timestamp, expected) in [
             ("2026-09-25T16:04:00Z", ["00:00", "01:00", "02:00"]),
-            ("2026-09-25T16:30:00Z", ["01:00", "02:00"]),
+            // Sixty minutes after the observation it is stale, and the
+            // calibrated clock's own hour takes over.
+            ("2026-09-25T16:50:00Z", ["01:00", "02:00"]),
         ] {
             XCTAssertEqual(ForecastWidgetSelection.upcomingPoints(
                 points, at: instant(timestamp),
@@ -801,7 +804,8 @@ final class ForecastWidgetProviderTests: XCTestCase {
         XCTAssertEqual(plan.snapshot?.regionCode, "407")
         XCTAssertNotNil(plan.forecast)
         let expiry = instant("2026-09-25T09:10:00Z")
-        XCTAssertEqual(plan.states.count, 4)
+        // now, forecast stale, current stale, 08:00, 09:00, forecast expiry.
+        XCTAssertEqual(plan.states.count, 6)
         XCTAssertTrue(plan.states.contains { $0.date == expiry })
         XCTAssertNotNil(plan.forecast(at: plan.states[0].date))
         XCTAssertNil(plan.forecast(at: expiry))
@@ -1489,8 +1493,11 @@ final class ForecastExpiryRegressionTests: XCTestCase {
         for family: WidgetFamily in [.systemMedium, .systemLarge] {
             let plan = await planner(forecast: cached()).plan(for: target, family: family)
             XCTAssertEqual(plan.reloadDate, instant("2026-09-25T07:41:00Z"))
+            // Each whole hour up to the hard expiry is an entry, so the hourly
+            // row moves on even when the requested reload runs late.
             XCTAssertEqual(plan.states.map(\.date), [
                 initial, instant("2026-09-25T07:40:00Z"), instant("2026-09-25T07:51:00Z"),
+                instant("2026-09-25T08:00:00Z"), instant("2026-09-25T09:00:00Z"),
                 instant("2026-09-25T09:10:00Z"),
             ])
             XCTAssertNotNil(plan.forecast(at: initial))

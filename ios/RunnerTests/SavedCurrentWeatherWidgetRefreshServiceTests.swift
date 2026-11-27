@@ -156,7 +156,7 @@ final class SavedCurrentWeatherWidgetRefreshServiceTests: XCTestCase {
         XCTAssertNil(snapshot.apparentTemperature)
     }
 
-    func testFirstClockSyncFailureDoesNotWrite() async throws {
+    func testFirstClockSyncFailureStillWritesWithDeviceTime() async throws {
         let weather = ScriptedCurrentWeather(
             result: .success(try makeObservation())
         )
@@ -175,12 +175,54 @@ final class SavedCurrentWeatherWidgetRefreshServiceTests: XCTestCase {
             target: .saved(regionCode: "242")
         )
 
-        XCTAssertEqual(result, .failed)
+        // A fetched observation is never thrown away for want of a clock.
+        XCTAssertEqual(result, .refreshed)
         let hasSynchronized = await clock.hasSynchronized
-        let weatherCallCount = await weather.callCount
         XCTAssertFalse(hasSynchronized)
-        XCTAssertEqual(weatherCallCount, 1)
-        XCTAssertEqual(writer.writeCount, 0)
+        XCTAssertEqual(writer.writeCount, 1)
+        XCTAssertEqual(
+            writer.snapshots.first?.calibratedTimeOffsetMilliseconds, 0
+        )
+    }
+
+    func testClockSyncFailureUsesAnchorPersistedByAnEarlierProcess() async throws {
+        let store = InMemoryClockAnchorStore()
+        let monotonicClock = TestMonotonicClock(milliseconds: 100)
+        let earlier = makeClock(
+            monotonicClock: monotonicClock,
+            serverResults: [.success(10_000)],
+            anchorStore: store
+        )
+        let synchronized = await earlier.synchronize()
+        XCTAssertTrue(synchronized)
+        monotonicClock.set(milliseconds: 600)
+
+        let weather = ScriptedCurrentWeather(
+            result: .success(try makeObservation())
+        )
+        let writer = CurrentWeatherSnapshotWriterSpy()
+        // A new process: a fresh clock whose own synchronization fails.
+        let later = makeClock(
+            monotonicClock: monotonicClock,
+            serverResults: [.failure(WidgetRefreshTestError.scripted)],
+            anchorStore: store
+        )
+        let service = try makeService(
+            codes: ["242"],
+            weather: weather,
+            clock: later,
+            writeSnapshot: writer.write
+        )
+
+        let result = await service.refresh(
+            target: .saved(regionCode: "242")
+        )
+
+        XCTAssertEqual(result, .refreshed)
+        XCTAssertEqual(
+            writer.snapshots.first?.calibratedTimeOffsetMilliseconds,
+            5_500
+        )
     }
 
     func testLaterClockSyncFailureUsesRetainedAnchor() async throws {
@@ -528,7 +570,8 @@ final class SavedCurrentWeatherWidgetRefreshServiceTests: XCTestCase {
         wallClock: TestWallClock = TestWallClock(milliseconds: 5_000),
         monotonicClock: TestMonotonicClock =
             TestMonotonicClock(milliseconds: 100),
-        serverResults: [Result<Int64, Error>]
+        serverResults: [Result<Int64, Error>],
+        anchorStore: (any WidgetClockAnchorStoring)? = nil
     ) -> WidgetServerClock {
         WidgetServerClock(
             deviceClock: wallClock,
@@ -536,7 +579,8 @@ final class SavedCurrentWeatherWidgetRefreshServiceTests: XCTestCase {
             serverTimeSource: ScriptedServerTimeSource(
                 results: serverResults
             ),
-            timeoutRunner: PassthroughServerClockTimeoutRunner()
+            timeoutRunner: PassthroughServerClockTimeoutRunner(),
+            anchorStore: anchorStore
         )
     }
 

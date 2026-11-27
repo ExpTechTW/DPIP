@@ -125,7 +125,7 @@ final class WidgetCurrentLocationClientTests: XCTestCase {
         )
     }
 
-    func testClearlyPreRequestCachedSampleWaitsUntilTimeout() async {
+    func testRecentPreRequestSampleIsAccepted() async {
         let manager = FakeWidgetLocationManager()
         let scheduler = FakeWidgetLocationTimeoutScheduler()
         let client = makeClient(manager: manager, scheduler: scheduler)
@@ -134,70 +134,117 @@ final class WidgetCurrentLocationClientTests: XCTestCase {
         }
         await waitForRequest(on: manager)
 
+        // Core Location's first delivery is usually its cached fix. A
+        // township answer does not need a newer one.
         manager.send(
             samples: [
                 WidgetLocationSample(
                     latitude: 25.033,
                     longitude: 121.5654,
-                    timestamp: now.addingTimeInterval(-2)
+                    timestamp: now.addingTimeInterval(-9 * 60)
                 ),
             ]
         )
-        await Task.yield()
-
-        XCTAssertEqual(manager.stopCount, 0)
-        XCTAssertNotNil(manager.delegate)
-        XCTAssertEqual(scheduler.lastCancellation?.cancelCount, 0)
-
-        scheduler.fireLast()
-        let result = await task.value
-
-        XCTAssertEqual(result, .timedOut)
-        XCTAssertEqual(manager.stopCount, 1)
-        XCTAssertNil(manager.delegate)
-    }
-
-    func testCurrentSampleWinsAfterPreRequestCachedSample() async {
-        let manager = FakeWidgetLocationManager()
-        let scheduler = FakeWidgetLocationTimeoutScheduler()
-        let client = makeClient(manager: manager, scheduler: scheduler)
-        let task = Task { @MainActor in
-            await client.acquireLocation()
-        }
-        await waitForRequest(on: manager)
-
-        manager.send(
-            samples: [
-                WidgetLocationSample(
-                    latitude: 24.1477,
-                    longitude: 120.6736,
-                    timestamp: now.addingTimeInterval(-30)
-                ),
-            ]
-        )
-        manager.send(
-            samples: [
-                WidgetLocationSample(
-                    latitude: 25.033,
-                    longitude: 121.5654,
-                    timestamp: now
-                ),
-            ]
-        )
-
         let result = await task.value
 
         XCTAssertEqual(
             result,
             .acquired(
-                WidgetCurrentLocation(
-                    latitude: 25.033,
-                    longitude: 121.5654
-                )!
+                WidgetCurrentLocation(latitude: 25.033, longitude: 121.5654)!
             )
         )
         XCTAssertEqual(manager.stopCount, 1)
         XCTAssertNil(manager.delegate)
+        XCTAssertEqual(scheduler.lastCancellation?.cancelCount, 1)
+    }
+
+    func testNewestSampleWinsWithinOneDelivery() async {
+        let manager = FakeWidgetLocationManager(
+            event: .samples([
+                WidgetLocationSample(
+                    latitude: 25.033,
+                    longitude: 121.5654,
+                    timestamp: now
+                ),
+                WidgetLocationSample(
+                    latitude: 24.1477,
+                    longitude: 120.6736,
+                    timestamp: now.addingTimeInterval(-30)
+                ),
+            ])
+        )
+
+        let result = await makeClient(manager: manager).acquireLocation()
+
+        XCTAssertEqual(
+            result,
+            .acquired(
+                WidgetCurrentLocation(latitude: 25.033, longitude: 121.5654)!
+            )
+        )
+    }
+
+    func testCachedFixWithinTenMinutesSkipsTheRequest() async {
+        let manager = FakeWidgetLocationManager()
+        manager.cachedLocation = WidgetLocationSample(
+            latitude: 24.1477,
+            longitude: 120.6736,
+            timestamp: now.addingTimeInterval(-10 * 60)
+        )
+        let scheduler = FakeWidgetLocationTimeoutScheduler()
+
+        let result = await makeClient(
+            manager: manager, scheduler: scheduler
+        ).acquireLocation()
+
+        XCTAssertEqual(
+            result,
+            .acquired(
+                WidgetCurrentLocation(latitude: 24.1477, longitude: 120.6736)!
+            )
+        )
+        XCTAssertEqual(manager.startCount, 0)
+        XCTAssertTrue(scheduler.scheduledIntervals.isEmpty)
+    }
+
+    func testCachedFixOlderThanTenMinutesStartsARequest() async {
+        let manager = FakeWidgetLocationManager(
+            event: .samples([
+                WidgetLocationSample(
+                    latitude: 25.033,
+                    longitude: 121.5654,
+                    timestamp: now
+                ),
+            ])
+        )
+        manager.cachedLocation = WidgetLocationSample(
+            latitude: 24.1477,
+            longitude: 120.6736,
+            timestamp: now.addingTimeInterval(-601)
+        )
+
+        let result = await makeClient(manager: manager).acquireLocation()
+
+        XCTAssertEqual(
+            result,
+            .acquired(
+                WidgetCurrentLocation(latitude: 25.033, longitude: 121.5654)!
+            )
+        )
+        XCTAssertEqual(manager.startCount, 1)
+    }
+
+    func testCachedFixIsIgnoredWithoutWidgetAuthorization() async {
+        let manager = FakeWidgetLocationManager(widgetUpdatesAuthorized: false)
+        manager.cachedLocation = WidgetLocationSample(
+            latitude: 24.1477,
+            longitude: 120.6736,
+            timestamp: now
+        )
+
+        let result = await makeClient(manager: manager).acquireLocation()
+
+        XCTAssertEqual(result, .unavailable)
     }
 
     func testRequestStartToleranceAcceptsLegitimateNearStartSample() async {
@@ -440,6 +487,7 @@ private final class FakeWidgetLocationManager: WidgetLocationManaging {
     let authorization: WidgetLocationAuthorization
     let isAuthorizedForWidgetUpdates: Bool
     var desiredAccuracy: Double = 0
+    var cachedLocation: WidgetLocationSample?
     private(set) var startCount = 0
     private(set) var stopCount = 0
     private let event: Event

@@ -91,6 +91,55 @@ actor ScriptedServerTimeSource: WidgetServerTimeSource {
     }
 }
 
+final class InMemoryClockAnchorStore: WidgetClockAnchorStoring,
+    @unchecked Sendable
+{
+    private let lock = NSLock()
+    private var stored: WidgetClockAnchor?
+    private var storedSaveCount = 0
+
+    init(_ anchor: WidgetClockAnchor? = nil) {
+        stored = anchor
+    }
+
+    var anchor: WidgetClockAnchor? { lock.withLock { stored } }
+    var saveCount: Int { lock.withLock { storedSaveCount } }
+
+    func load() -> WidgetClockAnchor? {
+        lock.withLock { stored }
+    }
+
+    func save(_ anchor: WidgetClockAnchor) {
+        lock.withLock {
+            stored = anchor
+            storedSaveCount += 1
+        }
+    }
+}
+
+final class TestBootMonotonicClock: WidgetMonotonicTimeSource,
+    @unchecked Sendable
+{
+    private let lock = NSLock()
+    private var milliseconds: Int64
+    private var boot: String?
+
+    init(milliseconds: Int64, boot: String?) {
+        self.milliseconds = milliseconds
+        self.boot = boot
+    }
+
+    func elapsedMilliseconds() -> Int64 { lock.withLock { milliseconds } }
+    func bootSessionIdentifier() -> String? { lock.withLock { boot } }
+
+    func set(milliseconds: Int64, boot: String?) {
+        lock.withLock {
+            self.milliseconds = milliseconds
+            self.boot = boot
+        }
+    }
+}
+
 struct PassthroughServerClockTimeoutRunner: WidgetServerClockTimeoutRunning {
     func serverTimeUnixMilliseconds(
         from source: any WidgetServerTimeSource,
@@ -156,13 +205,13 @@ actor ScriptedCurrentWeather {
 
 actor ScriptedSnapshotClock {
     private(set) var callCount = 0
-    private let sample: CurrentWeatherSnapshotTime?
+    private let sample: CurrentWeatherSnapshotTime
 
-    init(sample: CurrentWeatherSnapshotTime?) {
+    init(sample: CurrentWeatherSnapshotTime) {
         self.sample = sample
     }
 
-    func synchronizeAndSample() -> CurrentWeatherSnapshotTime? {
+    func synchronizeAndSample() -> CurrentWeatherSnapshotTime {
         callCount += 1
         return sample
     }

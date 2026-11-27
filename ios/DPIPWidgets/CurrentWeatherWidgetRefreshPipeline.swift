@@ -12,7 +12,7 @@ struct CurrentWeatherWidgetRefreshPipeline: Sendable {
         Double
     ) async throws -> CurrentWeatherRemoteDTO?
     typealias SynchronizeClock = @Sendable () async
-        -> CurrentWeatherSnapshotTime?
+        -> CurrentWeatherSnapshotTime
     typealias CommitSnapshot = @Sendable (
         CurrentWeatherWidgetSnapshot,
         CurrentWeatherSnapshotWriteToken
@@ -68,7 +68,7 @@ struct CurrentWeatherWidgetRefreshPipeline: Sendable {
         async let snapshotTime = synchronizeClock()
 
         let resolvedObservation: CurrentWeatherRemoteDTO?
-        let resolvedSnapshotTime: CurrentWeatherSnapshotTime?
+        let resolvedSnapshotTime: CurrentWeatherSnapshotTime
         do {
             (resolvedObservation, resolvedSnapshotTime) = try await (
                 observation,
@@ -80,9 +80,6 @@ struct CurrentWeatherWidgetRefreshPipeline: Sendable {
 
         guard let resolvedObservation else {
             return .noObservation
-        }
-        guard let resolvedSnapshotTime else {
-            return .failed
         }
 
         let snapshot = CurrentWeatherWidgetSnapshotFactory.make(
@@ -116,28 +113,24 @@ struct CurrentWeatherWidgetRefreshPipeline: Sendable {
         }
     }
 
+    /// A failed synchronization falls back to the last persisted anchor, and
+    /// with none at all to the device clock: the observation is committed
+    /// either way, because throwing it away leaves the widget on older data.
     static func synchronizedSnapshotTime(
         clock: WidgetServerClock
-    ) async -> CurrentWeatherSnapshotTime? {
+    ) async -> CurrentWeatherSnapshotTime {
         #if DEBUG
         WidgetWeatherRefreshDiagnostics.log("clock synchronization started")
         let synchronized = await clock.synchronize()
+        let hasAnchor = await clock.hasSynchronized
+        WidgetWeatherRefreshDiagnostics.log(
+            synchronized
+                ? "clock synchronized"
+                : "clock failed usableAnchor=\(hasAnchor)"
+        )
         #else
         _ = await clock.synchronize()
         #endif
-        let hasSynchronized = await clock.hasSynchronized
-        #if DEBUG
-        if synchronized {
-            WidgetWeatherRefreshDiagnostics.log("clock synchronized")
-        } else {
-            WidgetWeatherRefreshDiagnostics.log(
-                "clock failed retainedPreviousAnchor=\(hasSynchronized)"
-            )
-        }
-        #endif
-        guard hasSynchronized else {
-            return nil
-        }
         return await clock.currentWeatherSnapshotTime()
     }
 
