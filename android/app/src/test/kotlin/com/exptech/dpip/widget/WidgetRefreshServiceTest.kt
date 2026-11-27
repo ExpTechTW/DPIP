@@ -244,17 +244,39 @@ class WidgetRefreshServiceTest {
     }
 
     @Test
-    fun `a failed clock leaves the previous snapshot alone`() {
+    fun `a failed clock with an anchor still on hand refreshes as usual`() {
+        // `synchronize` answers true after a failed exchange whenever an anchor
+        // exists — the process's own, or the one restored from disk.
+        var synchronized = 0
+        val result = service(
+            synchronizeClock = { synchronized++; true },
+            fetchWeather = { _, _ -> observation(time = 1_791_454_900) },
+        ).refresh(currentLocation)
+
+        assertEquals(1, synchronized)
+        assertEquals(WidgetRefreshResult.Refreshed, result)
+        assertEquals(1_791_454_900L, store.readCurrentWeather(currentLocation)!!.snapshot.observationTime)
+    }
+
+    @Test
+    fun `a failed clock with no anchor at all keeps the fetched weather and asks for a retry`() {
+        assertEquals(WidgetRefreshResult.Refreshed, service().refresh(currentLocation))
+
+        val result = service(
+            synchronizeClock = { false },
+            snapshotTime = { null },
+            calibratedNow = { null },
+            fetchWeather = { _, _ -> observation(time = 1_791_454_900) },
+        ).refresh(currentLocation)
+
+        assertEquals("a clock to anchor is still worth a retry", WidgetRefreshResult.Failed, result)
+        val stored = store.readCurrentWeather(currentLocation)!!.snapshot
+        assertEquals("the weather it fetched is not thrown away", 1_791_454_900L, stored.observationTime)
+        // The observation's own server instant stands in for "now".
         assertEquals(
-            WidgetRefreshResult.Refreshed,
-            service().refresh(currentLocation),
+            WidgetSolarTime.isNightAt(1_791_454_900_000L, 24.181, 120.645),
+            stored.isNight,
         )
-
-        val result = service(synchronizeClock = { false })
-            .refresh(currentLocation)
-
-        assertEquals(WidgetRefreshResult.Unavailable, result)
-        assertEquals(1_791_454_316L, store.readCurrentWeather(currentLocation)!!.snapshot.observationTime)
     }
 
     @Test

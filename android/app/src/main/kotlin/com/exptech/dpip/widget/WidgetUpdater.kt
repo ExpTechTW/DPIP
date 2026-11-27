@@ -135,7 +135,9 @@ object WidgetUpdater {
             fun load(context: Context, appWidgetId: Int): InstanceData {
                 val store = WidgetStore.open(context)
                 // The one trusted instant every box of this render reasons from,
-                // from the monotonic anchor rather than the wall clock.
+                // from the monotonic anchor rather than the wall clock — restored
+                // from disk when this process has just started.
+                WidgetClock.attach(context)
                 val calibratedNow = WidgetClock.calibratedNowMilliseconds()
                 val address = store.readInstance(appWidgetId)?.address
                     ?: return InstanceData(
@@ -206,6 +208,7 @@ object WidgetUpdater {
     fun needsForecast(context: Context, appWidgetId: Int): Boolean {
         val manager = managerOrNull(context) ?: return false
         if (WidgetSizes.largestClass(context, optionsOf(manager, appWidgetId)) == WidgetSizeClass.Small) return false
+        WidgetClock.attach(context)
         val store = WidgetStore.open(context)
         val address = store.readInstance(appWidgetId)?.address ?: return false
         return !hasUsableForecast(store, address)

@@ -68,11 +68,13 @@ class WidgetRefreshService(
         }
 
         // ── Calibration, before the position ──
-        if (!synchronizeClock()) {
-            WidgetLog.warning(context, "clock unavailable source=${address.sourceIdentifier}")
-            return WidgetRefreshResult.Unavailable
-        }
-        val time = snapshotTime() ?: return WidgetRefreshResult.Unavailable
+        //
+        // A failure is not a reason to stop: an anchor from an earlier sync —
+        // this process's or the one restored from disk — still answers, and
+        // with none at all the observation is still fetched and committed
+        // (below) rather than thrown away.
+        val calibrated = synchronizeClock()
+        if (!calibrated) WidgetLog.warning(context, "clock unavailable source=${address.sourceIdentifier}")
 
         // ── The query point ──
         val location = when (val resolution = resolveAddress(address)) {
@@ -116,6 +118,10 @@ class WidgetRefreshService(
             return WidgetRefreshResult.Failed
         } ?: return WidgetRefreshResult.NoObservation
 
+        // With no anchor at all the observation's own server instant stands in
+        // for "now": it decides only the day/night glyph, and the screen still
+        // calls the reading unverified until a clock is anchored.
+        val time = snapshotTime() ?: WidgetSnapshotTime(observation.time * 1_000, 0)
         val committed = store.commitCurrentWeather(
             snapshot = snapshot(observation, location, time),
             writtenAt = nowMilliseconds(),
@@ -138,7 +144,9 @@ class WidgetRefreshService(
         }
 
         refreshForecast(location)
-        return WidgetRefreshResult.Refreshed
+        // Committed, but with no anchor the screen cannot call it fresh: a
+        // bounded retry is the quickest way to an anchor.
+        return if (calibrated) WidgetRefreshResult.Refreshed else WidgetRefreshResult.Failed
     }
 
     /**
@@ -250,6 +258,7 @@ class WidgetRefreshService(
          */
         fun create(context: Context): WidgetRefreshService {
             val applicationContext = context.applicationContext
+            WidgetClock.attach(applicationContext)
             val store = WidgetStore.open(applicationContext)
             return WidgetRefreshService(
                 context = applicationContext,

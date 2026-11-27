@@ -320,6 +320,46 @@ class WidgetSnapshotChannelTest {
     }
 
     @Test
+    fun `the app's catalog publish in a fresh process keeps a fresh widget fresh`() {
+        // App launch republishes the catalog and redraws every instance. That
+        // redraw used to run in a process with no calibrated anchor, so every
+        // Widget turned "outdated" and lost its forecast until a network
+        // refresh — or the user's tap — happened to synchronize the clock.
+        android.provider.Settings.Global.putInt(context.contentResolver, android.provider.Settings.Global.BOOT_COUNT, 2)
+        WidgetClock.attach(context)
+        WidgetClock.installForTest(atTaipei(14, 20), SystemClock.elapsedRealtime(), persist = true)
+        store.writeInstance(11, WidgetAddress.Saved("407"), "407", 1L)
+        shadowOf(AppWidgetManager.getInstance(context)).addBoundWidget(
+            11,
+            android.appwidget.AppWidgetProviderInfo().apply {
+                provider = android.content.ComponentName(context, WeatherWidgetProvider::class.java)
+            },
+        )
+        WidgetUpdater.optionsProvider = { _, _ ->
+            Bundle().apply {
+                putInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH, 218)
+                putInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, 202)
+            }
+        }
+        assertNull(write("currentWeather", payload(observationTime = atTaipei(14, 10) / 1_000), "region:407").errorCode)
+        WidgetClock.forgetForTest()
+
+        val catalog = """
+            {"schemaVersion":1,"locations":[
+              {"regionCode":"407","displayName":"西屯區","administrativeAreaName":"臺中市",
+               "latitude":24.181,"longitude":120.645}]}
+        """.trimIndent()
+        assertNull(write("locationCatalog", catalog).errorCode)
+
+        val submitted = shadowOf(AppWidgetManager.getInstance(context)).getViewFor(11)
+        assertEquals(
+            "the redraw must not call a ten-minute-old observation outdated",
+            android.view.View.GONE,
+            submitted.findViewById<android.view.View>(com.exptech.dpip.R.id.widget_stale).visibility,
+        )
+    }
+
+    @Test
     fun `an unknown method is not implemented`() {
         val result = RecordingResult()
         channel.onMethodCall(MethodCall("somethingElse", null), result)

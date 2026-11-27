@@ -11,7 +11,8 @@ import androidx.work.WorkerParameters
  * * [MODE_PERIODIC] — the periodic tick: reconcile against the launcher, redraw
  *   from the cache, and append a refresh link. It fetches nothing itself, so it
  *   can never run beside a link of the chain.
- * * [MODE_REDRAW] — a cache-only redraw at a boundary.
+ * * [MODE_REDRAW] — a redraw at a boundary, from the cache; a boundary that
+ *   needs new data also appends a refresh link.
  *
  * Every mode redraws, even when every fetch failed: the launcher is holding a
  * `RemoteViews` captured at some past instant, and this process is the only
@@ -42,6 +43,9 @@ class WeatherWidgetRefreshWorker(
 
     private fun redraw(): Result {
         WidgetUpdater.updateAll(applicationContext)
+        if (inputData.getBoolean(KEY_REFETCH, false)) {
+            WidgetRefresh.request(applicationContext, WidgetRefresh.Reason.Boundary)
+        }
         WidgetRefresh.scheduleNextLocalRerender(applicationContext)
         return Result.success()
     }
@@ -131,6 +135,7 @@ class WeatherWidgetRefreshWorker(
         const val KEY_SOURCE = "source"
         const val KEY_MANUAL = "manual"
         const val KEY_REASON = "reason"
+        const val KEY_REFETCH = "refetch"
 
         const val MODE_REFRESH = "refresh"
         const val MODE_PERIODIC = "periodic"

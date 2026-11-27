@@ -23,7 +23,15 @@ import java.time.ZoneOffset
  * when the response arrived — which is how an expired forecast comes back.
  */
 object WidgetDeadlines {
-    const val staleAfterMilliseconds = 30L * 60 * 1_000
+    /**
+     * An observation is outdated an hour after it was taken.
+     *
+     * Station observations already arrive 10–20 minutes old, so a 30-minute
+     * limit left a freshly fetched reading barely ten minutes before it was
+     * called outdated — less than one refresh period, and the Widget said
+     * "outdated" for a large share of every period even when nothing was wrong.
+     */
+    const val staleAfterMilliseconds = 60L * 60 * 1_000
     const val forecastExpiryMilliseconds = 30L * 60 * 1_000
 
     private val taipeiOffset = ZoneOffset.ofHours(8)
@@ -62,6 +70,19 @@ object WidgetDeadlines {
         updateTimeMilliseconds + forecastExpiryMilliseconds,
         nextTaipeiHourStart(receivedCalibratedMilliseconds),
     )
+
+    /**
+     * The earliest future instant at which the screen needs *new data*, or null:
+     * the observation turning stale or the forecast expiring. Reaching one is a
+     * reason to fetch, not merely to redraw; a day/night flip is not.
+     */
+    fun nextRefetch(
+        snapshot: CurrentWeatherSnapshot,
+        forecast: StoredForecast?,
+        calibratedNowMilliseconds: Long,
+    ): Long? = listOfNotNull(staleness(snapshot), forecast?.expiresAtMilliseconds)
+        .filter { it > calibratedNowMilliseconds }
+        .minOrNull()
 
     /**
      * The earliest future instant that would change what is on screen, or null.

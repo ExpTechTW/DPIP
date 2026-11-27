@@ -419,7 +419,30 @@ class WeatherWidgetRefreshWorkerTest {
     }
 
     @Test
-    fun `no trusted clock means no redraw is scheduled`() {
+    fun `a process that lost its anchor restores it and still schedules the boundary`() {
+        // The defect: the anchor lived only in memory, and a redraw runs in
+        // whatever process the system starts for it. With no anchor it called a
+        // fresh observation outdated, hid the forecast, and scheduled nothing —
+        // so the Widget stayed "outdated" until the user tapped it.
+        android.provider.Settings.Global.putInt(context.contentResolver, android.provider.Settings.Global.BOOT_COUNT, 4)
+        WidgetClock.attach(context)
+        val calibratedNow = System.currentTimeMillis()
+        WidgetClock.installForTest(calibratedNow, android.os.SystemClock.elapsedRealtime(), persist = true)
+        val observationSeconds = (calibratedNow - WidgetDeadlines.staleAfterMilliseconds) / 1_000 + 15 * 60
+        seedSnapshot(observationSeconds = observationSeconds, transitionSeconds = observationSeconds + 7_200)
+        WidgetClock.forgetForTest()
+
+        redraw().startWork().get()
+
+        assertTrue("the fresh observation is drawn as fresh", !WidgetUpdater.presentation(context, 11, 218, 202).isStale)
+        val line = checkNotNull(log.lines.firstOrNull { it.contains("local redraw") }) { "nothing scheduled: ${log.lines}" }
+        val seconds = line.substringAfter("in ").substringBefore("s").toLong()
+        assertTrue("expected ~900s, was $seconds ($line)", seconds in 890..910)
+        assertTrue("the next boundary is a staleness one: $line", line.endsWith("refetch=true"))
+    }
+
+    @Test
+    fun `with no anchor anywhere no weather boundary is scheduled`() {
         seedSnapshot(observationSeconds = 1_791_454_316, transitionSeconds = 1_791_460_000)
         WidgetClock.invalidate()
 
@@ -427,5 +450,38 @@ class WeatherWidgetRefreshWorkerTest {
 
         assertTrue(result is ListenableWorker.Result.Success)
         assertEquals(null, log.lines.firstOrNull { it.contains("local redraw") })
+    }
+
+    @Test
+    fun `a day-night boundary only redraws`() {
+        val calibratedNow = System.currentTimeMillis()
+        WidgetClock.installForTest(calibratedNow, android.os.SystemClock.elapsedRealtime())
+        // Fresh for another hour, but the sun sets in ten minutes.
+        seedSnapshot(observationSeconds = calibratedNow / 1_000, transitionSeconds = calibratedNow / 1_000 + 600)
+
+        WidgetRefresh.scheduleNextLocalRerender(context)
+
+        val line = checkNotNull(log.lines.firstOrNull { it.contains("local redraw") })
+        assertTrue(line, line.endsWith("refetch=false"))
+    }
+
+    @Test
+    fun `a boundary that needs data asks the chain for it and one that does not, does not`() {
+        seedSnapshot(observationSeconds = 1_791_454_316, transitionSeconds = 1_791_460_000)
+
+        worker(WeatherWidgetRefreshWorker.MODE_REDRAW).startWork().get()
+        assertTrue("a day/night redraw fetches nothing", infos(WidgetRefresh.refreshWorkName).isEmpty())
+
+        TestListenableWorkerBuilder<WeatherWidgetRefreshWorker>(context)
+            .setInputData(workDataOf(
+                WeatherWidgetRefreshWorker.KEY_MODE to WeatherWidgetRefreshWorker.MODE_REDRAW,
+                WeatherWidgetRefreshWorker.KEY_REFETCH to true,
+            ))
+            .build()
+            .startWork()
+            .get()
+
+        assertEquals(listOf(WorkInfo.State.ENQUEUED), infos(WidgetRefresh.refreshWorkName).map { it.state })
+        assertTrue("the redraw itself fetches nothing", refresherCalls.isEmpty())
     }
 }

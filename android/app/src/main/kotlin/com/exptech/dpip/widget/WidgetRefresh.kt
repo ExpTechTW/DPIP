@@ -68,6 +68,7 @@ object WidgetRefresh {
         Resized("resized"),
         Restored("restored"),
         Boot("boot"),
+        Boundary("boundary"),
         AppPublish("app-publish"),
         Tap("tap"),
     }
@@ -137,19 +138,25 @@ object WidgetRefresh {
     }
 
     /**
-     * A cache-only redraw at a future boundary, so the screen can turn stale or
-     * flip day/night without a network round trip.
+     * A redraw at a future boundary, from the cache first, so the screen turns
+     * stale or flips day/night even offline.
+     *
+     * When [refetch] is set the boundary is one that needs new data — the
+     * observation ageing out, the forecast expiring — and the redraw also
+     * appends a refresh to the chain. Redrawing alone there is what left a
+     * Widget saying "outdated" until the user tapped it.
      *
      * Non-exact by construction: WorkManager may deliver it late, and the
      * periodic tick redraws too. The delay is passed through uncapped — a clamp
      * turned every boundary into a redraw every minute.
      */
-    fun scheduleLocalRerender(context: Context, delayMilliseconds: Long) {
+    fun scheduleLocalRerender(context: Context, delayMilliseconds: Long, refetch: Boolean = false) {
         val request = OneTimeWorkRequestBuilder<WeatherWidgetRefreshWorker>()
             .setInitialDelay(delayMilliseconds.coerceAtLeast(0), TimeUnit.MILLISECONDS)
             .setInputData(
                 Data.Builder()
                     .putString(WeatherWidgetRefreshWorker.KEY_MODE, WeatherWidgetRefreshWorker.MODE_REDRAW)
+                    .putBoolean(WeatherWidgetRefreshWorker.KEY_REFETCH, refetch)
                     .build(),
             )
             .addTag(workTag)
@@ -163,33 +170,43 @@ object WidgetRefresh {
     }
 
     /**
-     * Asks for a cache-only redraw at the next instant the screen could change.
+     * Asks for a redraw at the next instant the screen could change.
      *
      * The boundaries are the staleness deadline, the next day/night transition
      * and the forecast's expiry — all calibrated, from `WidgetDeadlines` — plus
      * the expiry of manual-refresh feedback, which is UI-only device time. A
      * calibrated boundary is placed on the device clock with the *live* anchor,
-     * so a device time change cannot misplace it. With no anchor only the
-     * feedback expiry can be scheduled.
+     * so a device time change cannot misplace it; the anchor survives process
+     * death (`WidgetClock.attach`), so a redraw scheduled by one process is
+     * placed correctly by the next. With no anchor at all only the feedback
+     * expiry can be scheduled.
      */
     fun scheduleNextLocalRerender(context: Context) {
+        WidgetClock.attach(context)
         val calibratedNow = WidgetClock.calibratedNowMilliseconds()
         val now = System.currentTimeMillis()
         val store = WidgetStore.open(context)
         var earliest: Long? = null
+        var refetchAt: Long? = null
         for (address in store.usedAddresses()) {
             store.readRefreshFeedback(address, now)?.let {
                 earliest = minOf(earliest ?: Long.MAX_VALUE, it.expiresAtMilliseconds)
             }
             if (calibratedNow == null) continue
             val snapshot = store.readCurrentWeather(address)?.snapshot ?: continue
-            val change = WidgetDeadlines.nextChange(snapshot, store.readForecast(address), calibratedNow) ?: continue
-            val device = WidgetClock.deviceMillisecondsFor(change) ?: continue
-            earliest = minOf(earliest ?: Long.MAX_VALUE, device)
+            val forecast = store.readForecast(address)
+            WidgetDeadlines.nextChange(snapshot, forecast, calibratedNow)
+                ?.let(WidgetClock::deviceMillisecondsFor)
+                ?.let { earliest = minOf(earliest ?: Long.MAX_VALUE, it) }
+            WidgetDeadlines.nextRefetch(snapshot, forecast, calibratedNow)
+                ?.let(WidgetClock::deviceMillisecondsFor)
+                ?.let { refetchAt = minOf(refetchAt ?: Long.MAX_VALUE, it) }
         }
-        val delayMilliseconds = (earliest ?: return) - now
-        WidgetLog.debug(context, "local redraw scheduled in ${delayMilliseconds / 1_000}s")
-        scheduleLocalRerender(context, delayMilliseconds)
+        val at = earliest ?: return
+        val refetch = refetchAt?.let { it <= at } == true
+        val delayMilliseconds = at - now
+        WidgetLog.debug(context, "local redraw scheduled in ${delayMilliseconds / 1_000}s refetch=$refetch")
+        scheduleLocalRerender(context, delayMilliseconds, refetch)
     }
 
     /**
