@@ -2097,6 +2097,8 @@
   "experimentalCategorySound": "音效",
   "experimentalCategoryGraphics": "圖形",
   "experimentalCategoryTools": "工具",
+  "experimentalSeismometer": "地震儀",
+  "experimentalSeismometerSubtitle": "在資料分頁顯示地震儀",
   "trendRainPastHour": "過去 1 小時雨量",
   "trendRainHourLastReading": "截至該小時最後一筆的 1 小時雨量"
 }

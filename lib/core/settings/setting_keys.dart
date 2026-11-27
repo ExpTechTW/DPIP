@@ -177,6 +177,13 @@ abstract final class SettingKeys {
     'experimental.unlocked',
   );
 
+  /// Whether the Data tab lists the phone seismometer (absent = false). An
+  /// Experimental features option, off until the user turns it on. See
+  /// `ExperimentalSettings`.
+  static const SettingKey<bool> experimentalSeismometer = SettingKey<bool>._(
+    'experimental.seismometer',
+  );
+
   /// Last push token — the FCM registration token on Android, the raw APNs
   /// device token on iOS (backend registration keys on whichever this
   /// platform actually uses). See `NotificationService`.

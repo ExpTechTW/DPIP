@@ -2097,6 +2097,8 @@
   "experimentalCategorySound": "Âm thanh",
   "experimentalCategoryGraphics": "Đồ họa",
   "experimentalCategoryTools": "Công cụ",
+  "experimentalSeismometer": "Máy đo địa chấn",
+  "experimentalSeismometerSubtitle": "Hiển thị máy đo địa chấn trong tab Dữ liệu",
   "trendRainPastHour": "Lượng mưa trong 1 giờ qua",
   "trendRainHourLastReading": "Lượng mưa 1 giờ tính đến lần đo cuối của giờ này"
 }

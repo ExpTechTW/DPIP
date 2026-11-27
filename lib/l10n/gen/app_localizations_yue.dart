@@ -3498,4 +3498,10 @@ class AppLocalizationsYue extends AppLocalizations {
 
   @override
   String get experimentalCategoryTools => '工具';
+
+  @override
+  String get experimentalSeismometer => '地震儀';
+
+  @override
+  String get experimentalSeismometerSubtitle => '喺資料分頁顯示地震儀';
 }

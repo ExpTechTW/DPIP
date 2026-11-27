@@ -3,6 +3,7 @@
 /// the sky, would make the home backdrop lie about which override is in force.
 library;
 
+import 'package:dpip/core/platform/device_sensors.dart';
 import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/core/settings/settings_store.dart';
@@ -29,8 +30,14 @@ Future<ExperimentalSettings> _pump(
   final settings = ExperimentalSettings(SettingsStore.inMemory());
   await settings.unlock();
   await tester.pumpWidget(
-    ChangeNotifierProvider.value(
-      value: settings,
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(value: settings),
+        // A phone with an accelerometer, as the page is on most devices.
+        ChangeNotifierProvider.value(
+          value: DeviceSensors.known(const {DeviceSensor.accelerometer}),
+        ),
+      ],
       child: MaterialApp(
         localizationsDelegates: appLocalizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,

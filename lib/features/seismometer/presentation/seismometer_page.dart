@@ -1,7 +1,8 @@
 /// Live phone seismometer.
 ///
 /// Sampling runs while this page is on the data tab, the shell is the top
-/// route, and the app is in the foreground. [SeismometerController.stop]
+/// route, the page's own route is not on its way out, and the app is in the
+/// foreground. [SeismometerController.stop]
 /// runs when any of those stops being true, and [SeismometerController.start]
 /// runs again when they all hold. The state disposes the controller.
 library;
@@ -69,6 +70,7 @@ class _SeismometerPageState extends State<SeismometerPage>
     with WidgetsBindingObserver {
   late final SeismometerController _controller;
   VisibleTab? _visibleTab;
+  ModalRoute<Object?>? _route;
   var _foreground = true;
 
   @override
@@ -83,6 +85,7 @@ class _SeismometerPageState extends State<SeismometerPage>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    _route = ModalRoute.of(context);
     final visibleTab = VisibleTabScope.of(context);
     if (!identical(visibleTab, _visibleTab)) {
       _visibleTab?.removeListener(_syncRunning);
@@ -112,7 +115,15 @@ class _SeismometerPageState extends State<SeismometerPage>
 
   /// No [VisibleTabScope] means the page is outside the shell, so only the
   /// app lifecycle can hide it.
-  bool get _onScreen => _visibleTab?.isOnScreen(widget.tabIndex) ?? true;
+  ///
+  /// A route that is being popped is off screen whatever the tab says. Coming
+  /// back to the Data tab after the seismometer's switch went off closes this
+  /// page in the same frame the tab appears, and the tab is announced after
+  /// that frame — without this, the sensor would run again for the length of
+  /// the exit animation.
+  bool get _onScreen =>
+      (_route?.isActive ?? true) &&
+      (_visibleTab?.isOnScreen(widget.tabIndex) ?? true);
 
   void _syncRunning() {
     if (_foreground && _onScreen) {

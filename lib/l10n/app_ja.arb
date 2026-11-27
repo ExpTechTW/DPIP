@@ -2097,6 +2097,8 @@
   "experimentalCategorySound": "サウンド",
   "experimentalCategoryGraphics": "グラフィック",
   "experimentalCategoryTools": "ツール",
+  "experimentalSeismometer": "地震計",
+  "experimentalSeismometerSubtitle": "データタブに地震計を表示します",
   "trendRainPastHour": "過去1時間の雨量",
   "trendRainHourLastReading": "この時間帯の最終観測までの1時間雨量"
 }

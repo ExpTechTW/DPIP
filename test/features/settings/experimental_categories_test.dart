@@ -1,12 +1,16 @@
 /// The Experimental features page is built from a registry: each option says
-/// which category it sits in, where it is offered, and whether it waits for the
-/// Developer page's unlock.
+/// which category it sits in, where it is offered, which sensors it needs, and
+/// whether it waits for the Developer page's unlock.
 ///
 /// Each of those is a way for an option to silently show up somewhere it does
-/// not work — an Android-only switch on an iPhone, a debugging override in
-/// front of every user — or to silently vanish, which nothing else notices.
+/// not work — an Android-only switch on an iPhone, a seismometer on a phone
+/// with no accelerometer, a debugging override in front of every user — or to
+/// silently vanish, which nothing else notices.
 library;
 
+import 'dart:async';
+
+import 'package:dpip/core/platform/device_sensors.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/core/settings/settings_store.dart';
@@ -27,18 +31,25 @@ ExperimentalOption _option(
   ExperimentalCategory category, {
   Set<TargetPlatform> platforms = everyPlatform,
   bool requiresUnlock = false,
+  Set<DeviceSensor> requiredSensors = const {},
 }) => ExperimentalOption(
   category: category,
   platforms: platforms,
   requiresUnlock: requiresUnlock,
+  requiredSensors: requiredSensors,
   build: (_, _) => ListTile(title: Text(label)),
 );
 
-/// Pumps the page over [options] (the real registry when null).
+/// A device with every sensor there is.
+const Set<DeviceSensor> _allSensors = {DeviceSensor.accelerometer};
+
+/// Pumps the page over [options] (the real registry when null), on a device
+/// with [sensors] (every one there is unless a test says otherwise).
 Future<ExperimentalSettings> _pump(
   WidgetTester tester, {
   List<ExperimentalOption>? options,
   bool unlocked = false,
+  DeviceSensors? sensors,
 }) async {
   tester.view.physicalSize = _tall;
   tester.view.devicePixelRatio = 1;
@@ -50,8 +61,13 @@ Future<ExperimentalSettings> _pump(
       ? ExperimentalPage(watchWeatherCode: (_) => null)
       : ExperimentalPage(watchWeatherCode: (_) => null, options: options);
   await tester.pumpWidget(
-    ChangeNotifierProvider.value(
-      value: settings,
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(value: settings),
+        ChangeNotifierProvider.value(
+          value: sensors ?? DeviceSensors.known(_allSensors),
+        ),
+      ],
       child: MaterialApp(
         localizationsDelegates: appLocalizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
@@ -93,6 +109,7 @@ void main() {
       [tools, sound],
       platform: TargetPlatform.android,
       unlocked: false,
+      sensors: _allSensors,
     );
     expect(sections.map((s) => s.$1), [
       ExperimentalCategory.sound,
@@ -108,8 +125,58 @@ void main() {
       ExperimentalCategory.graphics,
       requiresUnlock: true,
     );
-    expect(hidden.isOffered(TargetPlatform.iOS, unlocked: false), isFalse);
-    expect(hidden.isOffered(TargetPlatform.iOS, unlocked: true), isTrue);
+    expect(
+      hidden.isOffered(TargetPlatform.iOS, unlocked: false, sensors: const {}),
+      isFalse,
+    );
+    expect(
+      hidden.isOffered(TargetPlatform.iOS, unlocked: true, sensors: const {}),
+      isTrue,
+    );
+  });
+
+  test('an option that needs a sensor is offered only where it is', () {
+    final needy = _option(
+      'needy',
+      ExperimentalCategory.tools,
+      requiredSensors: const {DeviceSensor.accelerometer},
+    );
+    final plain = _option('plain', ExperimentalCategory.tools);
+    expect(
+      needy.isOffered(
+        TargetPlatform.android,
+        unlocked: true,
+        sensors: const {},
+      ),
+      isFalse,
+    );
+    expect(
+      needy.isOffered(
+        TargetPlatform.android,
+        unlocked: true,
+        sensors: _allSensors,
+      ),
+      isTrue,
+    );
+    // Needing nothing is satisfied by nothing.
+    expect(
+      plain.isOffered(
+        TargetPlatform.android,
+        unlocked: false,
+        sensors: const {},
+      ),
+      isTrue,
+    );
+    // And the category it leaves empty goes with it.
+    expect(
+      experimentalSections(
+        [needy],
+        platform: TargetPlatform.android,
+        unlocked: true,
+        sensors: const {},
+      ),
+      isEmpty,
+    );
   });
 
   testWidgets('groups options by category in the fixed order', (tester) async {
@@ -240,5 +307,122 @@ void main() {
     expect(find.byType(ListTile), findsNothing);
     final list = tester.widget<ListView>(find.byType(ListView));
     expect(list.childrenDelegate.estimatedChildCount, 0);
+  });
+
+  for (final platform in [TargetPlatform.android, TargetPlatform.iOS]) {
+    testWidgets(
+      'the seismometer switch is offered on ${platform.name} without unlock',
+      (tester) async {
+        await _on(platform, () async {
+          final settings = await _pump(tester);
+          final l10n = await _en();
+
+          expect(settings.unlocked, isFalse);
+          expect(find.text(l10n.experimentalCategoryTools), findsOneWidget);
+          expect(find.text(l10n.experimentalSeismometer), findsOneWidget);
+          expect(
+            find.text(l10n.experimentalSeismometerSubtitle),
+            findsOneWidget,
+          );
+          expect(
+            _top(tester, l10n.experimentalSeismometer),
+            greaterThan(_top(tester, l10n.experimentalCategoryTools)),
+          );
+          // Off until the user turns it on.
+          final toggle = tester.widget<SwitchListTile>(
+            find.byType(SwitchListTile),
+          );
+          expect(toggle.value, isFalse);
+        });
+      },
+    );
+  }
+
+  testWidgets('a desktop sees nothing before the unlock', (tester) async {
+    await _on(TargetPlatform.macOS, () async {
+      await _pump(tester);
+      final l10n = await _en();
+
+      // The seismometer is phone-only and the backdrop overrides wait for the
+      // unlock, so the real registry leaves the page empty here.
+      expect(find.text(l10n.experimentalSeismometer), findsNothing);
+      expect(find.byType(SectionHeader), findsNothing);
+      expect(find.byType(ListTile), findsNothing);
+    });
+  });
+
+  for (final platform in [TargetPlatform.android, TargetPlatform.iOS]) {
+    testWidgets('a ${platform.name} phone with no accelerometer is offered no '
+        'seismometer', (tester) async {
+      await _on(platform, () async {
+        await _pump(tester, sensors: DeviceSensors.known(const {}));
+        final l10n = await _en();
+
+        expect(find.text(l10n.experimentalSeismometer), findsNothing);
+        // It was the only tool, so the Tools header goes with it; the
+        // backdrop overrides still wait for the unlock, so nothing is left.
+        expect(find.text(l10n.experimentalCategoryTools), findsNothing);
+        expect(find.byType(SectionHeader), findsNothing);
+        expect(find.byType(SwitchListTile), findsNothing);
+      });
+    });
+  }
+
+  testWidgets('the seismometer waits for the accelerometer answer', (
+    tester,
+  ) async {
+    final answer = Completer<bool>();
+    final sensors = DeviceSensors(
+      probes: {DeviceSensor.accelerometer: () => answer.future},
+    );
+    unawaited(sensors.resolve());
+    await _pump(tester, sensors: sensors);
+    final l10n = await _en();
+
+    // Not known yet, so not offered: it may arrive late, but it is never shown
+    // and then taken back.
+    expect(find.text(l10n.experimentalSeismometer), findsNothing);
+    expect(find.text(l10n.experimentalCategoryTools), findsNothing);
+
+    answer.complete(true);
+    await tester.pumpAndSettle();
+    expect(find.text(l10n.experimentalCategoryTools), findsOneWidget);
+    expect(find.text(l10n.experimentalSeismometer), findsOneWidget);
+  });
+
+  testWidgets('a failed accelerometer probe offers no seismometer', (
+    tester,
+  ) async {
+    final sensors = DeviceSensors(
+      probes: {
+        DeviceSensor.accelerometer: () async =>
+            throw StateError('no sensor service'),
+      },
+    );
+    await sensors.resolve();
+    await _pump(tester, sensors: sensors);
+    final l10n = await _en();
+
+    expect(find.text(l10n.experimentalSeismometer), findsNothing);
+    expect(find.text(l10n.experimentalCategoryTools), findsNothing);
+  });
+
+  testWidgets('the seismometer switch turns the option on and off', (
+    tester,
+  ) async {
+    final settings = await _pump(tester);
+    final l10n = await _en();
+
+    await tester.tap(find.text(l10n.experimentalSeismometer));
+    await tester.pumpAndSettle();
+    expect(settings.seismometerEnabled, isTrue);
+    expect(
+      tester.widget<SwitchListTile>(find.byType(SwitchListTile)).value,
+      isTrue,
+    );
+
+    await tester.tap(find.byType(Switch));
+    await tester.pumpAndSettle();
+    expect(settings.seismometerEnabled, isFalse);
   });
 }

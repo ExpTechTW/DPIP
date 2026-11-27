@@ -8,6 +8,8 @@ import android.hardware.SensorManager
 import android.os.Handler
 import android.os.Looper
 import io.flutter.plugin.common.EventChannel
+import io.flutter.plugin.common.MethodCall
+import io.flutter.plugin.common.MethodChannel
 
 /**
  * Streams the accelerometer at about 50 Hz on `com.exptech.dpip/accelerometer`,
@@ -25,12 +27,21 @@ import io.flutter.plugin.common.EventChannel
  * Cancelling unregisters the listener and drops the pending flush. No
  * accelerometer, or a listener the system will not register, is an error
  * event with code `unavailable`.
+ *
+ * It also answers `isPresent` on [PRESENCE_NAME], so Dart can ask whether
+ * there is an accelerometer at all without starting the stream: `true` when
+ * [SensorManager.getDefaultSensor] has one. The answer comes from the same
+ * lookup the stream uses, so the two cannot disagree about the device.
  */
 class AccelerometerChannel(context: Context) :
-    EventChannel.StreamHandler, SensorEventListener {
+    EventChannel.StreamHandler, SensorEventListener,
+    MethodChannel.MethodCallHandler {
 
     companion object {
         const val NAME = "com.exptech.dpip/accelerometer"
+
+        /** The method channel that answers `isPresent`. */
+        const val PRESENCE_NAME = "com.exptech.dpip/accelerometer_presence"
 
         /** 20 ms. The sensor HAL treats this as a hint, about 50 Hz. */
         private const val SAMPLING_PERIOD_US = 20_000
@@ -93,6 +104,13 @@ class AccelerometerChannel(context: Context) :
 
     override fun onCancel(arguments: Any?) {
         stop()
+    }
+
+    override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
+        when (call.method) {
+            "isPresent" -> result.success(accelerometer != null)
+            else -> result.notImplemented()
+        }
     }
 
     private fun stop() {

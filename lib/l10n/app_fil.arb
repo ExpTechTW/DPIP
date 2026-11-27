@@ -2097,6 +2097,8 @@
   "experimentalCategorySound": "Tunog",
   "experimentalCategoryGraphics": "Graphics",
   "experimentalCategoryTools": "Mga tool",
+  "experimentalSeismometer": "Seismometer",
+  "experimentalSeismometerSubtitle": "Ipakita ang seismometer sa tab ng Datos",
   "trendRainPastHour": "Ulan sa nakaraang 1 oras",
   "trendRainHourLastReading": "Ulan sa 1 oras hanggang sa huling sukat ng oras na ito"
 }

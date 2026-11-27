@@ -3523,4 +3523,10 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get experimentalCategoryTools => '도구';
+
+  @override
+  String get experimentalSeismometer => '지진계';
+
+  @override
+  String get experimentalSeismometerSubtitle => '자료 탭에 지진계를 표시합니다';
 }

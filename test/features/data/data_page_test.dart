@@ -7,13 +7,19 @@
 /// entry that fails to land fails here instead of on a phone.
 library;
 
+import 'dart:async';
+
+import 'package:dpip/core/platform/device_sensors.dart';
+import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/core/settings/locale_config.dart';
+import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/features/data/presentation/pages/data_page.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 /// Every destination the astronomy section must offer, with the English label
 /// the tile carries.
@@ -67,7 +73,12 @@ GoRouter _router(List<String> visited) => GoRouter(
   ],
 );
 
-Future<void> _pump(WidgetTester tester, GoRouter router) async {
+Future<void> _pump(
+  WidgetTester tester,
+  GoRouter router, {
+  ExperimentalSettings? settings,
+  DeviceSensors? sensors,
+}) async {
   // Tall enough to lay out and *hit-test* the whole hub: the seismic cards, the
   // seven-tile weather grid and the seven-tile astronomy grid below it. On a
   // phone the page scrolls; here nothing may fall past the viewport, or a tap
@@ -76,14 +87,34 @@ Future<void> _pump(WidgetTester tester, GoRouter router) async {
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
   await tester.pumpWidget(
-    MaterialApp.router(
-      localizationsDelegates: appLocalizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      routerConfig: router,
-    ),
+    _app(router, settings ?? _settings(), sensors: sensors),
   );
   await tester.pump();
 }
+
+ExperimentalSettings _settings() =>
+    ExperimentalSettings(SettingsStore.inMemory());
+
+/// The hub under [router], with the experimental settings it reads, on a
+/// device with [sensors] — one with an accelerometer unless a test says
+/// otherwise.
+Widget _app(
+  GoRouter router,
+  ExperimentalSettings settings, {
+  DeviceSensors? sensors,
+}) => MultiProvider(
+  providers: [
+    ChangeNotifierProvider.value(value: settings),
+    ChangeNotifierProvider.value(
+      value: sensors ?? DeviceSensors.known(const {DeviceSensor.accelerometer}),
+    ),
+  ],
+  child: MaterialApp.router(
+    localizationsDelegates: appLocalizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
+    routerConfig: router,
+  ),
+);
 
 void main() {
   testWidgets('offers every astronomy page', (tester) async {
@@ -108,13 +139,7 @@ void main() {
     tester.view.physicalSize = const Size(2752, 2064);
     tester.view.devicePixelRatio = 2;
     addTearDown(tester.view.reset);
-    await tester.pumpWidget(
-      MaterialApp.router(
-        localizationsDelegates: appLocalizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        routerConfig: _router([]),
-      ),
-    );
+    await tester.pumpWidget(_app(_router([]), _settings()));
     await tester.pump();
 
     final tile = tester.getRect(
@@ -143,13 +168,7 @@ void main() {
       tester.view.physicalSize = logical * 2;
       tester.view.devicePixelRatio = 2;
       addTearDown(tester.view.reset);
-      await tester.pumpWidget(
-        MaterialApp.router(
-          localizationsDelegates: appLocalizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          routerConfig: _router([]),
-        ),
-      );
+      await tester.pumpWidget(_app(_router([]), _settings()));
       await tester.pump();
 
       Rect tileOf(String label) => tester.getRect(
@@ -171,11 +190,80 @@ void main() {
     });
   }
 
+  testWidgets('the seismometer is not listed until its option is on', (
+    tester,
+  ) async {
+    final settings = _settings();
+    await _pump(tester, _router([]), settings: settings);
+    expect(settings.seismometerEnabled, isFalse);
+    expect(find.text('Seismometer'), findsNothing);
+    // The rest of the seismic section is untouched.
+    expect(find.text('Earthquake reports'), findsOneWidget);
+  });
+
+  testWidgets('the seismometer card follows its option live', (tester) async {
+    final settings = _settings();
+    await _pump(tester, _router([]), settings: settings);
+    expect(find.text('Seismometer'), findsNothing);
+
+    await settings.setSeismometerEnabled(true);
+    await tester.pump();
+    expect(find.text('Seismometer'), findsOneWidget);
+    // It sits with the seismic entries, above the weather section.
+    expect(
+      tester.getTopLeft(find.text('Seismometer')).dy,
+      lessThan(tester.getTopLeft(find.text('Weather')).dy),
+    );
+
+    await settings.setSeismometerEnabled(false);
+    await tester.pump();
+    expect(find.text('Seismometer'), findsNothing);
+  });
+
+  testWidgets('no accelerometer, no seismometer card, even switched on', (
+    tester,
+  ) async {
+    // A switch restored from a backup taken on another phone can be on here,
+    // where the Experimental features page does not even offer it.
+    final settings = _settings();
+    await settings.setSeismometerEnabled(true);
+    await _pump(
+      tester,
+      _router([]),
+      settings: settings,
+      sensors: DeviceSensors.known(const {}),
+    );
+    expect(find.text('Seismometer'), findsNothing);
+    expect(find.text('Earthquake reports'), findsOneWidget);
+  });
+
+  testWidgets('the seismometer card waits for the accelerometer answer', (
+    tester,
+  ) async {
+    final answer = Completer<bool>();
+    final sensors = DeviceSensors(
+      probes: {DeviceSensor.accelerometer: () => answer.future},
+    );
+    unawaited(sensors.resolve());
+    final settings = _settings();
+    await settings.setSeismometerEnabled(true);
+    await _pump(tester, _router([]), settings: settings, sensors: sensors);
+    // Unknown is treated as absent: the card may arrive late, but it never
+    // shows and then disappears.
+    expect(find.text('Seismometer'), findsNothing);
+
+    answer.complete(true);
+    await tester.pumpAndSettle();
+    expect(find.text('Seismometer'), findsOneWidget);
+  });
+
   testWidgets('the seismometer card opens the seismometer route', (
     tester,
   ) async {
     final visited = <String>[];
-    await _pump(tester, _router(visited));
+    final settings = _settings();
+    await settings.setSeismometerEnabled(true);
+    await _pump(tester, _router(visited), settings: settings);
     expect(find.text('Seismometer'), findsOneWidget);
     await tester.tap(find.text('Seismometer'));
     await tester.pumpAndSettle();

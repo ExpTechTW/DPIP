@@ -2097,6 +2097,8 @@
   "experimentalCategorySound": "เสียง",
   "experimentalCategoryGraphics": "กราฟิก",
   "experimentalCategoryTools": "เครื่องมือ",
+  "experimentalSeismometer": "เครื่องวัดแผ่นดินไหว",
+  "experimentalSeismometerSubtitle": "แสดงเครื่องวัดแผ่นดินไหวในแท็บข้อมูล",
   "trendRainPastHour": "ปริมาณฝนใน 1 ชั่วโมงที่ผ่านมา",
   "trendRainHourLastReading": "ปริมาณฝน 1 ชั่วโมงถึงการวัดครั้งสุดท้ายของชั่วโมงนี้"
 }

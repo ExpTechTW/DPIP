@@ -93,8 +93,13 @@ class MainActivity : FlutterActivity() {
         EventChannel(messenger, CompassChannel.NAME)
             .setStreamHandler(CompassChannel(applicationContext))
 
+        // One instance behind both channels: `isPresent` answers from the
+        // sensor lookup the stream itself uses.
+        val accelerometer = AccelerometerChannel(applicationContext)
         EventChannel(messenger, AccelerometerChannel.NAME)
-            .setStreamHandler(AccelerometerChannel(applicationContext))
+            .setStreamHandler(accelerometer)
+        MethodChannel(messenger, AccelerometerChannel.PRESENCE_NAME)
+            .setMethodCallHandler(accelerometer)
 
         EventChannel(messenger, NetworkChannel.NAME)
             .setStreamHandler(NetworkChannel(applicationContext))

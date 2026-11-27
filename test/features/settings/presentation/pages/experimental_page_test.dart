@@ -2,6 +2,7 @@
 /// on the previous mode would paint the home backdrop the user just rejected.
 library;
 
+import 'package:dpip/core/platform/device_sensors.dart';
 import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
 import 'package:dpip/core/settings/settings_store.dart';
@@ -25,7 +26,13 @@ Future<ExperimentalSettings> _pump(WidgetTester tester) async {
   await settings.unlock();
   await tester.pumpWidget(
     MultiProvider(
-      providers: [ChangeNotifierProvider.value(value: settings)],
+      providers: [
+        ChangeNotifierProvider.value(value: settings),
+        // A phone with an accelerometer, as the page is on most devices.
+        ChangeNotifierProvider.value(
+          value: DeviceSensors.known(const {DeviceSensor.accelerometer}),
+        ),
+      ],
       child: MaterialApp(
         localizationsDelegates: appLocalizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,

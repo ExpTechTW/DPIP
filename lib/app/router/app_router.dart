@@ -1,4 +1,5 @@
 import 'package:dpip/app/shell/main_shell.dart';
+import 'package:dpip/app/router/route_gates.dart';
 import 'package:dpip/app/router/route_params.dart';
 import 'package:dpip/app/router/widget_location_routes.dart';
 import 'package:dpip/core/settings/onboarding_store.dart';
@@ -71,7 +72,7 @@ final class OnboardingRefreshSignal extends ChangeNotifier {
 /// page widgets to navigate.
 final GoRouter appRouter = GoRouter(
   initialLocation: AppRoutes.homePath,
-  refreshListenable: onboardingRefresh,
+  refreshListenable: Listenable.merge([onboardingRefresh, routeGateRefresh]),
   // Lets the shell notice that one of the full-screen routes below has covered
   // it, so the tabs underneath can idle instead of animating at nobody.
   observers: [shellRouteObserver],
@@ -192,6 +193,7 @@ final GoRouter appRouter = GoRouter(
                 GoRoute(
                   path: AppRoutes.seismometerPath,
                   name: AppRoutes.seismometer,
+                  redirect: seismometerRedirect,
                   pageBuilder: (_, state) => MaterialPage<void>(
                     key: state.pageKey,
                     child: const SeismometerPage(tabIndex: DataPage.tabIndex),

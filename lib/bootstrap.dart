@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart' show kDebugMode, kReleaseMode;
 
 import 'package:dpip/app/app.dart';
 import 'package:dpip/app/router/app_router.dart' show onboardingRefresh;
+import 'package:dpip/app/router/route_gates.dart' show routeGateRefresh;
 import 'package:dpip/core/di/core_providers.dart';
 import 'package:dpip/core/di/shared_deps.dart';
 import 'package:dpip/core/diagnostics/bench_sky.dart';
@@ -248,6 +249,9 @@ Future<void> bootstrap() async {
   unawaited(importNativeLogs());
   final regions = RegionSelection(settings);
   final experimental = ExperimentalSettings(settings);
+  // The seismometer's route reads its switch; this re-runs that redirect when
+  // the switch flips, so a page left open closes with it.
+  routeGateRefresh.watch(experimental);
   final locale = LocaleController(settings);
   final theme = ThemeController(settings);
   // Constructed before the first frame: it installs the saved setting into

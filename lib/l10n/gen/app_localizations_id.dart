@@ -3612,4 +3612,11 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get experimentalCategoryTools => 'Alat';
+
+  @override
+  String get experimentalSeismometer => 'Seismometer';
+
+  @override
+  String get experimentalSeismometerSubtitle =>
+      'Tampilkan seismometer di tab Data';
 }
