@@ -7,7 +7,7 @@
 /// Flutter's bundled font, and so drew a snowflake on every rainy hour.
 ///
 /// The font is Material Symbols Outlined (Apache-2.0), instantiated at one
-/// static style and subset to the 22 glyphs below — an asset, not an icon
+/// static style and subset to the 26 glyphs below — an asset, not an icon
 /// package, so it does not breach the built-in-icons-only rule. Flutter's own
 /// `Icons` stay the source for everything that is not weather.
 ///
@@ -111,6 +111,22 @@ const IconData storm = IconData(0xf070, fontFamily: weatherIconFont);
 /// Material Symbols `air`.
 const IconData air = IconData(0xefd8, fontFamily: weatherIconFont);
 
+/// Earthquake — a seismogram trace.
+/// Material Symbols `earthquake`.
+const IconData earthquake = IconData(0xf64f, fontFamily: weatherIconFont);
+
+/// Extreme heat — rising heat waves.
+/// Material Symbols `heat`.
+const IconData heat = IconData(0xf537, fontFamily: weatherIconFont);
+
+/// Civil defence — an alarm siren.
+/// Material Symbols `siren`.
+const IconData siren = IconData(0xf3a7, fontFamily: weatherIconFont);
+
+/// Reservoir release — a pipe valve.
+/// Material Symbols `valve`.
+const IconData valve = IconData(0xe224, fontFamily: weatherIconFont);
+
 /// Every glyph in the font, for the coverage test.
 const Map<String, IconData> weatherIconsByName = {
   'clear_day': clearDay,
@@ -135,4 +151,8 @@ const Map<String, IconData> weatherIconsByName = {
   'thunderstorm': thunderstorm,
   'storm': storm,
   'air': air,
+  'earthquake': earthquake,
+  'heat': heat,
+  'siren': siren,
+  'valve': valve,
 };
