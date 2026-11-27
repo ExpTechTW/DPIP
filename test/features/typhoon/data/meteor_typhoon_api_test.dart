@@ -25,13 +25,22 @@ class _RecordingAdapter implements HttpClientAdapter {
   final String body;
   final List<String> urls = [];
 
+  /// A host that answers [downStatus], as a region that is down or does not
+  /// hold the resource.
+  String? downHost;
+  int downStatus = 503;
+
   @override
   Future<ResponseBody> fetch(
     RequestOptions options,
     Stream<Uint8List>? requestStream,
     Future<void>? cancelFuture,
   ) async {
-    urls.add(options.uri.toString());
+    final url = options.uri.toString();
+    urls.add(url);
+    if (downHost case final down? when url.startsWith(down)) {
+      return ResponseBody.fromString('', downStatus);
+    }
     return ResponseBody.fromString(
       body,
       200,
@@ -54,6 +63,10 @@ MeteorTyphoonApi _apiWith(HttpClientAdapter adapter) => MeteorTyphoonApi(
 
 const _mutableHost = 'https://api.core-tnn1.exptech.dev';
 const _immutableHost = 'https://static.core-tnn1.exptech.dev';
+
+/// The other core region, which a request fails over to.
+const _otherMutableHost = 'https://api.core-tyo1.exptech.dev';
+const _otherImmutableHost = 'https://static.core-tyo1.exptech.dev';
 const _base = '/api/v5/meteor/typhoon';
 
 void main() {
@@ -112,5 +125,31 @@ void main() {
 
     expect(adapter.urls.single, '$_immutableHost$_base/warning/1700000000');
     expect(result, {'time': 1700000000});
+  });
+
+  test('a region that is down fails over to the other one', () async {
+    final adapter = _RecordingAdapter()..downHost = _mutableHost;
+    await _apiWith(adapter).getCyclones();
+    expect(adapter.urls, ['$_mutableHost$_base', '$_otherMutableHost$_base']);
+  });
+
+  test('a snapshot fails over to the other region\'s static host', () async {
+    final adapter = _RecordingAdapter()..downHost = _immutableHost;
+    await _apiWith(adapter).getAt(TyphoonKind.track, 1700000000);
+    expect(adapter.urls, [
+      '$_immutableHost$_base/track/1700000000',
+      '$_otherImmutableHost$_base/track/1700000000',
+    ]);
+  });
+
+  test('a snapshot one region lacks is looked up in the other', () async {
+    final adapter = _RecordingAdapter()
+      ..downHost = _immutableHost
+      ..downStatus = 404;
+    await _apiWith(adapter).getAt(TyphoonKind.warning, 1700000000);
+    expect(adapter.urls, [
+      '$_immutableHost$_base/warning/1700000000',
+      '$_otherImmutableHost$_base/warning/1700000000',
+    ]);
   });
 }

@@ -187,6 +187,7 @@ class _Archive extends ApiClient {
     String path, {
     Map<String, dynamic>? query,
     CancelToken? cancelToken,
+    bool notFoundFailsOver = false,
   }) async {
     polls.add(path);
     if (path.contains(ApiPaths.rtsArchive)) {

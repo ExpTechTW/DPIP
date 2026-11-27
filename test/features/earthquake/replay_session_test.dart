@@ -38,6 +38,7 @@ class _RecordingApiClient implements ApiClient {
     String path, {
     Map<String, dynamic>? query,
     CancelToken? cancelToken,
+    bool notFoundFailsOver = false,
   }) async {
     paths.add(path);
     if (path.contains('/trem/rts')) return <String, dynamic>{};
@@ -93,6 +94,7 @@ class _RecordingApiClient implements ApiClient {
     Map<String, dynamic>? query,
     Options? options,
     CancelToken? cancelToken,
+    bool notFoundFailsOver = false,
   }) => throw UnimplementedError();
 
   @override

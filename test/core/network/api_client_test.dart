@@ -176,6 +176,50 @@ void main() {
     expect(health.summary, EndpointState.degraded);
   });
 
+  test('a 404 fails over only when the caller asks, uncharged', () async {
+    // An immutable snapshot one region lacks may be held by the other: the
+    // regions keep their own history. The missing one is not a sick host.
+    final health = EndpointHealthMonitor();
+    final adapter = _FakeAdapter(
+      (call, _) => call == 1 ? _json('{}', 404) : _json('{"ok":true}', 200),
+    );
+    final res = await monitoredClient(
+      adapter,
+      health,
+    ).request(ApiTier.coreStatic, '/x', notFoundFailsOver: true);
+
+    expect(res.statusCode, 200);
+    expect(adapter.hits, [
+      'static.core-tnn1.exptech.dev',
+      'static.core-tyo1.exptech.dev',
+    ]);
+    expect(
+      health.of(
+        EndpointService.other,
+        ApiTier.coreStatic,
+        'static.core-tnn1.exptech.dev',
+      ),
+      isNull,
+    );
+  });
+
+  test('a 404 from every region is the answer', () async {
+    final adapter = _FakeAdapter((_, _) => _json('{}', 404));
+    await expectLater(
+      () =>
+          clientWith(adapter)
+              .get(ApiTier.coreStatic, '/x', notFoundFailsOver: true),
+      throwsA(
+        isA<DioException>().having(
+          (e) => e.response?.statusCode,
+          'status',
+          404,
+        ),
+      ),
+    );
+    expect(adapter.hits, hasLength(2));
+  });
+
   test('a 4xx is not charged to the host', () async {
     // A 404 says the route or the resource is wrong, not that the region is
     // sick. Replaying an event older than the RTS retention 404s once a second,

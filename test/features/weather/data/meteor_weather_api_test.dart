@@ -23,13 +23,22 @@ class _RecordingAdapter implements HttpClientAdapter {
   final String body;
   final List<String> urls = [];
 
+  /// A host that answers [downStatus], as a region that is down or does not
+  /// hold the resource.
+  String? downHost;
+  int downStatus = 503;
+
   @override
   Future<ResponseBody> fetch(
     RequestOptions options,
     Stream<Uint8List>? requestStream,
     Future<void>? cancelFuture,
   ) async {
-    urls.add(options.uri.toString());
+    final url = options.uri.toString();
+    urls.add(url);
+    if (downHost case final down? when url.startsWith(down)) {
+      return ResponseBody.fromString('', downStatus);
+    }
     return ResponseBody.fromString(
       body,
       200,
@@ -51,6 +60,9 @@ MeteorWeatherApi _apiWith(HttpClientAdapter adapter) => MeteorWeatherApi(
 );
 
 const _mutableHost = 'https://api.core-tnn1.exptech.dev';
+
+/// The other core region, which a request fails over to.
+const _otherMutableHost = 'https://api.core-tyo1.exptech.dev';
 
 void main() {
   test('getRealtime asks the mutable host for the lat,lng pair', () async {
@@ -90,4 +102,14 @@ void main() {
       );
     },
   );
+
+  test('realtime fails over to the other region when one is down', () async {
+    final adapter = _RecordingAdapter()..downHost = _mutableHost;
+    await _apiWith(adapter).getRealtime(25.04, 121.51);
+
+    expect(adapter.urls, [
+      '$_mutableHost/api/v5/meteor/weather/realtime/25.04,121.51',
+      '$_otherMutableHost/api/v5/meteor/weather/realtime/25.04,121.51',
+    ]);
+  });
 }

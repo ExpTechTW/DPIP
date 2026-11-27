@@ -8,11 +8,13 @@ import 'package:dpip/features/typhoon/domain/typhoon_kind.dart';
 /// CWA typhoon datasets (005/002/003/001) — **API v5**
 /// (`/api/v5/meteor/typhoon`).
 ///
-/// **Cache-split dual host** (both on `core-tnn1`): a history URL ending in a
-/// 10-digit second is immutable and served from `static.core-tnn1`
-/// ([ApiTier.coreStaticExclusive], 1-year cache) — the `/{kind}/:time`
-/// snapshots; everything else (the latest datasets, `/{kind}/list`) is mutable
-/// and served from `api.core-tnn1` ([ApiTier.coreExclusiveApi], ETag/304).
+/// **Cache-split dual host, on both core regions**: a history URL ending in a
+/// 10-digit second is immutable and served from `static.core-{tyo1,tnn1}`
+/// ([ApiTier.coreStatic], 1-year cache) — the `/{kind}/:time` snapshots;
+/// everything else (the latest datasets, `/{kind}/list`) is mutable and served
+/// from `api.core-{tyo1,tnn1}` ([ApiTier.coreApi], ETag/304). Both regions
+/// answer every v5 typhoon path (verified 2026-11-28), so a request goes to the
+/// selected region and fails over to the other one.
 /// Returns raw decoded JSON; the repository maps it to domain models
 /// (geometry is `[lng, lat]`, times are Unix seconds, missing is `null`).
 ///
@@ -23,11 +25,11 @@ class MeteorTyphoonApi {
 
   final ApiClient _client;
 
-  /// Latest datasets and `/list`s (mutable) live on `api.core-tnn1`.
-  static const ApiTier _api = ApiTier.coreExclusiveApi;
+  /// Latest datasets and `/list`s (mutable) live on `api.core-*`.
+  static const ApiTier _api = ApiTier.coreApi;
 
-  /// Timestamped history snapshots (immutable) live on `static.core-tnn1`.
-  static const ApiTier _static = ApiTier.coreStaticExclusive;
+  /// Timestamped history snapshots (immutable) live on `static.core-*`.
+  static const ApiTier _static = ApiTier.coreStatic;
 
   static const String _base = '/api/v5/meteor/typhoon';
 
@@ -57,7 +59,13 @@ class MeteorTyphoonApi {
 
   /// Historical [kind] snapshot at [second] (10-digit Unix seconds) — from
   /// `static`; the shape matches the kind's latest endpoint (404 when absent).
+  ///
+  /// Each region keeps its own history, so a 404 asks the other region before
+  /// it is taken as the answer (see `MeteorSnapshotApi.getAt`).
   Future<Map<String, dynamic>> getAt(TyphoonKind kind, int second) async =>
-      (await _client.get(_static, '$_base/${kind.path}/$second'))
-          as Map<String, dynamic>;
+      (await _client.get(
+        _static,
+        '$_base/${kind.path}/$second',
+        notFoundFailsOver: true,
+      )) as Map<String, dynamic>;
 }
