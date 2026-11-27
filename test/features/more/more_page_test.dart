@@ -452,17 +452,13 @@ void main() {
     expect(noteTop, greaterThan(support));
   });
 
-  testWidgets('the notification log sits with the notification settings', (
-    tester,
-  ) async {
+  testWidgets('the notification group links to no outside log', (tester) async {
     await _pump(tester, _router([]));
-    final notify = tester
-        .getTopLeft(find.widgetWithText(ListTile, 'Notification settings'))
-        .dy;
-    final log = tester
-        .getTopLeft(find.widgetWithText(ListTile, 'DPIP notification log'))
-        .dy;
-    expect(log - notify, lessThan(240));
+    expect(
+      find.widgetWithText(ListTile, 'Notification settings'),
+      findsOneWidget,
+    );
+    expect(find.textContaining('notification log'), findsNothing);
     // Announcements left the links list — the only one left is the card.
     expect(find.widgetWithText(ListTile, 'Announcements'), findsNothing);
   });

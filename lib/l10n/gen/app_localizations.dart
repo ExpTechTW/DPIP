@@ -2856,12 +2856,6 @@ abstract class AppLocalizations {
   /// **'National'**
   String get regionNationwide;
 
-  /// More-menu link to the DPIP notification send-record website
-  ///
-  /// In en, this message translates to:
-  /// **'DPIP notification log'**
-  String get moreNotifyLog;
-
   /// Region bar label for the current GPS township
   ///
   /// In en, this message translates to:

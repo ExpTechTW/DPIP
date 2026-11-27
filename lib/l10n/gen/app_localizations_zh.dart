@@ -1470,9 +1470,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get regionNationwide => '全國';
 
   @override
-  String get moreNotifyLog => 'DPIP 通知發送記錄';
-
-  @override
   String get regionCurrent => '所在地';
 
   @override
@@ -4918,9 +4915,6 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get regionNationwide => '全国';
-
-  @override
-  String get moreNotifyLog => 'DPIP 通知发送记录';
 
   @override
   String get regionCurrent => '当前位置';
@@ -8369,9 +8363,6 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get regionNationwide => '全國';
 
   @override
-  String get moreNotifyLog => 'DPIP 通知發送記錄';
-
-  @override
   String get regionCurrent => '所在地';
 
   @override
@@ -11817,9 +11808,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get regionNationwide => '全國';
-
-  @override
-  String get moreNotifyLog => 'DPIP 通知發送記錄';
 
   @override
   String get regionCurrent => '所在地';

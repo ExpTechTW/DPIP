@@ -1507,9 +1507,6 @@ class AppLocalizationsId extends AppLocalizations {
   String get regionNationwide => 'Nasional';
 
   @override
-  String get moreNotifyLog => 'Log notifikasi DPIP';
-
-  @override
   String get regionCurrent => 'Lokasi';
 
   @override

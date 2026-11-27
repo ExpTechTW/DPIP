@@ -1500,9 +1500,6 @@ class AppLocalizationsTh extends AppLocalizations {
   String get regionNationwide => 'ทั่วประเทศ';
 
   @override
-  String get moreNotifyLog => 'บันทึกการส่งการแจ้งเตือนของ DPIP';
-
-  @override
   String get regionCurrent => 'ตำแหน่ง';
 
   @override
