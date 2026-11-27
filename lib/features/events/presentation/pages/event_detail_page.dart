@@ -18,8 +18,8 @@ import 'package:provider/provider.dart';
 /// has had, newest first.
 ///
 /// Loaded through [AsyncView], so it has a loading state, an error state with
-/// retry, and a saved copy is shown under a freshness banner, never as
-/// current. A cancelled card is still a card: its cancellation is the newest
+/// retry, pull-to-refresh, and a saved copy is shown under a freshness
+/// banner, never as current. A cancelled card is still a card: its cancellation is the newest
 /// report and the header says "cancelled".
 ///
 /// What a card adds beyond that depends on its type: [eventTypeDetailFor]
@@ -47,6 +47,7 @@ class EventDetailPage extends StatelessWidget {
       appBar: AppBar(title: Text(l10n.eventDetailTitle)),
       body: AsyncView<EventCardDetail>(
         future: () => repository.detail(id: id, regionCode: regionCode),
+        pullToRefresh: true,
         builder: (context, detail) => _DetailBody(detail: detail),
       ),
     );
@@ -76,6 +77,8 @@ class _DetailBody extends StatelessWidget {
     final summary = eventTypeDetailFor(detail.latest.type)
         .summary(context, detail);
     return ListView(
+      // A card with one short report must still be pullable.
+      physics: const AlwaysScrollableScrollPhysics(),
       padding: EdgeInsets.fromLTRB(
         AppSpacing.lg,
         AppSpacing.lg,

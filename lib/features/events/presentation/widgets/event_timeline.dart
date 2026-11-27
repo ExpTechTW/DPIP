@@ -14,6 +14,8 @@ import 'package:provider/provider.dart';
 /// an error with retry rather than an empty thread — "nothing happened here" and
 /// "we could not reach the server" must never look the same in a disaster app.
 ///
+/// Pulling the list down fetches it again.
+///
 /// The server lists cards by ascending id; this shows them by [EventCard.send],
 /// newest first (see [newestFirst]).
 class EventTimeline extends StatelessWidget {
@@ -47,7 +49,10 @@ class EventTimeline extends StatelessWidget {
           .then((result) => result.map(newestFirst)),
       isEmpty: (cards) => cards.isEmpty,
       refreshSignal: refreshSignal,
+      pullToRefresh: true,
       builder: (context, cards) => ListView.builder(
+        // A short feed must still be pullable.
+        physics: const AlwaysScrollableScrollPhysics(),
         padding: EdgeInsets.fromLTRB(
           AppSpacing.lg,
           AppSpacing.md,

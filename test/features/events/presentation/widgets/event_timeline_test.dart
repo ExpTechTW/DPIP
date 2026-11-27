@@ -84,6 +84,20 @@ void main() {
     expect(repo.requests, ['63000']);
   });
 
+  testWidgets('a feed of one card can be pulled to fetch it again', (
+    tester,
+  ) async {
+    final repo = _Repo(Ok([_card(1, 'Quake')]));
+    await _pump(tester, repo);
+
+    await tester.fling(find.text('Quake'), const Offset(0, 400), 1000);
+    await tester.pumpAndSettle();
+
+    expect(repo.requests, ['63000', '63000']);
+    expect(find.text('Quake'), findsOneWidget);
+    expect(find.byType(RefreshProgressIndicator), findsNothing);
+  });
+
   testWidgets('cards read newest first, not in the server id order', (
     tester,
   ) async {
