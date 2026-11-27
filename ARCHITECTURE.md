@@ -102,12 +102,13 @@ what it happens to do. They live here so there is one copy: `CLAUDE.md` and
 
 ## Native report-image renderer
 
-`ReportPicture` in `lib/shared/seismic/report_picture/` accepts the original
-UTF-8 Share Render Input v2 bytes. It checks the ABI (major 1, minor 2 or later)
-and the v2 and production 16:9 capability bits before loading fonts. Rust
-validates the input and returns a 1920×1080 PNG by default. The 4:5 information
-card returns 1080×1350 and requires ABI 1.3 or later, the production 4:5 capability
-and `eqr_render_share_png_with_options`. The service returns a
+`ReportPicture` in `lib/shared/seismic/report_picture/` accepts UTF-8 Share
+Render Input v3. It checks the ABI (major 1, minor 4 or later), the v3
+capability and the profile's symbols before loading fonts. Each render checks
+the selected format capability. The 16:9 map and 4:5 information card return
+1920×1080 and 1080×1350 PNGs through `eqr_render_share_png_v3`. The 9:16 QA
+Story returns a 1080×1920 PNG through `eqr_qa_render_story_png_v2`. Legacy
+verification tools can explicitly open the v2 renderer. The service returns a
 `Result<Uint8List>` with an app-owned copy or a structured
 `ReportPictureFailure`. The upstream Dart bindings copy native bytes and
 release the original buffer in the same isolate. Native initialization and
@@ -117,29 +118,26 @@ handle. Ignoring a request Future does not cancel native work.
 
 ### Earthquake report source evidence
 
-The Core v2 detail endpoint is fetched as bytes. The cache revalidates only
-against a row of the requested representation and restores the body with its
-matching ETag. `EarthquakeReportSnapshot` keeps the existing display model,
-the requested report ID, the optional ETag, the body SHA-256 and the exact
-JSON number tokens. It validates the source before the ordinary model
-decoder can discard duplicate keys or coerce integers. The detail screen
-still decodes the plain model: this stricter evidence belongs to the share
-path and must never turn a report the app could show into an error page.
+The region-pinned Core v2 detail endpoint is fetched as bytes. A complete 200
+or a 304 confirming the pinned binary cache entry supplies the body. A
+`CoreEarthquakeReportSnapshot` retains immutable content-decoded bytes, the
+full report ID, SHA-256, the exact JSON number tokens and HTTP provenance.
+The detail page and share sheet use the same response. A displayable report
+may still open when the stricter evidence check rejects sharing.
 
-`adaptEarthquakeShareSnapshot` accepts verified county and station codes,
-the intensity scale and the magnitude kind, all bound to that body SHA-256.
-The adapter uses the snapshot's original number tokens and emits
-deterministic Share Render Input v2 UTF-8 bytes for `ReportPicture`. A
-different body needs its own verified evidence even when the report ID and
-decoded model are equal. The Core v2 detail omits station identifiers, a
-per-report scale identifier and the original publication's revision
-metadata.
+`adaptEarthquakeShareSnapshotV3` checks the modern Core profile, the report
+time and identity, and the measurement and observation fields. It uses JSON
+Pointers as observation identities within that source body and uses the exact
+number tokens to emit deterministic v3 bytes. The share-sheet cache includes
+the source body and input hashes as well as renderer, format, mode, theme and
+locale. History with an unverified intensity scale stays available in the
+ordinary detail flow and is ineligible for v3 sharing.
 
 ### Native build inputs
 
 The native runtime is opt-in. DPIP pins the merged eq-report-pic commit
-`76662bb9710eafa2a77a694605513163db7c5967`
-([eq-report-pic #17](https://github.com/ExpTechTW/eq-report-pic/pull/17)), which includes the ABI and packaging from #16.
+`6c2ca6e21c9a50cd386d5c83064a261227a49326`
+([eq-report-pic #19](https://github.com/ExpTechTW/eq-report-pic/pull/19)).
 The build driver archives that commit and builds from the frozen Cargo lock
 and vendored sources. See the [QA guide](tool/qa/README.md) for launch commands.
 
@@ -154,9 +152,9 @@ and vendored sources. See the [QA guide](tool/qa/README.md) for launch commands.
 - Each invocation stages from a candidate package and a separately trusted
   manifest into a fresh directory. If staging fails, the app build cannot
   begin. An ordinary build without a stage has no report renderer.
-- Both profiles expose ABI 1.3 and capability mask `0x31f`. Story uses the
-  extra QA symbol, compiled into the debug QA flavor only. The production
-  options entry point rejects format 3.
+- Both profiles expose ABI 1.4. Production reports mask `0xb1f` and rejects
+  format 3. QA reports `0x1b1f` and uses the extra Story symbol and bit 12.
+  Bit 10 is disabled in both profiles.
 - Both profiles pass the same verified fonts to the renderer in order:
   M PLUS 2p Bold, Gen Shin Gothic Bold, then Noto Sans TC Black.
   The final-app verifier checks the actual bundled font hashes, the iOS link
