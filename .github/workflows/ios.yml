@@ -81,7 +81,10 @@ jobs:
             echo "no changelog entry in this push: no snapshot, so it is built here"
           fi
 
-  iOS:
+  # Builds the app and runs ios/RunnerTests. Not the required check by itself:
+  # the `iOS` job at the end of this file is, and it reads this job's result.
+  ios_build:
+    name: iOS build
     needs: changes
     if: ${{ needs.changes.outputs.ios == 'true' && needs.changes.outputs.release != 'true' }}
     runs-on: macos-latest
@@ -244,7 +247,11 @@ jobs:
           retention-days: 7
           compression-level: 6
 
+  # ios/WidgetFixtureUITests, on a runner of its own so the suite runs beside
+  # the build above instead of after it. Its result reaches the required `iOS`
+  # check through the job below.
   ios_widget_ui_tests:
+    name: iOS widget UI tests
     needs: changes
     if: ${{ needs.changes.outputs.ios == 'true' && needs.changes.outputs.release != 'true' }}
     runs-on: macos-latest
@@ -257,11 +264,17 @@ jobs:
           persist-credentials: false
 
       - name: Install toolchain (mise)
-        uses: jdx/mise-action@9b200bcecbfd6303e69a4a261b2e09e3757440a7 # v5.2.0
+        uses: jdx/mise-action@90f833d396d0cc3674b631d2d225e306476c303a # v5.2.10
 
       - name: Cache Swift Packages
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
+          # The same list as the build job's above and release.yml's, line for
+          # line, and it has to stay that way. A cache entry's version is a
+          # hash of these paths, so a different list is a different cache under
+          # the same key: this job would miss the entry main saved and store a
+          # fresh ~880 MB copy per pull request. The DerivedData line is
+          # release.yml's; nothing in this job writes it.
           path: |
             ~/Library/Caches/org.swift.swiftpm
             build/ios/SourcePackages
@@ -376,3 +389,53 @@ jobs:
           name: DPIP-iOS-WidgetFixtureUITests-diagnostics
           path: ${{ runner.temp }}/ios-test-diagnostics/
           retention-days: 7
+
+  # The required check. The `main` ruleset requires a check named `iOS`, and
+  # this job is what reports it: the two macOS jobs above run side by side and
+  # meet here. Renaming `name:` below drops the check from every pull request,
+  # and each one then waits for an `iOS` that never reports.
+  #
+  # It fails when any job it needs failed or was cancelled, `changes`
+  # included, and passes when each one passed or was skipped. Skipped is how a
+  # pull request that touches no iOS path, and a push release.yml builds
+  # instead, both end green.
+  #
+  # `always()`, not the default: a failed job above would otherwise skip this
+  # one, and a skipped required check counts as passing. Not `!cancelled()`
+  # either, which skips this job in a cancelled run. With `always()`, a run
+  # that a newer push cancels still reports `iOS`, as failed, on the commit
+  # that push replaced, and the newer run reports it for the new head. The
+  # check is never missing, and never green for work that did not finish.
+  iOS:
+    name: iOS
+    needs: [changes, ios_build, ios_widget_ui_tests]
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    permissions: {}
+    timeout-minutes: 5
+
+    steps:
+      - name: Both iOS jobs passed or were skipped
+        shell: bash
+        env:
+          CHANGES: ${{ needs.changes.result }}
+          BUILD: ${{ needs.ios_build.result }}
+          WIDGET_UI_TESTS: ${{ needs.ios_widget_ui_tests.result }}
+        run: |
+          gate=pass
+          report() {
+            printf -- '- %s: %s\n' "$1" "$2" | tee -a "$GITHUB_STEP_SUMMARY"
+            case "$2" in
+              success | skipped) ;;
+              *)
+                echo "::error::$1 finished as $2"
+                gate=fail
+                ;;
+            esac
+          }
+
+          printf '### iOS\n\n' >> "$GITHUB_STEP_SUMMARY"
+          report changes "$CHANGES"
+          report 'iOS build' "$BUILD"
+          report 'iOS widget UI tests' "$WIDGET_UI_TESTS"
+          [[ "$gate" == pass ]]

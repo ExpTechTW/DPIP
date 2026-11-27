@@ -106,8 +106,9 @@ PR 不需要它，例如只改文件的 PR 不會 build App。
 | `changes` | `android.yml`、`ios.yml` | 每個 PR | 判斷這個 PR 需不需要 build Android／iOS |
 | `Android` | `android.yml` | 動到 `android/`、`assets/`、`lib/`、`pubspec.yaml` | 原生 Widget 單元測試、Android lint、Android 能 build |
 | `Instrumented` | `android.yml` | 只動到 `android/`、`android.yml` 或 `tool/dev/test_android_device.sh`，不受 release 決策影響 | 在 Android 35 模擬器驗證 Widget metadata、RemoteViews 與 SQLite |
-| `iOS` | `ios.yml` | 動到 `ios/`、`assets/`、`lib/`、`pubspec.yaml` | iOS 能 build |
-| `ios_widget_ui_tests` | `ios.yml` | 與 `iOS` 相同 | 在 iPhone 模擬器驗證 Widget UI |
+| `iOS` | `ios.yml` | 每個 PR，等下面兩個 iOS job 結束 | 彙總：`iOS build` 與 `iOS widget UI tests` 都是 pass 或 skipped 才過，任一個（含 `changes`）失敗或被取消就失敗；分支規則要求的是這一項 |
+| `iOS build` | `ios.yml` | 動到 `ios/`、`assets/`、`lib/`、`pubspec.yaml` | `ios/RunnerTests`、iOS 能 build |
+| `iOS widget UI tests` | `ios.yml` | 與 `iOS build` 相同，兩個 job 同時跑 | 在 iPhone 模擬器驗證 Widget UI（`ios/WidgetFixtureUITests`） |
 | `code-review` | `review.yml` | 開 PR、推新 commit | 自動 code review 跑完；它留的意見要逐條回應 |
 | `codecov/project` | Codecov | `build` 上傳覆蓋率之後 | 總覆蓋率比 base 掉超過 1% 就失敗 |
 | `codecov/patch` | Codecov | 同上 | 新增與修改行的覆蓋率；只回報，不會失敗 |

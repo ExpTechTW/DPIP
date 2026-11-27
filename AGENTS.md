@@ -238,8 +238,8 @@ pinned release with a pinned checksum, the first time they run in a clone. `.git
 review.
 
 `ios.yml` also runs `ios/RunnerTests`, and it is the only thing that compiles
-the widget extension — so a change under `ios/` is unverified until that job
-goes green, whatever `ci.yml` says about the Dart side.
+the widget extension — so a change under `ios/` is unverified until its `iOS`
+check goes green, whatever `ci.yml` says about the Dart side.
 
 Safety-critical seismic maths is pinned by golden tests
 (`test/features/earthquake/eew_estimator_test.dart`). If you change the EEW
