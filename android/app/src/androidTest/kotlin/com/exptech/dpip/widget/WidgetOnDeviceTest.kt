@@ -210,10 +210,10 @@ class WidgetOnDeviceTest {
             apparentTemperature = 30.2,
         )
 
-        val tokens = store.beginRefreshWrites(address, includeForecast = true)!!
+        val acquisition = store.beginAcquisition(address)!!
         assertEquals(
             WidgetWriteResult.Written,
-            store.commitCurrentWeather(tokens.currentWeather, snapshot, writtenAt = 1L),
+            store.commitCurrentWeather(snapshot, writtenAt = 1L, acquisition = acquisition),
         )
 
         val stored = store.readCurrentWeather(address)!!
@@ -221,11 +221,11 @@ class WidgetOnDeviceTest {
         assertEquals(206, stored.snapshot.weatherCode)
         assertEquals(27.5, stored.snapshot.temperature!!, 1e-9)
 
-        // A clear fences the ticket and leaves the catalogue and the choice.
-        assertTrue(store.clearCurrentWeather())
+        // A later commit carrying an older observation is refused,
+        // and the catalogue and the choice are untouched by either commit.
         assertEquals(
             WidgetWriteResult.Superseded,
-            store.commitCurrentWeather(tokens.currentWeather, snapshot, writtenAt = 2L),
+            store.commitCurrentWeather(snapshot.copy(observationTime = 1_791_454_000), writtenAt = 2L),
         )
         assertNotNull(store.readInstance(11))
         assertEquals(1, store.readCatalog()!!.locations.size)

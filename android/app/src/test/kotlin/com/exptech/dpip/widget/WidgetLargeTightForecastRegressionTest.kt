@@ -48,7 +48,6 @@ class WidgetLargeTightForecastRegressionTest {
         )
         store.writeInstance(instanceId, WidgetAddress.Saved("407"), "407", 1L)
         store.commitCurrentWeather(
-            store.beginCurrentWeatherWrite(WidgetAddress.Saved("407"))!!,
             CurrentWeatherSnapshot(
                 schemaVersion = 7,
                 sourceIdentifier = "region:407",
@@ -72,7 +71,6 @@ class WidgetLargeTightForecastRegressionTest {
             writtenAt = 1L,
         )
         store.commitForecast(
-            token = store.beginForecastWrite(WidgetAddress.Saved("407"))!!,
             forecast = ForecastSnapshot(
                 schemaVersion = 1,
                 sourceIdentifier = "region:407",
@@ -320,8 +318,7 @@ class WidgetLargeTightForecastRegressionTest {
     @Test fun darkLongDescriptionsAndMissingForecastValues() {
         val store = WidgetStore.open(context)
         // Missing POP is decoded/presented by production as a dash; no invented value.
-        store.commitForecast(store.beginForecastWrite(WidgetAddress.Saved("407"))!!,
-            ForecastSnapshot(1, "region:407", "407", atTaipei(14, 10), atTaipei(14, 10),
+        store.commitForecast(ForecastSnapshot(1, "region:407", "407", atTaipei(14, 10), atTaipei(14, 10),
                 (15..19).map { ForecastPoint("$it:00", 27.0, "局部短暫陣雨", 206, null) }),
             receivedCalibratedMilliseconds = atTaipei(14, 10), expiresAtMilliseconds = atTaipei(15, 0), writtenAt = 2L)
         for (locale in listOf("zh-TW", "en", "ja", "ko", "th", "fil")) {

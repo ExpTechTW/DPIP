@@ -51,7 +51,12 @@ class WeatherWidgetConfigurationActivityTest {
         // connection to the previous test's deleted file.
         WidgetStore.resetForTest()
         store = WidgetStore.openUncached(context)
-        WorkManagerTestInitHelper.initializeTestWorkManager(context)
+        // The periodic tick's first run is immediate under the test scheduler;
+        // the stub keeps it from appending its own refresh to the chain.
+        WorkManagerTestInitHelper.initializeTestWorkManager(
+            context,
+            WidgetSchedulingOnlyWorkerFactory.configuration(),
+        )
         registerWidget(appWidgetId)
     }
 
@@ -83,9 +88,9 @@ class WeatherWidgetConfigurationActivityTest {
     }
 
     private fun assertNoRefresh() {
-        assertTrue(WorkManager.getInstance(context).getWorkInfosByTag(WidgetRefreshScheduler.workTag).get().isEmpty())
+        assertTrue(WorkManager.getInstance(context).getWorkInfosByTag(WidgetRefresh.workTag).get().isEmpty())
         assertTrue(WorkManager.getInstance(context)
-            .getWorkInfosForUniqueWork(WidgetRefreshScheduler.sourceWorkName(WidgetAddress.Saved("407")))
+            .getWorkInfosForUniqueWork(WidgetRefresh.refreshWorkName)
             .get().isEmpty())
     }
 
@@ -260,7 +265,7 @@ class WeatherWidgetConfigurationActivityTest {
         assertEquals(WidgetAddress.Saved("407"), store.readInstance(appWidgetId)!!.address)
 
         val work = WorkManager.getInstance(context)
-            .getWorkInfosForUniqueWork(WidgetRefreshScheduler.sourceWorkName(WidgetAddress.Saved("407")))
+            .getWorkInfosForUniqueWork(WidgetRefresh.refreshWorkName)
             .get()
         assertEquals(1, work.size)
         assertTrue(work.first().state == WorkInfo.State.ENQUEUED)

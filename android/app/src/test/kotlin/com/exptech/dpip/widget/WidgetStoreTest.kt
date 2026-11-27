@@ -21,12 +21,11 @@ import org.robolectric.RobolectricTestRunner
  * The store's real SQL, on Robolectric's SQLite.
  *
  * The ordering *rule* is pinned by `SnapshotOrderingTest` as a pure function;
- * what this covers is everything the rule cannot see — that the token survives
- * a transaction, that a clear fences an in-flight write, that a removed town
- * fences its own, that a reconfigure does not fence a source another instance
- * still uses, that a restore leaves no ghost, that an upgrade keeps the user's
- * choices, and that a broken database reports a *failure* rather than a quiet
- * rejection.
+ * what this covers is everything the rule cannot see — that the acquisition
+ * counter survives a transaction and a new connection, that a removed town
+ * refuses a late write, that a restore leaves no ghost, that an upgrade keeps
+ * the user's choices and their last observation, and that a broken database
+ * reports a *failure* rather than a quiet rejection.
  */
 @RunWith(RobolectricTestRunner::class)
 @org.robolectric.annotation.Config(sdk = [26, 35])
@@ -119,25 +118,66 @@ class WidgetStoreTest {
     }
 
     @Test
-    fun `the additive v4 upgrade preserves v3 observations forecasts and choices`() {
-        assertTrue(store.writeCatalog(catalog("407"), 1L))
-        store.writeInstance(11, saved, "407", 1L)
-        assertEquals(WidgetWriteResult.Written, commit(store.beginCurrentWeatherWrite(saved)!!))
-        assertEquals(WidgetWriteResult.Written, commitForecast(store.beginForecastWrite(saved)!!))
+    fun `the v5 upgrade keeps v4 observations, positions and choices`() {
+        // The v4 schema, as the previous build left it: the snapshot table's
+        // shape is unchanged, the rest of the cache is not.
         val path = context.getDatabasePath(WidgetStore.DATABASE_NAME)
-        SQLiteDatabase.openDatabase(path.path, null, SQLiteDatabase.OPEN_READWRITE).use {
-            it.execSQL("DROP TABLE widget_refresh_feedback")
-            it.version = 3
+        context.deleteDatabase(WidgetStore.DATABASE_NAME)
+        path.parentFile?.mkdirs()
+        SQLiteDatabase.openOrCreateDatabase(path, null).use { legacy ->
+            legacy.execSQL("CREATE TABLE widget_instances (app_widget_id INTEGER PRIMARY KEY, source_identifier TEXT NOT NULL, region_code TEXT, updated_at INTEGER NOT NULL)")
+            legacy.execSQL("CREATE TABLE widget_catalog (region_code TEXT PRIMARY KEY, display_name TEXT NOT NULL, administrative_area TEXT NOT NULL, latitude REAL NOT NULL, longitude REAL NOT NULL)")
+            legacy.execSQL("CREATE TABLE widget_meta (id INTEGER PRIMARY KEY, schema_version INTEGER NOT NULL, written_at INTEGER NOT NULL)")
+            legacy.execSQL(
+                "CREATE TABLE widget_snapshots (source_identifier TEXT PRIMARY KEY, schema_version INTEGER NOT NULL," +
+                    " region_code TEXT NOT NULL, region_name TEXT NOT NULL, observation_time INTEGER NOT NULL," +
+                    " station_name TEXT NOT NULL, weather TEXT NOT NULL, weather_code INTEGER NOT NULL," +
+                    " condition TEXT NOT NULL, is_night INTEGER NOT NULL, next_transition INTEGER NOT NULL," +
+                    " calibrated_offset INTEGER NOT NULL, temperature REAL, humidity INTEGER, rain REAL," +
+                    " wind_direction TEXT, wind_speed REAL, apparent_temperature REAL," +
+                    " write_generation INTEGER NOT NULL, location_generation INTEGER NOT NULL, written_at INTEGER NOT NULL)",
+            )
+            legacy.execSQL(
+                "CREATE TABLE widget_source_state (source_identifier TEXT PRIMARY KEY, degradation TEXT," +
+                    " generation INTEGER NOT NULL, forecast_demand INTEGER NOT NULL," +
+                    " forecast_demand_version INTEGER NOT NULL, updated_at INTEGER NOT NULL)",
+            )
+            legacy.execSQL("CREATE TABLE widget_ordering (kind TEXT NOT NULL, source_identifier TEXT NOT NULL, last_issued INTEGER NOT NULL, rejected_through INTEGER NOT NULL, snapshot_generation INTEGER, location_generation INTEGER, value_time INTEGER, region_code TEXT, PRIMARY KEY (kind, source_identifier))")
+            legacy.execSQL("CREATE TABLE widget_refresh_feedback (source_identifier TEXT PRIMARY KEY, request_id TEXT NOT NULL, state TEXT NOT NULL, updated_at INTEGER NOT NULL, expires_at INTEGER NOT NULL)")
+            legacy.execSQL("INSERT INTO widget_instances VALUES (11, 'current-location', NULL, 5)")
+            legacy.execSQL("INSERT INTO widget_catalog VALUES ('407', '西屯區', '臺中市', 24.181, 120.645)")
+            legacy.execSQL("INSERT INTO widget_meta VALUES (1, 1, 5)")
+            legacy.execSQL(
+                "INSERT INTO widget_snapshots VALUES ('current-location', 7, '407', '西屯區', 1791454316, '西屯'," +
+                    " '晴', 100, 'clear', 0, 0, 0, 27.5, 60, 0.0, NULL, NULL, NULL, 57, 57, 1)",
+            )
+            legacy.execSQL("INSERT INTO widget_source_state VALUES ('current-location', 'unusable_fix', 57, 1, 3, 1)")
+            legacy.version = 4
         }
+
         val upgraded = WidgetStore.openUncached(context)
-        assertEquals(snapshot().observationTime, upgraded.readCurrentWeather(saved)?.snapshot?.observationTime)
-        assertEquals(9_000L, upgraded.readForecast(saved)?.expiresAtMilliseconds)
-        assertEquals(saved, upgraded.readInstance(11)?.address)
-        assertTrue(upgraded.beginRefreshFeedback(saved, "after-upgrade", 1_000L))
+
+        assertEquals(WidgetAddress.CurrentLocation, upgraded.readInstance(11)?.address)
+        assertEquals(1, upgraded.readCatalog()!!.locations.size)
+        assertEquals("an update must not blank the Widget", 1_791_454_316L,
+            upgraded.readCurrentWeather(WidgetAddress.CurrentLocation)?.snapshot?.observationTime)
+        assertEquals(WidgetLocationDegradation.UnusableFix, upgraded.readLocationState(WidgetAddress.CurrentLocation))
+        // The rebuilt counter restarts at one, and the kept row was reset with
+        // it: a township change after the update is not refused by generation
+        // 57 from the counter that no longer exists.
+        assertEquals(1L, upgraded.beginAcquisition(WidgetAddress.CurrentLocation))
+        assertEquals(
+            WidgetWriteResult.Written,
+            upgraded.commitCurrentWeather(
+                snapshot(source = "current-location", regionCode = "100", observationSeconds = 1_791_454_000),
+                writtenAt = 2L,
+            ),
+        )
+        assertTrue(upgraded.beginRefreshFeedback(WidgetAddress.CurrentLocation, "after-upgrade", 1_000L))
     }
 
-    private fun commit(token: WidgetWriteToken, observation: Long = 1_791_454_316) =
-        store.commitCurrentWeather(token, snapshot(observation), writtenAt = 1L)
+    private fun commit(observation: Long = 1_791_454_316, target: WidgetStore = store) =
+        target.commitCurrentWeather(snapshot(observation), writtenAt = 1L)
 
     private fun forecast(regionCode: String = "407", updateTime: Long = 1_000) = ForecastSnapshot(
         schemaVersion = 1,
@@ -150,13 +190,11 @@ class WidgetStoreTest {
 
     /** Commits a forecast the way the refresh does: metadata fixed at commit. */
     private fun commitForecast(
-        token: WidgetWriteToken,
         regionCode: String = "407",
         updateTime: Long = 1_000,
         receivedCalibrated: Long = 5_000,
         expiresAt: Long = 9_000,
     ) = store.commitForecast(
-        token = token,
         forecast = forecast(regionCode, updateTime),
         receivedCalibratedMilliseconds = receivedCalibrated,
         expiresAtMilliseconds = expiresAt,
@@ -173,14 +211,8 @@ class WidgetStoreTest {
     fun `a later request carrying an older observation is superseded`() {
         assertTrue(store.writeCatalog(catalog("407"), 1L))
 
-        val first = store.beginCurrentWeatherWrite(saved)!!
-        assertEquals(WidgetWriteResult.Written, commit(first, observation = 1_791_454_400))
-
-        val second = store.beginCurrentWeatherWrite(saved)!!
-        assertEquals(
-            WidgetWriteResult.Superseded,
-            commit(second, observation = 1_791_454_300),
-        )
+        assertEquals(WidgetWriteResult.Written, commit(observation = 1_791_454_400))
+        assertEquals(WidgetWriteResult.Superseded, commit(observation = 1_791_454_300))
 
         assertEquals(
             1_791_454_400L,
@@ -191,7 +223,7 @@ class WidgetStoreTest {
     @Test
     fun `the snapshot round-trips every field`() {
         assertTrue(store.writeCatalog(catalog("407"), 1L))
-        commit(store.beginCurrentWeatherWrite(saved)!!)
+        commit()
 
         val stored = store.readCurrentWeather(saved)!!
         val value = stored.snapshot
@@ -208,83 +240,40 @@ class WidgetStoreTest {
         assertEquals(30.2, value.apparentTemperature!!, 1e-9)
     }
 
-    // ── Clear ───────────────────────────────────────────────────────────────
-
     @Test
-    fun `a clear fences a refresh already in flight`() {
+    fun `a town leaving the catalog refuses a late write`() {
         assertTrue(store.writeCatalog(catalog("407"), 1L))
-        val token = store.beginCurrentWeatherWrite(saved)!!
+        val acquisition = store.beginAcquisition(saved)!!
 
-        assertTrue(store.clearCurrentWeather())
+        assertTrue(store.writeCatalog(catalog("100"), 2L))
 
-        // The refresh finishes after the clear and must not resurrect anything.
-        assertEquals(WidgetWriteResult.Superseded, commit(token))
+        assertEquals(
+            WidgetWriteResult.Superseded,
+            store.commitCurrentWeather(snapshot(), writtenAt = 1L, acquisition = acquisition),
+        )
         assertNull(store.readCurrentWeather(saved))
     }
 
     @Test
-    fun `a clear keeps the instance choices and the catalog`() {
-        assertTrue(store.writeCatalog(catalog("407"), 1L))
-        assertTrue(store.writeInstance(11, saved, "407", 1L))
-
-        assertTrue(store.clearCurrentWeather())
-
-        assertNotNull(store.readInstance(11))
-        assertEquals(1, store.readCatalog()!!.locations.size)
+    fun `acquisitions count up per source and survive a new connection`() {
+        assertEquals(1L, store.beginAcquisition(saved))
+        assertEquals(2L, store.beginAcquisition(saved))
+        assertEquals(1L, store.beginAcquisition(WidgetAddress.CurrentLocation))
+        assertEquals(3L, WidgetStore.openUncached(context).beginAcquisition(saved))
     }
 
     @Test
-    fun `a town leaving the catalog fences its in-flight write`() {
-        assertTrue(store.writeCatalog(catalog("407"), 1L))
-        val token = store.beginCurrentWeatherWrite(saved)!!
-
-        assertTrue(store.writeCatalog(catalog("100"), 2L))
-
-        assertEquals(WidgetWriteResult.Superseded, commit(token))
+    fun `a refresh time round-trips per source`() {
+        assertNull(store.readRefreshedAt(saved))
+        assertTrue(store.markRefreshed(saved, 1_000L))
+        assertEquals(1_000L, store.readRefreshedAt(saved))
+        assertNull(store.readRefreshedAt(WidgetAddress.CurrentLocation))
+        // A position write shares the row without touching the refresh time.
+        assertTrue(store.writeLocationState(saved, WidgetLocationDegradation.Unavailable, 2_000L))
+        assertEquals(1_000L, store.readRefreshedAt(saved))
     }
 
     // ── Instances ───────────────────────────────────────────────────────────
-
-    @Test
-    fun `reconfiguring one of two instances on a source does not fence it`() {
-        assertTrue(store.writeCatalog(catalog("407", "100"), 1L))
-        assertTrue(store.writeInstance(11, saved, "407", 1L))
-        assertTrue(store.writeInstance(12, saved, "407", 1L))
-
-        // A refresh for the shared source is already in flight.
-        val token = store.beginCurrentWeatherWrite(saved)!!
-
-        // Instance 11 moves to another town while 12 stays, so the source is
-        // still in use and the in-flight write must still be accepted.
-        assertTrue(store.writeInstance(11, WidgetAddress.Saved("100"), "100", 2L))
-
-        assertEquals(WidgetWriteResult.Written, commit(token))
-    }
-
-    @Test
-    fun `reconfiguring the last instance on a source fences it`() {
-        assertTrue(store.writeCatalog(catalog("407", "100"), 1L))
-        assertTrue(store.writeInstance(11, saved, "407", 1L))
-
-        // The refresh for the town being left is in flight when the user moves
-        // the only instance away from it: its result must not land.
-        val token = store.beginCurrentWeatherWrite(saved)!!
-        assertTrue(store.writeInstance(11, WidgetAddress.Saved("100"), "100", 2L))
-
-        assertEquals(WidgetWriteResult.Superseded, commit(token))
-    }
-
-    @Test
-    fun `deleting one of two instances on a source does not fence it`() {
-        assertTrue(store.writeCatalog(catalog("407"), 1L))
-        assertTrue(store.writeInstance(11, saved, "407", 1L))
-        assertTrue(store.writeInstance(12, saved, "407", 1L))
-
-        val token = store.beginCurrentWeatherWrite(saved)!!
-        assertTrue(store.deleteInstance(11))
-
-        assertEquals(WidgetWriteResult.Written, commit(token))
-    }
 
     @Test
     fun `a restore moves the choice and leaves no ghost`() {
@@ -311,249 +300,21 @@ class WidgetStoreTest {
     }
 
     @Test
-    fun `reconcile fences a source whose last instance was dropped`() {
-        assertTrue(store.writeCatalog(catalog("407"), 1L))
-        assertTrue(store.writeInstance(11, saved, "407", 1L))
-        val token = store.beginCurrentWeatherWrite(saved)!!
-
-        assertEquals(1, (store.reconcileInstances(emptySet()) as WidgetInstanceReadResult.Read).dropped.size)
-
-        assertEquals(WidgetWriteResult.Superseded, commit(token))
-    }
-
-    // ── Location state ──────────────────────────────────────────────────────
-
-    @Test
     fun `every degradation round-trips`() {
         for (degradation in WidgetLocationDegradation.entries) {
-            assertTrue(store.writeLocationState(WidgetAddress.CurrentLocation, degradation, 1L, 1L))
+            assertTrue(store.writeLocationState(WidgetAddress.CurrentLocation, degradation, 1L))
             assertEquals(degradation, store.readLocationState(WidgetAddress.CurrentLocation))
         }
     }
 
     @Test
-    fun `an older acquisition cannot put a degradation back after a newer success`() {
-        val address = WidgetAddress.CurrentLocation
-        // The newer refresh succeeded and cleared the state at generation 7.
-        assertTrue(store.writeLocationState(address, null, 7L, 7L))
-
-        // The older refresh, which timed out, finishes afterwards.
-        assertTrue(store.writeLocationState(address, WidgetLocationDegradation.UnusableFix, 5L, 8L))
-
-        assertNull("the older timeout must not win", store.readLocationState(address))
-    }
-
-    @Test
-    fun `an older success cannot clear a newer revocation`() {
-        val address = WidgetAddress.CurrentLocation
-        // The user revoked the permission; a refresh at generation 8 recorded it.
-        assertTrue(
-            store.writeLocationState(address, WidgetLocationDegradation.Permission, 8L, 8L),
-        )
-
-        // A refresh that had already obtained a fix, issued at generation 6,
-        // commits its success now.
-        assertTrue(store.writeLocationState(address, null, 6L, 9L))
-
-        assertEquals(
-            "the newer revocation must survive the older success",
-            WidgetLocationDegradation.Permission,
-            store.readLocationState(address),
-        )
-    }
-
-    @Test
-    fun `the two directions hold when the writes actually overlap`() {
-        val address = WidgetAddress.CurrentLocation
-        val newer = CountDownLatch(1)
-        val older = CountDownLatch(1)
-
-        // The older refresh is parked just before it writes its timeout, while a
-        // newer one succeeds. The store serialises its methods, so whichever
-        // order they arrive in, the newer generation must win.
-        val olderWrite = FutureTask {
-            older.countDown()
-            assertTrue("newer write must finish", newer.await(5, TimeUnit.SECONDS))
-            assertTrue(store.writeLocationState(address, WidgetLocationDegradation.UnusableFix, 5L, 5L))
-        }
-        val olderThread = Thread(olderWrite)
-        olderThread.start()
-        try {
-            assertTrue(older.await(5, TimeUnit.SECONDS))
-            assertTrue(store.writeLocationState(address, null, 7L, 7L))
-            newer.countDown()
-            // get propagates background assertions and exceptions to JUnit.
-            olderWrite.get(5, TimeUnit.SECONDS)
-        } finally {
-            newer.countDown()
-            olderThread.interrupt()
-            olderThread.join(5_000)
-            assertFalse("older writer must not leak into another test", olderThread.isAlive)
-        }
-
-        assertNull(
-            "a timeout that finished after a newer success must not surface",
-            store.readLocationState(address),
-        )
-
-        // And the mirror, with the roles swapped: a newer revocation must
-        // survive an older success that lands afterwards.
-        val successWrite = FutureTask {
-            assertTrue(store.writeLocationState(address, null, 6L, 9L))
-        }
-        val successThread = Thread(successWrite)
-        assertTrue(store.writeLocationState(address, WidgetLocationDegradation.Permission, 8L, 8L))
-        successThread.start()
-        try {
-            successWrite.get(5, TimeUnit.SECONDS)
-        } finally {
-            successThread.interrupt()
-            successThread.join(5_000)
-            assertFalse("success writer must not leak into another test", successThread.isAlive)
-        }
-
-        assertEquals(
-            "an older success must not clear a newer revocation",
-            WidgetLocationDegradation.Permission,
-            store.readLocationState(address),
-        )
-    }
-
-    @Test
-    fun `a same-generation write is last-writer-wins`() {
-        val address = WidgetAddress.CurrentLocation
-        assertTrue(store.writeLocationState(address, WidgetLocationDegradation.Permission, 4L, 4L))
-        assertTrue(store.writeLocationState(address, null, 4L, 5L))
-        assertNull(store.readLocationState(address))
-    }
-
-    @Test
-    fun `the generation is remembered even when the state is fine`() {
-        val address = WidgetAddress.CurrentLocation
-        assertTrue(store.writeLocationState(address, null, 9L, 9L))
-        assertEquals(9L, store.readLocationStateGeneration(address))
-    }
-
-    @Test
-    fun `the forecast demand survives until it is answered`() {
-        val address = WidgetAddress.CurrentLocation
-        assertFalse(store.hasForecastDemand(address))
-
-        assertTrue(store.setForecastDemand(address, demand = true, updatedAt = 1L))
-        assertTrue(store.hasForecastDemand(address))
-
-        // A position write must not clear the demand: they share a row but are
-        // different facts.
-        assertTrue(
-            store.writeLocationState(address, WidgetLocationDegradation.Permission, 3L, 2L),
-        )
-        assertTrue(store.hasForecastDemand(address))
-
-        assertTrue(store.setForecastDemand(address, demand = false, updatedAt = 3L))
-        assertFalse(store.hasForecastDemand(address))
-    }
-
-    @Test
-    fun `a demand clear is ignored when a newer demand was raised meanwhile`() {
-        val address = WidgetAddress.CurrentLocation
-        assertTrue(store.setForecastDemand(address, demand = true, updatedAt = 1L))
-        assertEquals(1L, store.readForecastDemandVersion(address))
-
-        // The fetch reads the version it is answering, then a resize raises a new
-        // demand while it is in flight.
-        assertTrue(store.setForecastDemand(address, demand = true, updatedAt = 2L))
-        assertEquals(2L, store.readForecastDemandVersion(address))
-
-        // The fetch's commit names version 1, which no longer matches. The data
-        // still lands — it is a real forecast — but the demand is left raised, so
-        // the next run fetches for the demand it never answered.
-        assertEquals(
-            WidgetWriteResult.Written,
-            store.commitForecast(
-                token = store.beginForecastWrite(address)!!,
-                forecast = forecast(),
-                receivedCalibratedMilliseconds = 1L,
-                expiresAtMilliseconds = 2L,
-                writtenAt = 1L,
-                answeredDemandVersion = 1L,
-            ),
-        )
-        assertTrue(
-            "the newer demand must survive the older fetch",
-            store.hasForecastDemand(address),
-        )
-
-        // Answering the current version clears it, in the same transaction.
-        assertEquals(
-            WidgetWriteResult.Written,
-            store.commitForecast(
-                token = store.beginForecastWrite(address)!!,
-                forecast = forecast(updateTime = 2_000),
-                receivedCalibratedMilliseconds = 1L,
-                expiresAtMilliseconds = 2L,
-                writtenAt = 1L,
-                answeredDemandVersion = 2L,
-            ),
-        )
-        assertFalse(store.hasForecastDemand(address))
-    }
-
-    @Test
-    fun `one refresh reserves both tickets in one transaction`() {
-        val address = WidgetAddress.CurrentLocation
-
-        val tokens = store.beginRefreshWrites(address, includeForecast = true)!!
-        assertEquals(1L, tokens.currentWeather.generation)
-        assertEquals(1L, tokens.forecast!!.generation)
-
-        // A second refresh gets the next pair, still one apart per kind.
-        val second = store.beginRefreshWrites(address, includeForecast = true)!!
-        assertEquals(2L, second.currentWeather.generation)
-        assertEquals(2L, second.forecast!!.generation)
-
-        // Without a forecast there is no forecast ticket at all — and no
-        // forecast counter moved.
-        val third = store.beginRefreshWrites(address, includeForecast = false)!!
-        assertNull(third.forecast)
-        assertEquals(3L, third.currentWeather.generation)
-        // Two forecast tickets have been issued so far, so the next is the
-        // third — the counter only ever moves forward.
-        assertEquals(
-            3L,
-            store.beginRefreshWrites(address, includeForecast = true)!!.forecast!!.generation,
-        )
-    }
-
-    @Test
-    fun `a clear after the pair is reserved fences the forecast too`() {
-        val address = WidgetAddress.CurrentLocation
-        val tokens = store.beginRefreshWrites(address, includeForecast = true)!!
-
-        assertTrue(store.clearForecast())
-
-        assertEquals(
-            WidgetWriteResult.Superseded,
-            store.commitForecast(
-                token = tokens.forecast!!,
-                forecast = forecast(),
-                receivedCalibratedMilliseconds = 1L,
-                expiresAtMilliseconds = 2L,
-                writtenAt = 1L,
-            ),
-        )
-        assertNull(store.readForecast(address))
-    }
-
-    @Test
     fun `a commit that lands may clear the degradation`() {
         val address = WidgetAddress.CurrentLocation
-        assertTrue(store.writeLocationState(address, WidgetLocationDegradation.Permission, 1L, 1L))
+        assertTrue(store.writeLocationState(address, WidgetLocationDegradation.Permission, 1L))
 
-        val token = store.beginCurrentWeatherWrite(address)!!
         assertEquals(
             WidgetWriteResult.Written,
             store.commitCurrentWeather(
-                token = token,
                 snapshot = snapshot(source = "current-location"),
                 writtenAt = 1L,
                 locationStateAfterCommit = LocationStateWrite.Set(null),
@@ -565,22 +326,18 @@ class WidgetStoreTest {
     @Test
     fun `a superseded commit cannot clear the degradation`() {
         val address = WidgetAddress.CurrentLocation
-        assertTrue(store.writeLocationState(address, WidgetLocationDegradation.Permission, 1L, 1L))
+        assertTrue(store.writeLocationState(address, WidgetLocationDegradation.Permission, 1L))
 
-        val first = store.beginCurrentWeatherWrite(address)!!
         store.commitCurrentWeather(
-            first,
             snapshot(source = "current-location", observationSeconds = 2_000),
             writtenAt = 1L,
         )
 
         // A second, older acquisition is superseded; its commit must not touch
         // the degradation, because the observation it belongs to never landed.
-        val second = store.beginCurrentWeatherWrite(address)!!
         assertEquals(
             WidgetWriteResult.Superseded,
             store.commitCurrentWeather(
-                token = second,
                 snapshot = snapshot(source = "current-location", observationSeconds = 1_000),
                 writtenAt = 1L,
                 locationStateAfterCommit = LocationStateWrite.Set(null),
@@ -597,12 +354,11 @@ class WidgetStoreTest {
     @Test
     fun `a forecast is not filed against another township`() {
         assertTrue(store.writeCatalog(catalog("407"), 1L))
-        commit(store.beginCurrentWeatherWrite(saved)!!)
+        commit()
 
-        val token = store.beginForecastWrite(saved)!!
         assertEquals(
             WidgetWriteResult.Superseded,
-            commitForecast(token, regionCode = "100"),
+            commitForecast(regionCode = "100"),
         )
         assertNull(store.readForecast(saved))
     }
@@ -610,13 +366,11 @@ class WidgetStoreTest {
     @Test
     fun `a forecast round-trips its points in order`() {
         assertTrue(store.writeCatalog(catalog("407"), 1L))
-        commit(store.beginCurrentWeatherWrite(saved)!!)
+        commit()
 
-        val token = store.beginForecastWrite(saved)!!
         assertEquals(
             WidgetWriteResult.Written,
             store.commitForecast(
-                token = token,
                 forecast = ForecastSnapshot(
                     schemaVersion = 1,
                     sourceIdentifier = "region:407",
@@ -644,22 +398,8 @@ class WidgetStoreTest {
     }
 
     @Test
-    fun `clearing the forecast removes the points with it`() {
-        assertTrue(store.writeCatalog(catalog("407"), 1L))
-        commit(store.beginCurrentWeatherWrite(saved)!!)
-        commitForecast(store.beginForecastWrite(saved)!!)
-
-        assertTrue(store.clearForecast())
-
-        assertNull(store.readForecast(saved))
-    }
-
-    // ── Failures ────────────────────────────────────────────────────────────
-
-    @Test
     fun `a broken database is a failure, not a quiet rejection`() {
         assertTrue(store.writeCatalog(catalog("407"), 1L))
-        val token = store.beginCurrentWeatherWrite(saved)!!
 
         // Break the cache table underneath the store, the way a corrupt or
         // half-migrated file would.
@@ -669,7 +409,7 @@ class WidgetStoreTest {
             SQLiteDatabase.OPEN_READWRITE,
         ).use { it.execSQL("DROP TABLE widget_snapshots") }
 
-        assertEquals(WidgetWriteResult.Failed, commit(token))
+        assertEquals(WidgetWriteResult.Failed, commit())
     }
 
     @Test
@@ -678,14 +418,13 @@ class WidgetStoreTest {
         WidgetLog.overrideSink = { _ -> RecordingLog(recorded) }
 
         assertTrue(store.writeCatalog(catalog("407"), 1L))
-        val token = store.beginCurrentWeatherWrite(saved)!!
         SQLiteDatabase.openDatabase(
             context.getDatabasePath(WidgetStore.DATABASE_NAME).path,
             null,
             SQLiteDatabase.OPEN_READWRITE,
         ).use { it.execSQL("DROP TABLE widget_snapshots") }
 
-        assertEquals(WidgetWriteResult.Failed, commit(token))
+        assertEquals(WidgetWriteResult.Failed, commit())
 
         assertTrue(
             "expected the operation in $recorded",
@@ -769,37 +508,14 @@ class WidgetStoreTest {
         // The forecast cache had no deadline and is not readable by this build,
         // so it is gone — and the table accepts the new shape.
         assertNull(upgraded.readForecast(WidgetAddress.CurrentLocation))
-        assertTrue(upgraded.setForecastDemand(WidgetAddress.CurrentLocation, true, 9L))
         assertEquals(
             WidgetWriteResult.Written,
             upgraded.commitForecast(
-                token = upgraded.beginForecastWrite(WidgetAddress.CurrentLocation)!!,
-                forecast = forecast(),
+                forecast = forecast().copy(sourceIdentifier = "current-location"),
                 receivedCalibratedMilliseconds = 1L,
                 expiresAtMilliseconds = 2L,
                 writtenAt = 1L,
             ),
-        )
-    }
-
-    @Test
-    fun `a source-scoped clear leaves the other towns alone`() {
-        assertTrue(store.writeCatalog(catalog("407", "100"), 1L))
-        val saved100 = WidgetAddress.Saved("100")
-        commit(store.beginCurrentWeatherWrite(saved)!!)
-        store.commitCurrentWeather(
-            store.beginCurrentWeatherWrite(saved100)!!,
-            snapshot(regionCode = "100", source = "region:100"),
-            writtenAt = 1L,
-        )
-
-        // The app owns region:407 and changes town: only that source goes.
-        assertTrue(store.clearCurrentWeatherSource(saved))
-
-        assertNull(store.readCurrentWeather(saved))
-        assertNotNull(
-            "the other Widget's town must survive an app-side selection change",
-            store.readCurrentWeather(saved100),
         )
     }
 
@@ -851,7 +567,7 @@ class WidgetStoreTest {
         // And the rebuilt table accepts a write.
         assertEquals(
             WidgetWriteResult.Written,
-            commit(upgraded.beginCurrentWeatherWrite(saved)!!),
+            commit(target = upgraded),
         )
     }
 
@@ -889,31 +605,4 @@ class WidgetStoreTest {
         )
     }
 
-    // ── Forecast demand ─────────────────────────────────────────────────────
-
-    @Test
-    fun `a cached forecast retires the demand it answers`() {
-        // The leak: `commitForecast` is the only other place the demand clears,
-        // and a refresh that keeps a still-valid cached forecast never reaches
-        // it. Left raised, every later options change re-reserves a ticket.
-        assertTrue(store.setForecastDemand(saved, demand = true, updatedAt = 1L))
-        assertTrue(store.hasForecastDemand(saved))
-        val version = store.readForecastDemandVersion(saved)
-
-        assertTrue(store.clearAnsweredForecastDemand(saved, version, updatedAt = 2L))
-
-        assertFalse(store.hasForecastDemand(saved))
-    }
-
-    @Test
-    fun `a demand raised after the run started stays raised`() {
-        assertTrue(store.setForecastDemand(saved, demand = true, updatedAt = 1L))
-        val answered = store.readForecastDemandVersion(saved)
-        // A resize while the refresh was deciding: a newer ask nothing answered.
-        assertTrue(store.setForecastDemand(saved, demand = true, updatedAt = 2L))
-
-        assertFalse(store.clearAnsweredForecastDemand(saved, answered, updatedAt = 3L))
-
-        assertTrue(store.hasForecastDemand(saved))
-    }
 }

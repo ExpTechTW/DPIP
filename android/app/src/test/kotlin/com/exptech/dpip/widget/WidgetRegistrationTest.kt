@@ -1,5 +1,6 @@
 package com.exptech.dpip.widget
 
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -89,21 +90,32 @@ class WidgetRegistrationTest {
     }
 
     @Test
-    fun `the provider, the reconcile receiver and the configuration Activity are declared`() {
+    fun `the provider, the system receiver and the configuration Activity are declared`() {
         for (component in listOf(
             ".widget.WeatherWidgetProvider",
-            ".widget.WidgetReconcileReceiver",
+            ".widget.WidgetSystemReceiver",
             ".widget.WeatherWidgetConfigurationActivity",
-            ".widget.WidgetClockReceiver",
         )) {
             assertTrue("$component must be declared", manifest.contains(component))
+        }
+        for (retired in listOf(".widget.WidgetReconcileReceiver", ".widget.WidgetClockReceiver")) {
+            assertFalse("$retired was merged into the system receiver", manifest.contains(retired))
         }
         assertTrue(manifest.contains("android.appwidget.action.APPWIDGET_UPDATE"))
         assertTrue(manifest.contains("android.appwidget.action.APPWIDGET_CONFIGURE"))
         assertTrue(manifest.contains("android.appwidget.provider"))
-        // A clock change re-renders and re-arms the local redraw.
-        assertTrue(manifest.contains("android.intent.action.TIME_SET"))
-        assertTrue(manifest.contains("android.intent.action.TIMEZONE_CHANGED"))
+        // A reboot or an update reconciles; a clock change re-renders and
+        // re-arms the local redraw. All four reach the one system receiver.
+        val system = manifest.substring(manifest.indexOf(".widget.WidgetSystemReceiver"))
+            .substringBefore("</receiver>")
+        for (action in listOf(
+            "android.intent.action.BOOT_COMPLETED",
+            "android.intent.action.MY_PACKAGE_REPLACED",
+            "android.intent.action.TIME_SET",
+            "android.intent.action.TIMEZONE_CHANGED",
+        )) {
+            assertTrue("$action must reach the system receiver", system.contains(action))
+        }
     }
 
     @Test
@@ -117,11 +129,19 @@ class WidgetRegistrationTest {
             manifest.indexOf(".widget.WeatherWidgetConfigurationActivity"),
         )
         assertTrue(activity.take(200).contains("android:exported=\"true\""))
-        assertFalse(
-            "the clock receiver must not be reachable by other apps",
-            manifest.substring(manifest.indexOf(".widget.WidgetClockReceiver"))
-                .take(200)
-                .contains("android:exported=\"true\""),
+        // The system receiver is exported like the app's other boot receiver,
+        // but listens only for protected broadcasts no other app can send.
+        val system = manifest.substring(manifest.indexOf(".widget.WidgetSystemReceiver"))
+            .substringBefore("</receiver>")
+        val actions = Regex("action android:name=\"([^\"]+)\"").findAll(system).map { it.groupValues[1] }.toList()
+        assertEquals(
+            listOf(
+                "android.intent.action.BOOT_COMPLETED",
+                "android.intent.action.MY_PACKAGE_REPLACED",
+                "android.intent.action.TIME_SET",
+                "android.intent.action.TIMEZONE_CHANGED",
+            ),
+            actions,
         )
     }
 }

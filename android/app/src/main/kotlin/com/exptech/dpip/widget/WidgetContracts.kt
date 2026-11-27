@@ -339,12 +339,6 @@ data class StoredForecast(
     val points: List<ForecastPoint> get() = forecast.points
 }
 
-/** The two write tickets one refresh reserves, from a single transaction. */
-data class RefreshWriteTokens(
-    val currentWeather: WidgetWriteToken,
-    val forecast: WidgetWriteToken?,
-)
-
 /**
  * Why a Widget instance cannot show the position the user asked for.
  *

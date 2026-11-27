@@ -255,97 +255,38 @@ class WidgetSnapshotChannelTest {
     }
 
     @Test
-    fun `clearing a kind empties it and reports success`() {
-        write("currentWeather", payload(), "region:407")
-
-        assertNull(clear("currentWeather").errorCode)
-        assertNull(store.readCurrentWeather(WidgetAddress.Saved("407")))
-    }
-
-    @Test
-    fun `a source-scoped clear of current weather leaves the other sources`() {
-        write("currentWeather", payload(), "region:407")
-        write("currentWeather", currentLocationPayload(1_791_454_316), "current-location")
-
-        assertNull(clear("currentWeather", "region:407").errorCode)
-
-        assertNull("the named source is gone", store.readCurrentWeather(WidgetAddress.Saved("407")))
-        assertNotNull(
-            "the other source must survive its neighbour's clear",
-            store.readCurrentWeather(WidgetAddress.CurrentLocation),
-        )
-    }
-
-    @Test
-    fun `a source on a forecast clear is refused and clears nothing`() {
+    fun `a clear is answered as a success and changes nothing on Android`() {
+        // Home invalidation never clears the Android cache (home_providers.dart):
+        // a snapshot a home-screen Widget still shows is not the app's to erase.
+        // The call stays answerable so the shared Dart writer keeps one contract.
         write("currentWeather", payload(), "region:407")
         seedForecast(WidgetAddress.Saved("407"))
         store.writeInstance(11, WidgetAddress.Saved("407"), "407", 1L)
 
-        val result = clear("weatherForecast", "region:407")
+        for ((kind, source) in listOf(
+            "currentWeather" to null,
+            "currentWeather" to "region:407",
+            "weatherForecast" to null,
+            "locationCatalog" to null,
+        )) {
+            assertNull("$kind/$source", clear(kind, source).errorCode)
+        }
 
-        assertEquals("invalid_payload", result.errorCode)
-        assertNotNull(
-            "the forecast must survive a scoped clear it does not support",
-            store.readForecast(WidgetAddress.Saved("407")),
-        )
         assertNotNull(store.readCurrentWeather(WidgetAddress.Saved("407")))
-        assertNotNull(store.readCatalog())
+        assertNotNull(store.readForecast(WidgetAddress.Saved("407")))
+        assertEquals(listOf("407"), store.readCatalog()!!.locations.map { it.regionCode })
         assertNotNull(store.readInstance(11))
     }
 
     @Test
-    fun `a source on a catalog clear is refused and keeps the catalog`() {
-        write("currentWeather", payload(), "region:407")
-        seedForecast(WidgetAddress.Saved("407"))
-        store.writeInstance(11, WidgetAddress.Saved("407"), "407", 1L)
+    fun `a forecast write is answered as a success and stores nothing`() {
+        val json = """
+            {"schemaVersion":1,"sourceIdentifier":"region:407","regionCode":"407",
+             "updateTime":1000,"receivedAt":2000,"points":[]}
+        """.trimIndent()
 
-        val result = clear("locationCatalog", "region:407")
-
-        assertEquals("invalid_payload", result.errorCode)
-        assertEquals(
-            listOf("407"),
-            store.readCatalog()!!.locations.map { it.regionCode },
-        )
-        assertNotNull(store.readCurrentWeather(WidgetAddress.Saved("407")))
-        assertNotNull(store.readForecast(WidgetAddress.Saved("407")))
-        assertNotNull(store.readInstance(11))
-    }
-
-    @Test
-    fun `a malformed clear leaves every kind intact`() {
-        write("currentWeather", payload(), "region:407")
-        seedForecast(WidgetAddress.Saved("407"))
-        store.writeInstance(11, WidgetAddress.Saved("407"), "407", 1L)
-
-        // An unknown kind never had a scope to begin with.
-        assertEquals("invalid_kind", clear("somethingElse").errorCode)
-        // A source that is not a valid address on the one kind that takes one.
-        assertEquals("invalid_payload", clear("currentWeather", "region:../").errorCode)
-
-        assertNotNull(store.readCurrentWeather(WidgetAddress.Saved("407")))
-        assertNotNull(store.readForecast(WidgetAddress.Saved("407")))
-        assertNotNull(store.readCatalog())
-        assertNotNull(store.readInstance(11))
-    }
-
-    @Test
-    fun `clearing the forecast without a source still clears it`() {
-        seedForecast(WidgetAddress.Saved("407"))
-        assertNotNull(store.readForecast(WidgetAddress.Saved("407")))
-
-        assertNull(clear("weatherForecast").errorCode)
-
+        assertNull(write("weatherForecast", json).errorCode)
         assertNull(store.readForecast(WidgetAddress.Saved("407")))
-    }
-
-    @Test
-    fun `clearing the catalog without a source still empties it`() {
-        assertNotNull(store.readCatalog())
-
-        assertNull(clear("locationCatalog").errorCode)
-
-        assertTrue(store.readCatalog()!!.locations.isEmpty())
     }
 
     @Test
@@ -360,9 +301,7 @@ class WidgetSnapshotChannelTest {
         assertEquals(
             0,
             WorkManager.getInstance(context)
-                .getWorkInfosForUniqueWork(
-                    WidgetRefreshScheduler.sourceWorkName(WidgetAddress.Saved("407")),
-                )
+                .getWorkInfosForUniqueWork(WidgetRefresh.refreshWorkName)
                 .get()
                 .size,
         )
@@ -375,7 +314,7 @@ class WidgetSnapshotChannelTest {
         assertNull(write("currentWeather", payload(), "region:407").errorCode)
 
         val work = WorkManager.getInstance(context)
-            .getWorkInfosForUniqueWork(WidgetRefreshScheduler.sourceWorkName(WidgetAddress.Saved("407")))
+            .getWorkInfosForUniqueWork(WidgetRefresh.refreshWorkName)
             .get()
         assertEquals(1, work.size)
     }
@@ -406,7 +345,7 @@ class WidgetSnapshotChannelTest {
         )
 
         WeatherWidgetRefreshWorker.refresher =
-            { context, address, includeForecast, demandVersion, isCancelled ->
+            { context, address ->
                 WidgetRefreshService(
                     context = context,
                     store = store,
@@ -424,13 +363,12 @@ class WidgetSnapshotChannelTest {
                     fetchWeather = { _, _ -> null },
                     fetchForecast = { throw WidgetHttpException("no network") },
                     nowMilliseconds = { 1L },
-                ).refresh(address, includeForecast, demandVersion, isCancelled)
+                ).refresh(address)
             }
         try {
             TestListenableWorkerBuilder<WeatherWidgetRefreshWorker>(context)
                 .setInputData(
                     workDataOf(
-                        WeatherWidgetRefreshWorker.KEY_LOCAL_ONLY to false,
                         WeatherWidgetRefreshWorker.KEY_SOURCE to "current-location",
                     ),
                 )
@@ -481,9 +419,7 @@ class WidgetSnapshotChannelTest {
     /** Seeds a committed forecast directly, the way a refresh leaves one. */
     private fun seedForecast(address: WidgetAddress) {
         val regionCode = (address as WidgetAddress.Saved).regionCode
-        val token = store.beginForecastWrite(address)!!
         store.commitForecast(
-            token = token,
             forecast = ForecastSnapshot(
                 schemaVersion = 1,
                 sourceIdentifier = address.sourceIdentifier,

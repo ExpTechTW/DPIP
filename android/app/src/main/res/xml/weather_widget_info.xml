@@ -5,7 +5,7 @@
   `updatePeriodMillis` is 0 on purpose. Its floor is 30 minutes and it is
   delivered even for an app the OS has put to sleep, so using it would buy a
   second, worse scheduler beside the WorkManager one that already owns the
-  cadence. The comment in `WidgetRefreshScheduler` records the actual contract:
+  cadence. The comment in `WidgetRefresh` records the actual contract:
   a request of about 20 minutes, never a promise.
 
   The resize bounds are the range the faces actually support: the 110 dp

@@ -224,9 +224,8 @@ class WeatherWidgetConfigurationActivity : Activity() {
         // order matters: the launcher shows the cache while the network runs,
         // not a blank.
         WidgetUpdater.updateInstance(this, appWidgetId)
-        WidgetUpdater.refreshForecastDemand(this, row.address)
-        WidgetRefreshScheduler.schedulePeriodic(this)
-        WidgetRefreshScheduler.scheduleOneTime(this, row.address)
+        WidgetRefresh.schedulePeriodic(this)
+        WidgetRefresh.request(this, WidgetRefresh.Reason.Configured, row.address)
 
         setResult(
             RESULT_OK,

@@ -89,7 +89,6 @@ class WidgetSubmissionWiringTest {
     private fun cache(address: WidgetAddress.Saved, name: String, temperature: Double) {
         val previous = store.readCurrentWeather(address)?.snapshot?.observationTime ?: 1_791_454_316L
         assertEquals(WidgetWriteResult.Written, store.commitCurrentWeather(
-            checkNotNull(store.beginCurrentWeatherWrite(address)),
             CurrentWeatherSnapshot(
                 schemaVersion = 7, sourceIdentifier = address.sourceIdentifier,
                 regionCode = address.regionCode, regionName = name,
@@ -110,8 +109,8 @@ class WidgetSubmissionWiringTest {
     private fun text(id: Int, viewId: Int): String =
         submitted(id).findViewById<TextView>(viewId).text.toString()
 
-    private fun requests(address: WidgetAddress): List<WorkInfo> = WorkManager.getInstance(context)
-        .getWorkInfosForUniqueWork(WidgetRefreshScheduler.sourceWorkName(address))
+    private fun requests(): List<WorkInfo> = WorkManager.getInstance(context)
+        .getWorkInfosForUniqueWork(WidgetRefresh.refreshWorkName)
         .get(5, TimeUnit.SECONDS)
 
     private fun resize(id: Int, width: Int, height: Int) {
@@ -131,64 +130,57 @@ class WidgetSubmissionWiringTest {
         assertEquals("19°", text(12, R.id.widget_temperature))
     }
 
-    @Test fun `source scoped cache only worker changes A submitted face but leaves B untouched`() {
+    @Test fun `a cache-only redraw submits every instance's newest cache without fetching`() {
         WidgetUpdater.updateInstance(context, 11)
         WidgetUpdater.updateInstance(context, 12)
         cache(a, "西屯新觀測", 30.0)
-        cache(b, "中正未提交", 15.0)
-        WeatherWidgetRefreshWorker.refresher = { _, _, _, _, _ ->
+        cache(b, "中正新觀測", 15.0)
+        WeatherWidgetRefreshWorker.refresher = { _, _ ->
             error("cache-only work must not acquire weather")
         }
         val worker = TestListenableWorkerBuilder<WeatherWidgetRefreshWorker>(context)
             .setInputData(workDataOf(
-                WeatherWidgetRefreshWorker.KEY_LOCAL_ONLY to true,
-                WeatherWidgetRefreshWorker.KEY_SOURCE to a.sourceIdentifier,
+                WeatherWidgetRefreshWorker.KEY_MODE to WeatherWidgetRefreshWorker.MODE_REDRAW,
             )).build()
         assertTrue(worker.doWork() is ListenableWorker.Result.Success)
         assertEquals("西屯新觀測", text(11, R.id.widget_location))
         assertEquals("30°", text(11, R.id.widget_temperature))
-        assertEquals("中正區", text(12, R.id.widget_location))
-        assertEquals("19°", text(12, R.id.widget_temperature))
-        // Prove B really has new cached data, rather than vacuously asserting
-        // that a source with nothing to change remained unchanged.
-        WidgetUpdater.updateInstance(context, 12)
-        assertEquals("中正未提交", text(12, R.id.widget_location))
+        assertEquals("中正新觀測", text(12, R.id.widget_location))
         assertEquals("15°", text(12, R.id.widget_temperature))
     }
 
-    @Test fun `resize callback submits medium and large faces and requests only their source`() {
+    @Test fun `resize callback submits medium and large faces and asks for the missing forecast`() {
         WidgetUpdater.updateInstance(context, 11)
         assertNull(submitted(11).findViewById<View>(R.id.widget_forecast_container))
         resize(11, 300, 200)
         assertNotNull(submitted(11).findViewById<View>(R.id.widget_forecast_container))
         assertNull(submitted(11).findViewById<View>(R.id.widget_grid_station_value))
-        assertTrue(store.hasForecastDemand(a))
-        assertTrue(requests(a).any { it.state == WorkInfo.State.ENQUEUED })
-        assertTrue(requests(b).isEmpty())
+        assertEquals("a wider cell with no usable forecast asks for one", 1, requests().size)
         resize(11, 300, 400)
         assertNotNull(submitted(11).findViewById<View>(R.id.widget_grid_station_value))
         assertEquals("西屯區", text(11, R.id.widget_location))
         resize(11, 180, 160)
         assertNull(submitted(11).findViewById<View>(R.id.widget_forecast_container))
-        assertTrue("downsize must not erase unserved demand", store.hasForecastDemand(a))
+        assertEquals("a compact cell asks for nothing more", 2, requests().size)
     }
 
-    @Test fun `downsizing one instance still requests forecast for another wide instance of its source`() {
-        bind(13, a)
-        manager.updateAppWidgetOptions(13, options(300, 240))
-        assertFalse(store.hasForecastDemand(a))
-        resize(11, 180, 160)
-        assertNull(submitted(11).findViewById<View>(R.id.widget_forecast_container))
-        assertTrue(store.hasForecastDemand(a))
-        assertTrue(requests(a).any { it.state == WorkInfo.State.ENQUEUED })
-        assertTrue(requests(b).isEmpty())
+    @Test fun `a wider resize with a usable forecast redraws without asking for anything`() {
+        WidgetClock.installForTest(1_791_454_400_000L, android.os.SystemClock.elapsedRealtime())
+        assertEquals(WidgetWriteResult.Written, store.commitForecast(
+            ForecastSnapshot(1, a.sourceIdentifier, "407", 1_791_454_300_000L, 1_791_454_300_000L,
+                listOf(ForecastPoint("15:00", 27.0, "多雲", 200, 20))),
+            receivedCalibratedMilliseconds = 1_791_454_300_000L,
+            expiresAtMilliseconds = 1_791_456_000_000L,
+            writtenAt = 1L,
+        ))
+        resize(11, 300, 200)
+        assertNotNull(submitted(11).findViewById<View>(R.id.widget_forecast_container))
+        assertTrue(requests().isEmpty())
     }
 
-    @Test fun `compact only resize redraws without creating forecast demand or refresh work`() {
+    @Test fun `compact only resize redraws without creating refresh work`() {
         resize(11, 180, 160)
         assertEquals("西屯區", text(11, R.id.widget_location))
-        assertFalse(store.hasForecastDemand(a))
-        assertTrue(requests(a).isEmpty())
-        assertTrue(requests(b).isEmpty())
+        assertTrue(requests().isEmpty())
     }
 }

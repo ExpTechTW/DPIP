@@ -83,7 +83,6 @@ class WidgetLayoutFitTest {
         )
         store.writeInstance(instanceId, WidgetAddress.Saved("407"), "407", 1L)
         store.commitCurrentWeather(
-            store.beginCurrentWeatherWrite(WidgetAddress.Saved("407"))!!,
             CurrentWeatherSnapshot(
                 schemaVersion = 7,
                 sourceIdentifier = "region:407",
@@ -107,7 +106,6 @@ class WidgetLayoutFitTest {
             writtenAt = 1L,
         )
         store.commitForecast(
-            token = store.beginForecastWrite(WidgetAddress.Saved("407"))!!,
             forecast = ForecastSnapshot(
                 schemaVersion = 1,
                 sourceIdentifier = "region:407",
@@ -407,8 +405,7 @@ class WidgetLayoutFitTest {
                 val boxes = if (scale == 1f) listOf(200 to 170, 320 to 172)
                     else listOf(260 to 221, 320 to 230)
                 for (apparent in listOf(30.2, -12.0, 100.0, -100.0, null)) {
-                    store.commitCurrentWeather(store.beginCurrentWeatherWrite(address)!!,
-                        snapshot.copy(apparentTemperature = apparent), writtenAt = 1L)
+                    store.commitCurrentWeather(snapshot.copy(apparentTemperature = apparent), writtenAt = 1L)
                     for ((width, height) in boxes) {
                         for (stale in listOf(false, true)) {
                             val base = WidgetUpdater.presentation(context, instanceId, width, height)
@@ -1005,7 +1002,6 @@ class WidgetLayoutFitTest {
         address: WidgetAddress = WidgetAddress.Saved("407"),
     ) {
         store.commitCurrentWeather(
-            store.beginCurrentWeatherWrite(address)!!,
             CurrentWeatherSnapshot(
                 schemaVersion = 7,
                 sourceIdentifier = source,

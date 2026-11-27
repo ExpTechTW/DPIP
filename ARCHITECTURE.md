@@ -499,12 +499,13 @@ app's database directory, opened only by `WidgetStore`. The boundary runs both
 ways — Dart reaches it only through `WidgetSnapshotChannel` and never opens the
 file; native code never opens Flutter's databases. Widget instance choices and
 the published location catalog are durable and exist nowhere else: Dart cannot
-rebuild them, so schema rebuilds and snapshot clears must never drop them;
-snapshots, forecasts, ordering and demand state are rebuildable.
-`AppDatabase.clearCache()` does not reach this file; any native clear goes
-through the channel under the same split. The table map, ordering fences and
-reconcile behaviour live with the code that enforces them
-(`android/app/src/main/kotlin/com/exptech/dpip/widget/WidgetStore.kt`).
+rebuild them, so schema rebuilds must never drop them; snapshots, forecasts
+and per-address state are rebuildable. `AppDatabase.clearCache()` does not
+reach this file. The table map, the acquisition ordering and the reconcile
+behaviour live with the code that enforces them
+(`android/app/src/main/kotlin/com/exptech/dpip/widget/WidgetStore.kt`), and
+every background refresh goes through one WorkManager chain
+(`WidgetRefresh.kt`).
 
 Settings go through the typed `SettingsStore` facade
 (`core/settings/settings_store.dart`), keyed by a `SettingKey<T>` from the

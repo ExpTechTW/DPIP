@@ -199,15 +199,20 @@
                 android:resource="@xml/weather_widget_info" />
         </receiver>
 
-        <!-- Rebuilds the Widget's scheduled work and redraw after a reboot or an
-             app update; WorkManager's own work survives both, but a launcher
-             that restored instances hands back ids this process has not seen. -->
+        <!-- The system events the Widget answers on its own: a reboot or an
+             app update reconciles the instances and asks for a refresh (a
+             launcher that restored instances hands back ids this process has
+             not seen), and a device clock or timezone change redraws and
+             re-arms the local redraw. Every action is a protected system
+             broadcast, so no other app can send one. -->
         <receiver
-            android:name=".widget.WidgetReconcileReceiver"
+            android:name=".widget.WidgetSystemReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
             </intent-filter>
         </receiver>
 
@@ -223,18 +228,6 @@
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
             </intent-filter>
         </activity>
-
-        <!-- A device clock or timezone change re-renders and re-arms the local
-             redraw: the calibrated anchor is monotonic and unaffected, but the
-             device-side offset a scheduled redraw is expressed in is not. -->
-        <receiver
-            android:name=".widget.WidgetClockReceiver"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="android.intent.action.TIME_SET" />
-                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
-            </intent-filter>
-        </receiver>
 
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->

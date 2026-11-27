@@ -48,7 +48,6 @@ class WidgetLargeRoomyForecastRegressionTest {
         )
         store.writeInstance(instanceId, WidgetAddress.Saved("407"), "407", 1L)
         store.commitCurrentWeather(
-            store.beginCurrentWeatherWrite(WidgetAddress.Saved("407"))!!,
             CurrentWeatherSnapshot(
                 schemaVersion = 7,
                 sourceIdentifier = "region:407",
@@ -72,7 +71,6 @@ class WidgetLargeRoomyForecastRegressionTest {
             writtenAt = 1L,
         )
         store.commitForecast(
-            token = store.beginForecastWrite(WidgetAddress.Saved("407"))!!,
             forecast = ForecastSnapshot(
                 schemaVersion = 1,
                 sourceIdentifier = "region:407",

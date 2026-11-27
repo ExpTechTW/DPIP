@@ -18,16 +18,15 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
-import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * The refresh's ordering, on the real store.
  *
  * The rule "a late response must not overwrite a newer one" is only worth
- * anything if the *token* is taken before the work that can be overtaken, and
- * that is not visible in a pure function — it is visible here, by letting a
- * refresh's own fetch clear the cache underneath it.
+ * anything if the *acquisition* is taken before the work that can be
+ * overtaken, and that is not visible in a pure function — it is visible here,
+ * by letting another writer land while a refresh's own fetch is parked.
  */
 @RunWith(RobolectricTestRunner::class)
 class WidgetRefreshServiceTest {
@@ -148,7 +147,6 @@ class WidgetRefreshServiceTest {
         expiresAt: Long,
     ) {
         store.commitForecast(
-            token = store.beginForecastWrite(currentLocation)!!,
             forecast = ForecastSnapshot(
                 schemaVersion = 1,
                 sourceIdentifier = currentLocation.sourceIdentifier,
@@ -161,35 +159,6 @@ class WidgetRefreshServiceTest {
             expiresAtMilliseconds = expiresAt,
             writtenAt = 1L,
         )
-    }
-
-    @Test
-    fun `the token is reserved before the fetch, so a clear during it wins`() {
-        // The fetch clears the cache underneath the refresh before answering.
-        // If the token were reserved after the fetch — as it was — the commit
-        // would be accepted and the cleared data would reappear.
-        val result = service(
-            fetchWeather = { _, _ ->
-                store.clearCurrentWeather()
-                observation()
-            },
-        ).refresh(currentLocation, includeForecast = false)
-
-        assertEquals(WidgetRefreshResult.Superseded, result)
-        assertNull(store.readCurrentWeather(currentLocation))
-    }
-
-    @Test
-    fun `the token is reserved before the clock, so a clear during it wins`() {
-        val result = service(
-            synchronizeClock = {
-                store.clearCurrentWeather()
-                true
-            },
-        ).refresh(currentLocation, includeForecast = false)
-
-        assertEquals(WidgetRefreshResult.Superseded, result)
-        assertNull(store.readCurrentWeather(currentLocation))
     }
 
     @Test
@@ -209,7 +178,7 @@ class WidgetRefreshServiceTest {
                             assertTrue("older fetch was not released", released.await(10, TimeUnit.SECONDS))
                             observation(time = 1_791_454_400)
                         },
-                    ).refresh(currentLocation, includeForecast = false).also {
+                    ).refresh(currentLocation).also {
                         assertEquals(WidgetRefreshResult.Superseded, it)
                     }
                 }
@@ -219,7 +188,7 @@ class WidgetRefreshServiceTest {
                 val fast = service(
                     resolve = { LocationResolution.Resolved(resolved("100")) },
                     fetchWeather = { _, _ -> observation(time = 1_791_454_300) },
-                ).refresh(currentLocation, includeForecast = false)
+                ).refresh(currentLocation)
                 assertEquals(WidgetRefreshResult.Refreshed, fast)
 
                 released.countDown()
@@ -235,24 +204,41 @@ class WidgetRefreshServiceTest {
     }
 
     @Test
-    fun `a clear during the current-weather fetch fences the forecast too`() {
-        // Only the forecast cache is cleared: the current weather still lands,
-        // and its refresh's forecast token was reserved with it, so the forecast
-        // commit is refused as well.
+    fun `a township the app publishes during the fix outranks the position taken before it`() {
+        // The refresh took its acquisition, then the app published township
+        // 100 while the fix was still being taken; the fix itself (407) is from
+        // before the move and must not replace what the app just published.
+        val result = service(
+            resolve = {
+                assertEquals(
+                    WidgetWriteResult.Written,
+                    store.commitCurrentWeather(currentSnapshot("100", observationSeconds = 1_791_454_000), writtenAt = 1L),
+                )
+                LocationResolution.Resolved(resolved("407"))
+            },
+        ).refresh(currentLocation)
+
+        assertEquals(WidgetRefreshResult.Superseded, result)
+        assertEquals("100", store.readCurrentWeather(currentLocation)!!.snapshot.regionCode)
+        assertNull("a forecast for the township left behind is not fetched", store.readForecast(currentLocation))
+    }
+
+    @Test
+    fun `a newer observation the app publishes during the fetch is kept`() {
         val result = service(
             fetchWeather = { _, _ ->
-                store.clearForecast()
-                observation()
+                store.commitCurrentWeather(currentSnapshot("407", observationSeconds = 1_791_454_900), writtenAt = 1L)
+                observation(time = 1_791_454_316)
             },
-        ).refresh(currentLocation, includeForecast = true)
+        ).refresh(currentLocation)
 
-        assertEquals(WidgetRefreshResult.Refreshed, result)
-        assertNull(store.readForecast(currentLocation))
+        assertEquals(WidgetRefreshResult.Superseded, result)
+        assertEquals(1_791_454_900L, store.readCurrentWeather(currentLocation)!!.snapshot.observationTime)
     }
 
     @Test
     fun `a forecast lands with the same refresh identity`() {
-        val result = service().refresh(currentLocation, includeForecast = true)
+        val result = service().refresh(currentLocation)
         assertEquals(WidgetRefreshResult.Refreshed, result)
         assertEquals("407", store.readForecast(currentLocation)!!.forecast.regionCode)
     }
@@ -261,11 +247,11 @@ class WidgetRefreshServiceTest {
     fun `a failed clock leaves the previous snapshot alone`() {
         assertEquals(
             WidgetRefreshResult.Refreshed,
-            service().refresh(currentLocation, includeForecast = false),
+            service().refresh(currentLocation),
         )
 
         val result = service(synchronizeClock = { false })
-            .refresh(currentLocation, includeForecast = false)
+            .refresh(currentLocation)
 
         assertEquals(WidgetRefreshResult.Unavailable, result)
         assertEquals(1_791_454_316L, store.readCurrentWeather(currentLocation)!!.snapshot.observationTime)
@@ -273,10 +259,10 @@ class WidgetRefreshServiceTest {
 
     @Test
     fun `a failed fetch leaves the previous snapshot alone`() {
-        service().refresh(currentLocation, includeForecast = false)
+        service().refresh(currentLocation)
 
         val result = service(fetchWeather = { _, _ -> throw WidgetHttpException("boom") })
-            .refresh(currentLocation, includeForecast = false)
+            .refresh(currentLocation)
 
         assertEquals(WidgetRefreshResult.Failed, result)
         assertEquals(1_791_454_316L, store.readCurrentWeather(currentLocation)!!.snapshot.observationTime)
@@ -285,18 +271,18 @@ class WidgetRefreshServiceTest {
     @Test
     fun `no observation is its own outcome and writes nothing`() {
         val result = service(fetchWeather = { _, _ -> null })
-            .refresh(currentLocation, includeForecast = false)
+            .refresh(currentLocation)
         assertEquals(WidgetRefreshResult.NoObservation, result)
         assertNull(store.readCurrentWeather(currentLocation))
     }
 
     @Test
     fun `a degraded position records the reason and keeps the snapshot`() {
-        service().refresh(currentLocation, includeForecast = false)
+        service().refresh(currentLocation)
 
         val result = service(
             resolve = { LocationResolution.Degraded(WidgetLocationDegradation.Disabled) },
-        ).refresh(currentLocation, includeForecast = false)
+        ).refresh(currentLocation)
 
         assertEquals(WidgetRefreshResult.Unavailable, result)
         assertEquals(
@@ -311,7 +297,7 @@ class WidgetRefreshServiceTest {
     fun `a fix that cannot be trusted records its own reason`() {
         val result = service(
             resolve = { LocationResolution.Degraded(WidgetLocationDegradation.UnresolvedTownship) },
-        ).refresh(currentLocation, includeForecast = false)
+        ).refresh(currentLocation)
 
         assertEquals(WidgetRefreshResult.Unavailable, result)
         assertEquals(
@@ -322,13 +308,13 @@ class WidgetRefreshServiceTest {
 
     @Test
     fun `the degradation is only cleared by a commit that lands`() {
-        store.writeLocationState(currentLocation, WidgetLocationDegradation.Permission, 1L, 1L)
+        store.writeLocationState(currentLocation, WidgetLocationDegradation.Permission, 1L)
 
         // The position resolves and the clock is fine, but the fetch returns
         // nothing, so no commit lands and the notice must stay.
         assertEquals(
             WidgetRefreshResult.NoObservation,
-            service(fetchWeather = { _, _ -> null }).refresh(currentLocation, false),
+            service(fetchWeather = { _, _ -> null }).refresh(currentLocation),
         )
         assertEquals(
             WidgetLocationDegradation.Permission,
@@ -338,7 +324,7 @@ class WidgetRefreshServiceTest {
         // Only a landed observation clears it.
         assertEquals(
             WidgetRefreshResult.Refreshed,
-            service().refresh(currentLocation, false),
+            service().refresh(currentLocation),
         )
         assertNull(store.readLocationState(currentLocation))
     }
@@ -351,14 +337,14 @@ class WidgetRefreshServiceTest {
             assertEquals(
                 WidgetRefreshResult.Unavailable,
                 service(resolve = { LocationResolution.Degraded(degradation) })
-                    .refresh(currentLocation, includeForecast = false),
+                    .refresh(currentLocation),
             )
             assertEquals(degradation, store.readLocationState(currentLocation))
             assertEquals(cached, store.readCurrentWeather(currentLocation))
 
             assertEquals(
                 WidgetRefreshResult.Refreshed,
-                service().refresh(currentLocation, includeForecast = false),
+                service().refresh(currentLocation),
             )
             assertNull(store.readLocationState(currentLocation))
             assertEquals("407", store.readCurrentWeather(currentLocation)!!.snapshot.regionCode)
@@ -367,7 +353,7 @@ class WidgetRefreshServiceTest {
 
     @Test
     fun `the snapshot records a transition in seconds, not milliseconds`() {
-        service().refresh(currentLocation, includeForecast = false)
+        service().refresh(currentLocation)
 
         val snapshot = store.readCurrentWeather(currentLocation)!!.snapshot
         // A Unix-seconds value for 2026 is around 1.79e9; milliseconds would be
@@ -408,7 +394,7 @@ class WidgetRefreshServiceTest {
             calibratedNow = { clock },
         )
 
-        assertEquals(WidgetRefreshResult.Refreshed, service.refresh(currentLocation, true))
+        assertEquals(WidgetRefreshResult.Refreshed, service.refresh(currentLocation))
 
         assertEquals(
             "the deadline must be taken from the receipt, not from before the request",
@@ -433,7 +419,7 @@ class WidgetRefreshServiceTest {
                     points = listOf(ForecastPoint("15:00", 27.0, "多雲", 200, 20)),
                 )
             },
-        ).refresh(currentLocation, includeForecast = true)
+        ).refresh(currentLocation)
 
         assertEquals(atTaipei(15, 0), store.readForecast(currentLocation)!!.expiresAtMilliseconds)
 
@@ -451,7 +437,7 @@ class WidgetRefreshServiceTest {
             // The forecast is asked for again and its fetch fails, so the entry
             // from before is the one still on screen — which is the case a
             // recomputed deadline would have expired-and-revived.
-            later.refresh(currentLocation, includeForecast = true),
+            later.refresh(currentLocation),
         )
 
         assertEquals(
@@ -490,7 +476,7 @@ class WidgetRefreshServiceTest {
         val log = RecordingLog()
         WidgetLog.overrideSink = { log }
 
-        service().refresh(currentLocation, includeForecast = false)
+        service().refresh(currentLocation)
 
         assertTrue("expected a resolved line in ${log.lines}", log.contains("position resolved source=current-location region=407"))
         // The diagnostic carries the region, the accuracy and the age — never the
@@ -508,7 +494,7 @@ class WidgetRefreshServiceTest {
             assertEquals(
                 WidgetRefreshResult.Refreshed,
                 service(now = { counter.incrementAndGet().toLong() })
-                    .refresh(currentLocation, includeForecast = false),
+                    .refresh(currentLocation),
             )
         }
         // The newest observation is the one on screen, and the counter only ever
@@ -516,85 +502,12 @@ class WidgetRefreshServiceTest {
         assertEquals(1_791_454_316L, store.readCurrentWeather(currentLocation)!!.snapshot.observationTime)
     }
 
-    // ── A run that was stopped leaves nothing for the run that replaced it ──
-
-    @Test
-    fun `a run stopped before it starts touches nothing`() {
-        var resolved = false
-        val result = service(
-            resolve = { resolved = true; LocationResolution.Resolved(resolved("407")) },
-        ).refresh(currentLocation, includeForecast = true, isCancelled = { true })
-
-        assertEquals(WidgetRefreshResult.Cancelled, result)
-        assertFalse("a stopped run must not spend a location fix", resolved)
-        assertNull(store.readCurrentWeather(currentLocation))
-    }
-
-    @Test
-    fun `a run stopped while its weather fetch is in flight lands nothing`() {
-        val stop = AtomicBoolean(false)
-        var forecastFetches = 0
-        store.setForecastDemand(currentLocation, demand = true, updatedAt = 1L)
-        val demandVersion = store.readForecastDemandVersion(currentLocation)
-
-        val result = service(
-            fetchWeather = { _, _ ->
-                // The replacement cancels this run while its fetch is parked.
-                stop.set(true)
-                observation()
-            },
-            fetchForecast = { forecastFetches++; forecastUpdate() },
-        ).refresh(
-            currentLocation,
-            includeForecast = true,
-            answeredDemandVersion = demandVersion,
-            isCancelled = { stop.get() },
-        )
-
-        assertEquals(WidgetRefreshResult.Cancelled, result)
-        assertNull(store.readCurrentWeather(currentLocation))
-        assertNull(store.readForecast(currentLocation))
-        assertEquals("a stopped run must not fetch the forecast", 0, forecastFetches)
-        assertTrue(
-            "a stopped run must not clear the demand its replacement will answer",
-            store.hasForecastDemand(currentLocation),
-        )
-    }
-
-    @Test
-    fun `a run stopped while its forecast fetch is in flight keeps the demand raised`() {
-        val stop = AtomicBoolean(false)
-        store.setForecastDemand(currentLocation, demand = true, updatedAt = 1L)
-        val demandVersion = store.readForecastDemandVersion(currentLocation)
-
-        val result = service(
-            fetchForecast = { stop.set(true); forecastUpdate() },
-        ).refresh(
-            currentLocation,
-            includeForecast = true,
-            answeredDemandVersion = demandVersion,
-            isCancelled = { stop.get() },
-        )
-
-        // The observation landed before the stop, so that part stands.
-        assertEquals(WidgetRefreshResult.Refreshed, result)
-        assertNotNull(store.readCurrentWeather(currentLocation))
-        assertNull("a stopped run must not commit its forecast", store.readForecast(currentLocation))
-        assertTrue(
-            "a stopped run must not answer the demand it never committed",
-            store.hasForecastDemand(currentLocation),
-        )
-    }
-
-    // ── The forecast is decided against the township this round resolved ──
-
     @Test
     fun `a fresh forecast for the township the device just left does not stop this round's fetch`() {
         // The cache names township A and its forecast is fresh, but this round's
         // position resolves to B. The reservation is made before the resolve, so
         // the fetch can only be decided here — against B.
         store.commitCurrentWeather(
-            token = store.beginCurrentWeatherWrite(currentLocation)!!,
             snapshot = currentSnapshot("407"),
             writtenAt = 1L,
         )
@@ -608,7 +521,7 @@ class WidgetRefreshServiceTest {
         val result = service(
             resolve = { LocationResolution.Resolved(resolved("100")) },
             fetchForecast = { region -> fetched.add(region); forecastUpdate() },
-        ).refresh(currentLocation, includeForecast = true)
+        ).refresh(currentLocation)
 
         assertEquals(WidgetRefreshResult.Refreshed, result)
         assertEquals("the same round must fetch the township it resolved to", listOf("100"), fetched)
@@ -618,7 +531,6 @@ class WidgetRefreshServiceTest {
     @Test
     fun `a fresh forecast for the resolved township is not fetched again`() {
         store.commitCurrentWeather(
-            token = store.beginCurrentWeatherWrite(currentLocation)!!,
             snapshot = currentSnapshot("407"),
             writtenAt = 1L,
         )
@@ -631,83 +543,12 @@ class WidgetRefreshServiceTest {
         var forecastFetches = 0
         val result = service(
             fetchForecast = { forecastFetches++; forecastUpdate() },
-        ).refresh(currentLocation, includeForecast = true)
+        ).refresh(currentLocation)
 
         assertEquals(WidgetRefreshResult.Refreshed, result)
         assertEquals("a forecast for the same township inside its deadline needs no fetch", 0, forecastFetches)
         assertEquals("407", store.readForecast(currentLocation)!!.forecast.regionCode)
     }
-
-    @Test
-    fun `a kept forecast retires the demand that asked for it`() {
-        // The leak: this path returns before `commitForecast`, the only other
-        // place the demand clears. Left raised it is permanent — `wantsForecast`
-        // reads it on every later options change, so each one reserves a ticket
-        // and re-fetches a forecast that is already stored, including after a
-        // resize back down to a size that draws none.
-        store.commitCurrentWeather(
-            token = store.beginCurrentWeatherWrite(currentLocation)!!,
-            snapshot = currentSnapshot("407"),
-            writtenAt = 1L,
-        )
-        seedForecast(
-            regionCode = "407",
-            updateTime = 1_791_454_400_000L,
-            expiresAt = 1_791_457_200_000L,
-        )
-        store.setForecastDemand(currentLocation, demand = true, updatedAt = 1L)
-        val demandVersion = store.readForecastDemandVersion(currentLocation)
-
-        var forecastFetches = 0
-        val result = service(
-            fetchForecast = { forecastFetches++; forecastUpdate() },
-        ).refresh(
-            currentLocation,
-            includeForecast = true,
-            answeredDemandVersion = demandVersion,
-        )
-
-        assertEquals(WidgetRefreshResult.Refreshed, result)
-        assertEquals(0, forecastFetches)
-        assertFalse(
-            "the cache is the answer, so the demand must not outlive it",
-            store.hasForecastDemand(currentLocation),
-        )
-    }
-
-    @Test
-    fun `a demand raised while the run was deciding survives a kept forecast`() {
-        // The version fence, on this path too: a resize that asked for a forecast
-        // after this run read its arguments is a question the cache has not been
-        // checked against, so it must stay raised for the next run.
-        store.commitCurrentWeather(
-            token = store.beginCurrentWeatherWrite(currentLocation)!!,
-            snapshot = currentSnapshot("407"),
-            writtenAt = 1L,
-        )
-        seedForecast(
-            regionCode = "407",
-            updateTime = 1_791_454_400_000L,
-            expiresAt = 1_791_457_200_000L,
-        )
-        store.setForecastDemand(currentLocation, demand = true, updatedAt = 1L)
-        val staleVersion = store.readForecastDemandVersion(currentLocation)
-        store.setForecastDemand(currentLocation, demand = true, updatedAt = 2L)
-
-        val result = service().refresh(
-            currentLocation,
-            includeForecast = true,
-            answeredDemandVersion = staleVersion,
-        )
-
-        assertEquals(WidgetRefreshResult.Refreshed, result)
-        assertTrue(
-            "a newer ask is not answered by the run that never saw it",
-            store.hasForecastDemand(currentLocation),
-        )
-    }
-
-    // ── Calibration does not depend on getting a background fix ──
 
     @Test
     fun `a foreground-only position still calibrates the clock and the screen shows the fresh observation`() {
@@ -717,7 +558,6 @@ class WidgetRefreshServiceTest {
         // the headless refresh cannot get a fix, but that must not stop the clock.
         store.writeInstance(7, WidgetAddress.CurrentLocation, null, 1L)
         store.commitCurrentWeather(
-            token = store.beginCurrentWeatherWrite(WidgetAddress.CurrentLocation)!!,
             snapshot = currentSnapshot("407", observationSeconds = atTaipei(14, 18) / 1_000),
             writtenAt = 1L,
         )
@@ -728,7 +568,7 @@ class WidgetRefreshServiceTest {
                 WidgetClock.installForTest(now, SystemClock.elapsedRealtime())
                 true
             },
-        ).refresh(WidgetAddress.CurrentLocation, includeForecast = false)
+        ).refresh(WidgetAddress.CurrentLocation)
 
         assertEquals(WidgetRefreshResult.Unavailable, result)
         assertNotNull(
