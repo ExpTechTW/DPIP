@@ -29,22 +29,26 @@ VoiceOver interaction and glyph-level clipping require separate QA.
 
 ## Phase 3 checklist
 
-1. Keep the existing RunnerTests step in `.github/workflows/ios.yml`. Add a
-   WidgetFixtureUITests step in the same required `Build iOS / iOS` job. Add
+1. Keep the RunnerTests step in the `iOS build` job of
+   `.github/workflows/ios.yml`. Run WidgetFixtureUITests in its own
+   `iOS widget UI tests` job, on a second macOS runner in parallel, under the
+   same path filter and release condition. Merges are gated through the
+   required `iOS` check, an aggregate job that fails when either job fails or
+   is cancelled and passes when each one passed or was skipped. Add
    `tool/dev/test_ios.sh`, `tool/dev/test_widget_ui.sh` and the iOS workflow
-   to the iOS path filter so test infrastructure changes exercise the job.
+   to the iOS path filter so test infrastructure changes exercise both jobs.
 2. Select a supported runner/Xcode with the iOS 26.5 runtime and iPhone 17 Pro
-   device type available. Create a clean simulator, record its UDID and
-   `simctl bootstatus -b` separately, then run RunnerTests before
-   WidgetFixtureUITests on that UDID with parallel testing disabled. Give the
-   suites distinct result bundle and DerivedData paths.
-3. Give the boot step an ID such as `simulator`. Run the UI suite with
-   `if: ${{ !cancelled() && steps.simulator.outcome == 'success' }}` so it
-   also runs after an unsuccessful RunnerTests step. Keep both steps
-   failure-propagating and require the iOS job for merge. Preserve independent
-   boot, RunnerTests and WidgetFixtureUITests outcomes. Use the xcresult
-   summary and named failed tests to distinguish assertions from launch or
-   build failures.
+   device type available. In each job, create a clean simulator, record its
+   UDID and `simctl bootstatus -b` separately, then run that job's suite on
+   that UDID with parallel testing disabled. Give the suites distinct result
+   bundle and DerivedData paths.
+3. Give the boot step an ID such as `simulator`. Each suite runs in its own
+   job, so an unsuccessful RunnerTests step no longer stands between the UI
+   suite and its run. Keep both test steps failure-propagating; the `iOS`
+   aggregate turns a failure in either job into a failed required check.
+   Preserve independent boot, RunnerTests and WidgetFixtureUITests outcomes.
+   Use the xcresult summary and named failed tests to distinguish assertions
+   from launch or build failures.
 4. On failure, export attachments from any available xcresult bundle with
    `xcresulttool export attachments --only-failures`. Upload the xcresults,
    screenshots and boot/test logs with the pinned artifact action in an
