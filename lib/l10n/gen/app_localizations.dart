@@ -3462,6 +3462,24 @@ abstract class AppLocalizations {
   /// **'Experimental features'**
   String get experimentalFeatures;
 
+  /// Snackbar on the Developer page while the version row is being tapped toward the unlock: how many taps are left before the hidden options appear on the Experimental features page
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 more tap to show the hidden options in Experimental features} other{{count} more taps to show the hidden options in Experimental features}}'**
+  String experimentalUnlockTapsLeft(int count);
+
+  /// Snackbar on the Developer page once the version-row taps have unlocked the hidden options on the Experimental features page
+  ///
+  /// In en, this message translates to:
+  /// **'Hidden options are now shown in Experimental features'**
+  String get experimentalUnlockDone;
+
+  /// Snackbar on the Developer page when the version row is tapped after the hidden options on the Experimental features page are already unlocked
+  ///
+  /// In en, this message translates to:
+  /// **'Hidden options are already shown in Experimental features'**
+  String get experimentalUnlockAlready;
+
   /// Onboarding terms of service body
   ///
   /// In en, this message translates to:
@@ -6659,6 +6677,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'1-hour rain up to this hour\'s last reading'**
   String get trendRainHourLastReading;
+
+  /// Section header on the Experimental features page grouping options about alert sounds and volume
+  ///
+  /// In en, this message translates to:
+  /// **'Sound'**
+  String get experimentalCategorySound;
+
+  /// Section header on the Experimental features page grouping options about animation and rendering
+  ///
+  /// In en, this message translates to:
+  /// **'Graphics'**
+  String get experimentalCategoryGraphics;
+
+  /// Section header on the Experimental features page grouping options that add or show tools
+  ///
+  /// In en, this message translates to:
+  /// **'Tools'**
+  String get experimentalCategoryTools;
 }
 
 class _AppLocalizationsDelegate

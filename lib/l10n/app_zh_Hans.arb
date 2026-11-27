@@ -876,6 +876,9 @@
     "description": "Empty scan result"
   },
   "experimentalFeatures": "实验性功能",
+  "experimentalUnlockTapsLeft": "{count, plural, other{再点 {count} 下，即可在“实验性功能”显示隐藏选项}}",
+  "experimentalUnlockDone": "已在“实验性功能”显示隐藏选项",
+  "experimentalUnlockAlready": "“实验性功能”已显示隐藏选项",
   "onboardingTermsBody": "使用 DPIP 前，请详细阅读以下注意事项：\n\n• 任何信息均应以中央气象署（CWA）发布的内容为准。\n\n• 受网络状态、服务器状态、应用程序状态、上游数据来源状态等因素影响，存在收不到信息的可能，我们会尽力避免此类情况，但不保证一定不会发生。\n\n• 强烈震动有可能比通知更早抵达您所在的位置。\n\n• 地震预警为快速计算的结果，可能存在较大误差，请理解并谨慎使用。\n\n• 任何未获官方认可的行为均可能承担法律风险，请务必遵守相关规定。\n\n此外，为提供本地化预警，本服务会在前台及后台收集并上传您的大致位置与设备推送标识符，仅用于决定应向您推送哪些预警。\n\n点击下方“同意并继续”即表示您已阅读、理解并同意上述事项。",
   "reportFilterTitle": "筛选",
   "onboardingPermCritical": "重要警告",
@@ -2091,6 +2094,9 @@
   "seismometerReset": "重置",
   "seismometerDisclaimer": "请将手机平放在稳固的平面上。手机传感器精度有限，测量结果仅供参考，不代表中央气象署发布的震度。",
   "seismometerAlgorithm": "依 ES-Net 的 JMA 计测震度算法计算",
+  "experimentalCategorySound": "音效",
+  "experimentalCategoryGraphics": "图形",
+  "experimentalCategoryTools": "工具",
   "trendRainPastHour": "过去 1 小时雨量",
   "trendRainHourLastReading": "截至该小时最后一笔的 1 小时雨量"
 }

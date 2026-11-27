@@ -1829,6 +1829,25 @@ class AppLocalizationsVi extends AppLocalizations {
   String get experimentalFeatures => 'Tính năng thử nghiệm';
 
   @override
+  String experimentalUnlockTapsLeft(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          'Chạm thêm $count lần để hiện các tùy chọn ẩn trong Tính năng thử nghiệm',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get experimentalUnlockDone =>
+      'Các tùy chọn ẩn giờ đã hiện trong Tính năng thử nghiệm';
+
+  @override
+  String get experimentalUnlockAlready =>
+      'Các tùy chọn ẩn đã được hiện trong Tính năng thử nghiệm';
+
+  @override
   String get onboardingTermsBody =>
       'Vui lòng đọc kỹ các lưu ý sau đây trước khi sử dụng DPIP:\n\n• Mọi thông tin phải căn cứ theo nội dung do Cục Khí tượng Trung ương Đài Loan (CWA) công bố.\n\n• Tùy thuộc vào tình trạng mạng, máy chủ, ứng dụng và nguồn dữ liệu đầu nguồn, có khả năng không nhận được thông tin; chúng tôi nỗ lực hết sức để tránh điều này nhưng không thể bảo đảm rằng nó không bao giờ xảy ra.\n\n• Rung lắc mạnh có thể lan đến vị trí của bạn trước khi thông báo được gửi tới.\n\n• Cảnh báo sớm động đất là kết quả được tính toán nhanh nên có thể chứa sai số đáng kể — hãy hiểu rõ điều này và sử dụng một cách thận trọng.\n\n• Bất kỳ hành vi nào không được cơ quan chức năng cho phép đều có thể mang rủi ro pháp lý; vui lòng tuân thủ mọi quy định hiện hành.\n\nNgoài ra, để cung cấp cảnh báo theo khu vực, dịch vụ này thu thập và tải lên vị trí gần đúng cùng mã định danh thông báo đẩy của bạn — cả ở nền trước lẫn nền sau — chỉ nhằm quyết định những cảnh báo nào sẽ gửi cho bạn.\n\nBằng việc nhấn \"Đồng ý và tiếp tục\", bạn xác nhận rằng đã đọc, hiểu và đồng ý với những điều trên.';
 
@@ -3575,4 +3594,13 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get trendRainHourLastReading =>
       'Lượng mưa 1 giờ tính đến lần đo cuối của giờ này';
+
+  @override
+  String get experimentalCategorySound => 'Âm thanh';
+
+  @override
+  String get experimentalCategoryGraphics => 'Đồ họa';
+
+  @override
+  String get experimentalCategoryTools => 'Công cụ';
 }

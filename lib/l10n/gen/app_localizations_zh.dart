@@ -1783,6 +1783,22 @@ class AppLocalizationsZh extends AppLocalizations {
   String get experimentalFeatures => '實驗性功能';
 
   @override
+  String experimentalUnlockTapsLeft(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '再點 $count 下，即可在「實驗性功能」顯示隱藏選項',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get experimentalUnlockDone => '已在「實驗性功能」顯示隱藏選項';
+
+  @override
+  String get experimentalUnlockAlready => '「實驗性功能」已顯示隱藏選項';
+
+  @override
   String get onboardingTermsBody =>
       '使用 DPIP 前,請詳閱以下注意事項:\n\n• 任何資訊應以中央氣象署發布之內容為準。\n\n• 根據網路狀態、伺服器狀態、應用程式狀態、上游資料來源狀態等,有收不到資訊的可能性,我們會盡力避免此類情況,但不保證一定不會發生。\n\n• 強烈搖晃有機率比通知早抵達使用者所在地。\n\n• 地震速報為快速計算之結果,可能存在較大誤差,應理解並謹慎使用。\n\n• 任何不被官方所認可的行為均有可能承擔法律風險,請務必遵守相關規範。\n\n此外,為提供在地化警報,本服務會在前景及背景蒐集並上傳您的概略位置與裝置推播識別碼,僅用於決定應向您推送之警報。\n\n點選下方「同意並繼續」即表示您已閱讀、理解並同意上述事項。';
 
@@ -3473,6 +3489,15 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get trendRainHourLastReading => '截至該小時最後一筆的 1 小時雨量';
+
+  @override
+  String get experimentalCategorySound => '音效';
+
+  @override
+  String get experimentalCategoryGraphics => '圖形';
+
+  @override
+  String get experimentalCategoryTools => '工具';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -5251,6 +5276,22 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get experimentalFeatures => '实验性功能';
 
   @override
+  String experimentalUnlockTapsLeft(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '再点 $count 下，即可在“实验性功能”显示隐藏选项',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get experimentalUnlockDone => '已在“实验性功能”显示隐藏选项';
+
+  @override
+  String get experimentalUnlockAlready => '“实验性功能”已显示隐藏选项';
+
+  @override
   String get onboardingTermsBody =>
       '使用 DPIP 前，请详细阅读以下注意事项：\n\n• 任何信息均应以中央气象署（CWA）发布的内容为准。\n\n• 受网络状态、服务器状态、应用程序状态、上游数据来源状态等因素影响，存在收不到信息的可能，我们会尽力避免此类情况，但不保证一定不会发生。\n\n• 强烈震动有可能比通知更早抵达您所在的位置。\n\n• 地震预警为快速计算的结果，可能存在较大误差，请理解并谨慎使用。\n\n• 任何未获官方认可的行为均可能承担法律风险，请务必遵守相关规定。\n\n此外，为提供本地化预警，本服务会在前台及后台收集并上传您的大致位置与设备推送标识符，仅用于决定应向您推送哪些预警。\n\n点击下方“同意并继续”即表示您已阅读、理解并同意上述事项。';
 
@@ -6940,6 +6981,15 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get trendRainHourLastReading => '截至该小时最后一笔的 1 小时雨量';
+
+  @override
+  String get experimentalCategorySound => '音效';
+
+  @override
+  String get experimentalCategoryGraphics => '图形';
+
+  @override
+  String get experimentalCategoryTools => '工具';
 }
 
 /// The translations for Chinese, as used in Hong Kong, using the Han script (`zh_Hant_HK`).
@@ -8718,6 +8768,22 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get experimentalFeatures => '實驗性功能';
 
   @override
+  String experimentalUnlockTapsLeft(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '再點 $count 下，即可在「實驗性功能」顯示隱藏選項',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get experimentalUnlockDone => '已在「實驗性功能」顯示隱藏選項';
+
+  @override
+  String get experimentalUnlockAlready => '「實驗性功能」已顯示隱藏選項';
+
+  @override
   String get onboardingTermsBody =>
       '使用 DPIP 前,請詳閱以下注意事項:\n\n• 任何資訊應以中央氣象署發布之內容為準。\n\n• 根據網絡狀態、伺服器狀態、應用程式狀態、上游資料來源狀態等,有收不到資訊的可能性,我們會盡力避免此類情況,但不保證一定不會發生。\n\n• 強烈搖晃有機會比通知早抵達用戶所在地。\n\n• 地震速報為快速計算之結果,可能存在較大誤差,應理解並謹慎使用。\n\n• 任何不被官方所認可的行為均有可能承擔法律風險,請務必遵守相關規範。\n\n此外,為提供本地化警報,本服務會在前景及背景收集並上傳您的概略位置與裝置推送識別碼,僅用於決定應向您推送之警報。\n\n點按下方「同意並繼續」即表示您已閱讀、理解並同意上述事項。';
 
@@ -10408,6 +10474,15 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get trendRainHourLastReading => '截至該小時最後一筆的 1 小時雨量';
+
+  @override
+  String get experimentalCategorySound => '音效';
+
+  @override
+  String get experimentalCategoryGraphics => '圖形';
+
+  @override
+  String get experimentalCategoryTools => '工具';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -12186,6 +12261,22 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get experimentalFeatures => '實驗性功能';
 
   @override
+  String experimentalUnlockTapsLeft(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '再點 $count 下，即可在「實驗性功能」顯示隱藏選項',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get experimentalUnlockDone => '已在「實驗性功能」顯示隱藏選項';
+
+  @override
+  String get experimentalUnlockAlready => '「實驗性功能」已顯示隱藏選項';
+
+  @override
   String get onboardingTermsBody =>
       '使用 DPIP 前,請詳閱以下注意事項:\n\n• 任何資訊應以中央氣象署發布之內容為準。\n\n• 根據網路狀態、伺服器狀態、應用程式狀態、上游資料來源狀態等,有收不到資訊的可能性,我們會盡力避免此類情況,但不保證一定不會發生。\n\n• 強烈搖晃有機率比通知早抵達使用者所在地。\n\n• 地震速報為快速計算之結果,可能存在較大誤差,應理解並謹慎使用。\n\n• 任何不被官方所認可的行為均有可能承擔法律風險,請務必遵守相關規範。\n\n此外,為提供在地化警報,本服務會在前景及背景蒐集並上傳您的概略位置與裝置推播識別碼,僅用於決定應向您推送之警報。\n\n點選下方「同意並繼續」即表示您已閱讀、理解並同意上述事項。';
 
@@ -13876,4 +13967,13 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get trendRainHourLastReading => '截至該小時最後一筆的 1 小時雨量';
+
+  @override
+  String get experimentalCategorySound => '音效';
+
+  @override
+  String get experimentalCategoryGraphics => '圖形';
+
+  @override
+  String get experimentalCategoryTools => '工具';
 }

@@ -1783,6 +1783,22 @@ class AppLocalizationsYue extends AppLocalizations {
   String get experimentalFeatures => '實驗性功能';
 
   @override
+  String experimentalUnlockTapsLeft(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '再點 $count 下，就會喺「實驗性功能」顯示隱藏選項',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get experimentalUnlockDone => '已經喺「實驗性功能」顯示隱藏選項';
+
+  @override
+  String get experimentalUnlockAlready => '「實驗性功能」已經顯示咗隱藏選項';
+
+  @override
   String get onboardingTermsBody =>
       '使用 DPIP 前,請詳閱以下注意事項:\n\n• 任何資訊應以中央氣象署發布嘅內容為準。\n\n• 根據網絡狀態、伺服器狀態、應用程式狀態、上游資料來源狀態等,有收唔到資訊嘅可能性,我哋會盡力避免此類情況,但唔保證一定唔會發生。\n\n• 強烈搖晃有機會早過通知到達用戶所在地。\n\n• 地震速報係快速計算嘅結果,可能存在較大誤差,應該理解並謹慎使用。\n\n• 任何唔受官方認可嘅行為均有可能承擔法律風險,請務必遵守相關規範。\n\n此外,為提供本地化警報,本服務會喺前景及背景收集並上傳你嘅概略位置同裝置推送識別碼,僅用嚟決定應向你推送嘅警報。\n\n㩒下方「同意並繼續」就表示你已閱讀、理解並同意上述事項。';
 
@@ -3473,4 +3489,13 @@ class AppLocalizationsYue extends AppLocalizations {
 
   @override
   String get trendRainHourLastReading => '截至呢個鐘最後一筆嘅 1 個鐘雨量';
+
+  @override
+  String get experimentalCategorySound => '音效';
+
+  @override
+  String get experimentalCategoryGraphics => '圖形';
+
+  @override
+  String get experimentalCategoryTools => '工具';
 }

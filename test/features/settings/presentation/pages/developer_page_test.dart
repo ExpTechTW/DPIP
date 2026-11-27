@@ -1,6 +1,6 @@
 /// The developer page is what gets pasted into a bug report. A version row
 /// that never unlocks, or a clear that runs without a confirm, would either
-/// hide the experimental menu or wipe the cache by accident.
+/// hide the unlock-only experimental options or wipe the cache by accident.
 library;
 
 import 'package:dpip/core/settings/locale_config.dart';
@@ -119,31 +119,9 @@ void main() {
     PathProviderPlatform.instance = _FakePaths();
     final store = SettingsStore.inMemory();
     final experimental = ExperimentalSettings(store);
+    final l10n = lookupAppLocalizations(const Locale('en'));
 
-    await tester.pumpWidget(
-      MultiProvider(
-        providers: [
-          Provider(create: (_) => NotificationService(store)),
-          Provider.value(value: const AppDatabase(durable: null, cache: null)),
-          Provider(
-            create: (_) => BackgroundLocationService(
-              platform: 0,
-              version: '1',
-              channel: _bg,
-            ),
-          ),
-          Provider<EtagCacheStore?>.value(value: null),
-          Provider<NetworkUsageStore?>.value(value: null),
-          Provider<MapTileCache?>.value(value: null),
-          ChangeNotifierProvider.value(value: experimental),
-        ],
-        child: MaterialApp(
-          localizationsDelegates: appLocalizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          home: const DeveloperPage(),
-        ),
-      ),
-    );
+    await tester.pumpWidget(_unlockApp(store, experimental));
     await tester.pump();
     await tester.pump(const Duration(seconds: 1));
 
@@ -161,19 +139,16 @@ void main() {
       await tester.pump();
     }
     expect(experimental.unlocked, isFalse);
-    expect(find.textContaining('more tap'), findsOneWidget);
+    expect(find.text(l10n.experimentalUnlockTapsLeft(1)), findsOneWidget);
 
     await tester.tap(version);
     await tester.pump();
     expect(experimental.unlocked, isTrue);
-    expect(find.text('Experimental features unlocked'), findsOneWidget);
+    expect(find.text(l10n.experimentalUnlockDone), findsOneWidget);
 
     await tester.tap(version);
     await tester.pump();
-    expect(
-      find.text('Experimental features are already unlocked'),
-      findsOneWidget,
-    );
+    expect(find.text(l10n.experimentalUnlockAlready), findsOneWidget);
 
     await tester.tap(find.text('Report location now'));
     await tester.pump();
@@ -194,6 +169,38 @@ void main() {
     await tester.tap(find.text('Cancel').last);
     await tester.pump();
     expect(find.text('Maintenance'), findsOneWidget);
+  });
+
+  // The rest of the page is English on purpose; these three are not, because
+  // they describe the Experimental features page, which is localized.
+  testWidgets('the unlock speaks the reader\'s language', (tester) async {
+    tester.view.physicalSize = _tall;
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    const locale = Locale('ja');
+    final l10n = lookupAppLocalizations(locale);
+    final store = SettingsStore.inMemory();
+    final experimental = ExperimentalSettings(store);
+    await tester.pumpWidget(_unlockApp(store, experimental, locale: locale));
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
+
+    final version = find.text('Version');
+    await tester.tap(version);
+    await tester.pump();
+    expect(find.text(l10n.experimentalUnlockTapsLeft(9)), findsOneWidget);
+
+    for (var i = 0; i < 9; i++) {
+      await tester.tap(version);
+      await tester.pump();
+    }
+    expect(experimental.unlocked, isTrue);
+    expect(find.text(l10n.experimentalUnlockDone), findsOneWidget);
+
+    await tester.tap(version);
+    await tester.pump();
+    expect(find.text(l10n.experimentalUnlockAlready), findsOneWidget);
   });
 
   testWidgets('confirming clears the cache and the location track', (
@@ -394,3 +401,30 @@ class _ThrowingTrack extends BackgroundLocationService {
     throw StateError('track');
   }
 }
+
+/// The page with what its version row needs, in [locale] (the test default,
+/// English, when null).
+Widget _unlockApp(
+  SettingsStore store,
+  ExperimentalSettings experimental, {
+  Locale? locale,
+}) => MultiProvider(
+  providers: [
+    Provider(create: (_) => NotificationService(store)),
+    Provider.value(value: const AppDatabase(durable: null, cache: null)),
+    Provider(
+      create: (_) =>
+          BackgroundLocationService(platform: 0, version: '1', channel: _bg),
+    ),
+    Provider<EtagCacheStore?>.value(value: null),
+    Provider<NetworkUsageStore?>.value(value: null),
+    Provider<MapTileCache?>.value(value: null),
+    ChangeNotifierProvider.value(value: experimental),
+  ],
+  child: MaterialApp(
+    locale: locale,
+    localizationsDelegates: appLocalizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
+    home: const DeveloperPage(),
+  ),
+);

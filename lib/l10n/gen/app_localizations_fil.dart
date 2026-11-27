@@ -1842,6 +1842,26 @@ class AppLocalizationsFil extends AppLocalizations {
   String get experimentalFeatures => 'Mga experimental na feature';
 
   @override
+  String experimentalUnlockTapsLeft(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count tap pa para makita ang mga nakatagong opsyon sa Mga experimental na feature',
+      one: '1 tap pa para makita ang mga nakatagong opsyon sa Mga experimental na feature',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get experimentalUnlockDone =>
+      'Makikita na ang mga nakatagong opsyon sa Mga experimental na feature';
+
+  @override
+  String get experimentalUnlockAlready =>
+      'Nakikita na ang mga nakatagong opsyon sa Mga experimental na feature';
+
+  @override
   String get onboardingTermsBody =>
       'Mangyaring basahin ang mga sumusunod na paunawa bago gamitin ang DPIP:\n\n• Ang lahat ng impormasyon ay dapat sumunod sa nilalamang inilathala ng Central Weather Administration (CWA).\n\n• Depende sa kalagayan ng network, server, app, at pinagmumulan ng datos, may posibilidad na hindi matanggap ang impormasyon; ginagawa namin ang lahat ng aming makakaya upang maiwasan ito ngunit hindi namin magagarantiya na hindi ito mangyayari.\n\n• Maaaring maunang makarating sa iyong lokasyon ang malakas na pagyanig bago pa dumating ang notipikasyon.\n\n• Ang mga maagang babala sa lindol ay mabilis na kinakalkulang resulta na maaaring magtaglay ng malaking pagkakamali — unawain ito at gamitin nang may pag-iingat.\n\n• Anumang gawaing hindi pinahihintulutan ng mga awtoridad ay maaaring magdala ng panganib sa batas; mangyaring sundin ang lahat ng naaangkop na regulasyon.\n\nBukod dito, upang magbigay ng lokal na mga alerto, kinokolekta at ini-upload ng serbisyong ito ang iyong tinatayang lokasyon at push identifier — sa foreground at background — para lamang matukoy kung aling mga alerto ang ipapadala sa iyo.\n\nSa pamamagitan ng pag-tap sa \"Sumang-ayon at magpatuloy\" kinukumpirma mo na nabasa, naunawaan, at sinasang-ayunan mo ang nasa itaas.';
 
@@ -3594,4 +3614,13 @@ class AppLocalizationsFil extends AppLocalizations {
   @override
   String get trendRainHourLastReading =>
       'Ulan sa 1 oras hanggang sa huling sukat ng oras na ito';
+
+  @override
+  String get experimentalCategorySound => 'Tunog';
+
+  @override
+  String get experimentalCategoryGraphics => 'Graphics';
+
+  @override
+  String get experimentalCategoryTools => 'Mga tool';
 }

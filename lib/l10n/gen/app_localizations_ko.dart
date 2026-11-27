@@ -1794,6 +1794,22 @@ class AppLocalizationsKo extends AppLocalizations {
   String get experimentalFeatures => '실험적 기능';
 
   @override
+  String experimentalUnlockTapsLeft(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count번 더 탭하면 \'실험적 기능\'에 숨겨진 옵션이 표시됩니다',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get experimentalUnlockDone => '이제 \'실험적 기능\'에 숨겨진 옵션이 표시됩니다';
+
+  @override
+  String get experimentalUnlockAlready => '\'실험적 기능\'에 숨겨진 옵션이 이미 표시되어 있습니다';
+
+  @override
   String get onboardingTermsBody =>
       'DPIP를 사용하기 전에 다음 유의 사항을 반드시 읽어 주세요:\n\n• 모든 정보는 중앙기상청(CWA)에서 발표한 내용을 기준으로 합니다.\n\n• 네트워크, 서버, 애플리케이션, 상위 데이터 출처의 상태에 따라 정보를 받지 못할 수 있습니다. 이러한 상황을 방지하기 위해 최선을 다하고 있으나, 절대 발생하지 않는다고 보장할 수는 없습니다.\n\n• 강한 흔들림이 알림보다 먼저 귀하의 위치에 도달할 수 있습니다.\n\n• 지진 조기경보는 빠르게 계산된 결과로 상당한 오차가 있을 수 있으므로, 이를 이해하고 신중하게 사용하시기 바랍니다.\n\n• 당국이 승인하지 않은 모든 행위는 법적 위험을 수반할 수 있으니, 관련 규정을 반드시 준수해 주세요.\n\n또한 지역 맞춤형 경보를 제공하기 위해, 본 서비스는 귀하에게 어떤 경보를 보낼지 결정하기 위한 목적으로만 포그라운드 및 백그라운드에서 귀하의 대략적인 위치와 푸시 식별자를 수집하여 업로드합니다.\n\n하단의 “동의하고 계속”을 누르면 위 사항을 읽고 이해했으며 이에 동의함을 확인하는 것입니다.';
 
@@ -3498,4 +3514,13 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get trendRainHourLastReading => '이 시간대 마지막 관측까지의 1시간 강수량';
+
+  @override
+  String get experimentalCategorySound => '사운드';
+
+  @override
+  String get experimentalCategoryGraphics => '그래픽';
+
+  @override
+  String get experimentalCategoryTools => '도구';
 }

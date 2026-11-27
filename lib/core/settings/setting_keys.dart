@@ -170,9 +170,9 @@ abstract final class SettingKeys {
     'experimental.skyTimeMode',
   );
 
-  /// Whether the experimental-features menu is unlocked. Hidden behind ten taps
-  /// on the Developer page's version row so accidental users never see it. See
-  /// `ExperimentalSettings`.
+  /// Whether the hidden experimental options are unlocked. Hidden behind ten
+  /// taps on the Developer page's version row so accidental users never see
+  /// them. See `ExperimentalSettings`.
   static const SettingKey<bool> experimentalUnlocked = SettingKey<bool>._(
     'experimental.unlocked',
   );
