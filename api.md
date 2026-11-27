@@ -75,6 +75,22 @@
 | `DisasterMapApi.getRestroomDetail` | `/api/v2/tiles/dpm/restroom/{id}` | `coreStatic` | `static.core-{tyo1,tnn1}.exptech.dev` |
 | `DisasterMapApi.getShelterDetail` | `/api/v2/tiles/dpm/shelter/{id}` | `coreStatic` | `static.core-{tyo1,tnn1}.exptech.dev` |
 | `DpipMcpToolHost`（AI 對話的工具） | `/mcp`（**POST**，JSON-RPC） | `coreApi` | `api.core-{tyo1,tnn1}.exptech.dev` |
+| `EventApi.history` | `/api/v2/dpip/{lang}/history[/{region}]` | `coreApi` | `api.core-{tyo1,tnn1}.exptech.dev` |
+| `EventApi.realtime` | `/api/v2/dpip/{lang}/realtime[/{region}]` | `coreApi` | `api.core-{tyo1,tnn1}.exptech.dev` |
+| `EventApi.detail` | `/api/v2/dpip/{lang}/event/{id}/{region}` | `coreApi` | `api.core-{tyo1,tnn1}.exptech.dev` |
+
+> **事件卡片（App API v2）：** 規格以 dpip-server-go 的 `api.md` 第 2 節為準。
+> `history` 是事件頁（還在進行中或近 3 天內結束），`realtime` 是首頁拖盤收起
+> （生效中）；不帶 `{region}` 是全國，帶了是該鄉鎮（伺服器依卡片的 `area` 與
+> 該區到期時間篩選）。列表回 `{"lang","cards":[...]}`，詳情回同形狀、`cards`
+> 是第 1 報到最新一報；body 沒有伺服器時間。`{lang}` 只收 12 個 tag、逐字分大小寫
+> （`zh-TW` `zh` `zh-Hans` `zh-Hant-HK` `yue` `en` `ja` `ko` `vi` `th` `id` `fil`），
+> 由 `eventApiLanguage`（`event_language.dart`）從 App 目前的語系換算；其他值 404。
+> 詳情的 `{region}` 必填，沒有所在地時帶 `0`（全國文字）；非 int32 十進位回 400。
+> 兩區讀同一個 PostgreSQL，卡片 id、內容與加引號的強 ETag 逐位元組相同，跨區
+> 容錯時 `If-None-Match` 照樣有效。PG 不可用時回 503（沒有 ETag），`ApiClient`
+> 換另一區重試；400、404 不重試。`history` 是 stale-if-error（`getOrSaved`），
+> `realtime` 與詳情不是。
 
 > **地震報告 list（v2）query：** `limit`/`page`、`sort`/`order`
 > （`time`\|`intensity`\|`magnitude`\|`depth` × `asc`\|`desc`）、震度／規模／深度
@@ -389,18 +405,9 @@ App 的圖層選擇器為每個 channel 註冊一個獨立圖層（`satellite` �
 
 ### 舊 server `api-1`（逐步淘汰中）
 
-後端會把端點陸續搬到 `core-tnn1`，這裡會隨之縮減。以下**仍只在 `api-1` 上**，
-且都已在 App 中實際使用：
-
-| 類別.方法 | 路徑 | 層級 | 使用處 |
-|---|---|---|---|
-| `EventApi.getHistoryList` | `/api/v1/dpip/history/list` | `legacyApi` | 事件頁（全國） |
-| `EventApi.getHistoryRegion` | `/api/v1/dpip/history/{region}` | `legacyApi` | 事件頁（鄉鎮） |
-| `EventApi.getRealtimeList` | `/api/v1/dpip/realtime/list` | `legacyApi` | 首頁拖盤收起（全國生效中） |
-| `EventApi.getRealtimeRegion` | `/api/v1/dpip/realtime/{region}` | `legacyApi` | 首頁拖盤收起（鄉鎮生效中） |
-
-`/api/v1/dpip/event/{id}` 存在於 `api-1`，但 App 裡**沒有任何方法呼叫它** ——
-先前這裡列的 `getEvent` 並不存在於程式碼中。
+後端會把端點陸續搬到 `core-tnn1`，這裡會隨之縮減。事件（`/api/v1/dpip/*`）
+已改用 App API v2（見上方「多活備援」的 `EventApi`），目前 App 沒有端點在
+`legacyApi` 上。
 
 ### 對時 `/ntp`（SNTP 的退路，**不走 `ApiClient`**）
 
