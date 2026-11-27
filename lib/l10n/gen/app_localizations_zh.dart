@@ -3794,6 +3794,70 @@ class AppLocalizationsZh extends AppLocalizations {
   String aiErrorServiceSaid(String detail) {
     return '服務的訊息：$detail';
   }
+
+  @override
+  String get locationModeTitle => '所在地與通知區域';
+
+  @override
+  String get locationModeAuto => '自動（GPS 定位）';
+
+  @override
+  String get locationModeAutoSubtitle => '依手機的位置決定所在地與通知區域，移動時自動更新。建議使用。';
+
+  @override
+  String get locationModeManual => '手動指定鄉鎮';
+
+  @override
+  String get locationModeManualSubtitle => '固定使用你選的鄉鎮，並停用 GPS。';
+
+  @override
+  String locationModeManualSummary(String place) {
+    return '手動：$place';
+  }
+
+  @override
+  String locationModeManualBanner(String place) {
+    return '目前為手動設定。所在地與所有通知都固定在$place，GPS 已停用；你不在這裡時，可能收不到所在地的緊急警報。';
+  }
+
+  @override
+  String get locationModeSwitchToAuto => '切回自動（GPS）';
+
+  @override
+  String get locationModeChangeTown => '變更鄉鎮';
+
+  @override
+  String get locationModeWarningTitle => '除非必要，請勿手動設定';
+
+  @override
+  String get locationModeWarningBody =>
+      '手動設定後，App 會停用 GPS。地震速報、海嘯、各種警特報等所有通知，都只會依你選的鄉鎮發送，不會隨你的實際位置改變。\n\n只要你不在這個鄉鎮，就可能收不到所在地的緊急警報，也可能收到其他地區的通知。\n\n除非你清楚知道自己在做什麼（例如手機無法定位），否則請保持自動。';
+
+  @override
+  String get locationModeWarningAcknowledge => '我了解手動設定可能讓我收不到所在地的緊急警報';
+
+  @override
+  String get locationModeWarningContinue => '仍要手動設定';
+
+  @override
+  String get locationModeKeepAuto => '保持自動';
+
+  @override
+  String get locationModePickTownTitle => '選擇鄉鎮';
+
+  @override
+  String get locationModeSwitchedToAuto => '已切回自動，改用 GPS 定位';
+
+  @override
+  String get homeManualLocationHint => '所在地為手動設定，點此可切回自動';
+
+  @override
+  String locationModeWarningDismiss(int days) {
+    return '關閉，$days 天後再提醒';
+  }
+
+  @override
+  String get locationModeManualBadge => '所在地為手動設定';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -7582,6 +7646,70 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String aiErrorServiceSaid(String detail) {
     return '服务返回：$detail';
   }
+
+  @override
+  String get locationModeTitle => '所在地与通知区域';
+
+  @override
+  String get locationModeAuto => '自动（GPS 定位）';
+
+  @override
+  String get locationModeAutoSubtitle => '根据手机的位置决定所在地与通知区域，移动时自动更新。建议使用。';
+
+  @override
+  String get locationModeManual => '手动指定乡镇';
+
+  @override
+  String get locationModeManualSubtitle => '固定使用你选择的乡镇，并停用 GPS。';
+
+  @override
+  String locationModeManualSummary(String place) {
+    return '手动：$place';
+  }
+
+  @override
+  String locationModeManualBanner(String place) {
+    return '当前为手动设置。所在地与所有通知都固定在$place，GPS 已停用；你不在这里时，可能收不到所在地的紧急警报。';
+  }
+
+  @override
+  String get locationModeSwitchToAuto => '切回自动（GPS）';
+
+  @override
+  String get locationModeChangeTown => '更改乡镇';
+
+  @override
+  String get locationModeWarningTitle => '除非必要，请勿手动设置';
+
+  @override
+  String get locationModeWarningBody =>
+      '手动设置后，App 会停用 GPS。地震速报、海啸、各种警特报等所有通知，都只会按你选择的乡镇发送，不会随你的实际位置改变。\n\n只要你不在这个乡镇，就可能收不到所在地的紧急警报，也可能收到其他地区的通知。\n\n除非你清楚知道自己在做什么（例如手机无法定位），否则请保持自动。';
+
+  @override
+  String get locationModeWarningAcknowledge => '我了解手动设置可能让我收不到所在地的紧急警报';
+
+  @override
+  String get locationModeWarningContinue => '仍要手动设置';
+
+  @override
+  String get locationModeKeepAuto => '保持自动';
+
+  @override
+  String get locationModePickTownTitle => '选择乡镇';
+
+  @override
+  String get locationModeSwitchedToAuto => '已切回自动，改用 GPS 定位';
+
+  @override
+  String get homeManualLocationHint => '所在地为手动设置，点此可切回自动';
+
+  @override
+  String locationModeWarningDismiss(int days) {
+    return '关闭，$days 天后再提醒';
+  }
+
+  @override
+  String get locationModeManualBadge => '所在地为手动设置';
 }
 
 /// The translations for Chinese, as used in Hong Kong, using the Han script (`zh_Hant_HK`).
@@ -11371,6 +11499,70 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String aiErrorServiceSaid(String detail) {
     return '服務的訊息：$detail';
   }
+
+  @override
+  String get locationModeTitle => '所在地與通知區域';
+
+  @override
+  String get locationModeAuto => '自動（GPS 定位）';
+
+  @override
+  String get locationModeAutoSubtitle => '依手機的位置決定所在地與通知區域，移動時自動更新。建議使用。';
+
+  @override
+  String get locationModeManual => '手動指定鄉鎮';
+
+  @override
+  String get locationModeManualSubtitle => '固定使用你選的鄉鎮，並停用 GPS。';
+
+  @override
+  String locationModeManualSummary(String place) {
+    return '手動：$place';
+  }
+
+  @override
+  String locationModeManualBanner(String place) {
+    return '目前為手動設定。所在地與所有通知都固定在$place，GPS 已停用；你不在這裡時，可能收不到所在地的緊急警報。';
+  }
+
+  @override
+  String get locationModeSwitchToAuto => '切回自動（GPS）';
+
+  @override
+  String get locationModeChangeTown => '變更鄉鎮';
+
+  @override
+  String get locationModeWarningTitle => '除非必要，請勿手動設定';
+
+  @override
+  String get locationModeWarningBody =>
+      '手動設定後，App 會停用 GPS。地震速報、海嘯、各種警特報等所有通知，都只會依你選的鄉鎮發送，不會隨你的實際位置改變。\n\n只要你不在這個鄉鎮，就可能收不到所在地的緊急警報，也可能收到其他地區的通知。\n\n除非你清楚知道自己在做什麼（例如手機無法定位），否則請保持自動。';
+
+  @override
+  String get locationModeWarningAcknowledge => '我了解手動設定可能讓我收不到所在地的緊急警報';
+
+  @override
+  String get locationModeWarningContinue => '仍要手動設定';
+
+  @override
+  String get locationModeKeepAuto => '保持自動';
+
+  @override
+  String get locationModePickTownTitle => '選擇鄉鎮';
+
+  @override
+  String get locationModeSwitchedToAuto => '已切回自動，改用 GPS 定位';
+
+  @override
+  String get homeManualLocationHint => '所在地為手動設定，點此可切回自動';
+
+  @override
+  String locationModeWarningDismiss(int days) {
+    return '關閉，$days 天後再提醒';
+  }
+
+  @override
+  String get locationModeManualBadge => '所在地為手動設定';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -15160,4 +15352,68 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String aiErrorServiceSaid(String detail) {
     return '服務的訊息：$detail';
   }
+
+  @override
+  String get locationModeTitle => '所在地與通知區域';
+
+  @override
+  String get locationModeAuto => '自動（GPS 定位）';
+
+  @override
+  String get locationModeAutoSubtitle => '依手機的位置決定所在地與通知區域，移動時自動更新。建議使用。';
+
+  @override
+  String get locationModeManual => '手動指定鄉鎮';
+
+  @override
+  String get locationModeManualSubtitle => '固定使用你選的鄉鎮，並停用 GPS。';
+
+  @override
+  String locationModeManualSummary(String place) {
+    return '手動：$place';
+  }
+
+  @override
+  String locationModeManualBanner(String place) {
+    return '目前為手動設定。所在地與所有通知都固定在$place，GPS 已停用；你不在這裡時，可能收不到所在地的緊急警報。';
+  }
+
+  @override
+  String get locationModeSwitchToAuto => '切回自動（GPS）';
+
+  @override
+  String get locationModeChangeTown => '變更鄉鎮';
+
+  @override
+  String get locationModeWarningTitle => '除非必要，請勿手動設定';
+
+  @override
+  String get locationModeWarningBody =>
+      '手動設定後，App 會停用 GPS。地震速報、海嘯、各種警特報等所有通知，都只會依你選的鄉鎮發送，不會隨你的實際位置改變。\n\n只要你不在這個鄉鎮，就可能收不到所在地的緊急警報，也可能收到其他地區的通知。\n\n除非你清楚知道自己在做什麼（例如手機無法定位），否則請保持自動。';
+
+  @override
+  String get locationModeWarningAcknowledge => '我了解手動設定可能讓我收不到所在地的緊急警報';
+
+  @override
+  String get locationModeWarningContinue => '仍要手動設定';
+
+  @override
+  String get locationModeKeepAuto => '保持自動';
+
+  @override
+  String get locationModePickTownTitle => '選擇鄉鎮';
+
+  @override
+  String get locationModeSwitchedToAuto => '已切回自動，改用 GPS 定位';
+
+  @override
+  String get homeManualLocationHint => '所在地為手動設定，點此可切回自動';
+
+  @override
+  String locationModeWarningDismiss(int days) {
+    return '關閉，$days 天後再提醒';
+  }
+
+  @override
+  String get locationModeManualBadge => '所在地為手動設定';
 }

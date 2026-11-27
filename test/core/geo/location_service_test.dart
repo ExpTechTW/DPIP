@@ -42,6 +42,44 @@ TownDirectory _dir() => TownDirectory.fromJson({
 });
 
 void main() {
+  group('a location set by hand', () {
+    final town = _dir().byCode('970')!;
+    LocationService manual() => LocationService(
+      _dir(),
+      isAvailable: () async => fail('the GPS was asked if it is available'),
+      fix: () async => fail('the GPS was read'),
+      lastKnown: () async => fail('the GPS cache was read'),
+      // Ignored: a location that does not come from the GPS is ready however
+      // the GPS stands.
+      status: () async => LocationStatus.deniedForever,
+      manualTown: () => town,
+    );
+    final pinned = (lat: town.lat, lng: town.lng);
+
+    test('never reads the GPS, and is ready with location denied', () async {
+      final service = manual();
+      expect(service.isManual, isTrue);
+      expect(await service.status(), LocationStatus.ready);
+      expect(await service.currentTown(), town);
+      expect(await service.currentFix(), pinned);
+      expect(await service.lastKnownFix(), pinned);
+      expect(await service.townAt(25.03, 121.52), town);
+    });
+
+    test('the position stream is the one pinned fix, and stays open', () async {
+      final fixes = <GpsFix>[];
+      var done = false;
+      final sub = manual().positionStream().listen(
+        fixes.add,
+        onDone: () => done = true,
+      );
+      await pumpEventQueue();
+      expect(fixes, [pinned]);
+      expect(done, isFalse, reason: 'a finished stream reads as GPS gone');
+      await sub.cancel();
+    });
+  });
+
   test('resolves the nearest township from a GPS fix', () async {
     final service = LocationService(
       _dir(),

@@ -2,6 +2,7 @@ import 'package:dpip/app/theme/app_glass.dart';
 import 'package:dpip/app/theme/app_motion.dart';
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
+import 'package:dpip/core/geo/location_mode.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/settings/home_area.dart';
@@ -109,6 +110,12 @@ class _HomeSheetHeaderState extends State<HomeSheetHeader> {
     final area = context.select<RegionStore, HomeArea>(
       (store) => store.selected,
     );
+    // 所在地 pinned to a township by hand: say so under its name, with the way
+    // back to the GPS one tap away. Nullable so a tree without the mode (a
+    // widget test) shows no hint.
+    final manualLocation =
+        area is CurrentArea &&
+        context.select<LocationMode?, bool>((mode) => mode?.isManual ?? false);
     final areaName = switch (area) {
       NationwideArea() => l10n.regionNationwide,
       CurrentArea(:final code) =>
@@ -197,6 +204,10 @@ class _HomeSheetHeaderState extends State<HomeSheetHeader> {
             style: nameStyle ?? const TextStyle(),
             child: Text(areaName),
           ),
+          if (manualLocation) ...[
+            const SizedBox(height: AppSpacing.xs),
+            _ManualLocationHint(color: secondary, expanded: expanded),
+          ],
           if (realtime case final current?) ...[
             const SizedBox(height: AppSpacing.xs),
             Text(
@@ -465,4 +476,47 @@ void _openNearestStationOnMap(BuildContext context, WeatherRealtime realtime) {
     longitude: realtime.station.longitude,
   );
   context.goNamed(AppRoutes.map);
+}
+
+/// The line under 所在地's name while it is set by hand: what it is, and that a
+/// tap goes back to the GPS. Drawn in the sheet's own secondary ink, which is
+/// what stays legible over every sky.
+class _ManualLocationHint extends StatelessWidget {
+  const _ManualLocationHint({required this.color, required this.expanded});
+
+  final Color color;
+  final bool expanded;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final style =
+        (expanded ? theme.textTheme.labelLarge : theme.textTheme.labelMedium)
+            ?.copyWith(color: color, fontWeight: FontWeight.w600);
+    return InkWell(
+      onTap: () => context.pushNamed(AppRoutes.locationMode),
+      borderRadius: AppRadius.small,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.edit_location_alt_outlined,
+              size: expanded ? 18 : 16,
+              color: color,
+            ),
+            const SizedBox(width: AppSpacing.xs),
+            Flexible(
+              child: Text(
+                AppLocalizations.of(context).homeManualLocationHint,
+                style: style,
+              ),
+            ),
+            Icon(Icons.chevron_right, size: expanded ? 18 : 16, color: color),
+          ],
+        ),
+      ),
+    );
+  }
 }

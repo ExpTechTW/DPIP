@@ -129,6 +129,64 @@ class DeviceLocationReporter {
   /// Reports [fix] now, subject to the same throttle as a move. Never throws.
   Future<ReportOutcome> reportNow(GpsFix fix) => _send(fix);
 
+  /// Reports [fix] as soon as the throttle allows: now when the window is
+  /// open, else the moment it closes. Never throws.
+  ///
+  /// For a change of where the device is placed that is not a move — the user
+  /// pinning a township by hand, or returning to GPS. It has to reach the
+  /// server even when a report went out a moment ago (or the server keeps
+  /// alerting for the old place), and it must not be a second request inside
+  /// the window either. A later call supersedes one still waiting, which then
+  /// returns [ReportOutcome.throttled] without sending: its fix is no longer
+  /// where the device is placed.
+  ///
+  /// A fix the server already has from this reporter — the position stream
+  /// reports a newly pinned township itself when the window is open — is not
+  /// sent again.
+  Future<ReportOutcome> reportWhenAllowed(GpsFix fix) async {
+    final generation = ++_placement;
+    for (var attempt = 0; attempt < _maxPlacementAttempts; attempt++) {
+      if (generation != _placement) return ReportOutcome.throttled;
+      if (fix == _lastSent) return ReportOutcome.sent;
+      final wait = _windowLeft(_now().toUtc().millisecondsSinceEpoch);
+      if (wait > Duration.zero) {
+        await Future<void>.delayed(wait);
+        continue;
+      }
+      final outcome = await _send(fix);
+      // Another report can take the window just before this one.
+      if (outcome != ReportOutcome.throttled) return outcome;
+    }
+    return ReportOutcome.throttled;
+  }
+
+  /// The latest [reportWhenAllowed] call; an earlier one still waiting gives up.
+  int _placement = 0;
+
+  /// The last fix the server answered with a 2xx.
+  GpsFix? _lastSent;
+
+  /// How many windows [reportWhenAllowed] waits out before giving up.
+  static const int _maxPlacementAttempts = 5;
+
+  /// How long until the throttle window opens at [nowMs]; zero when it is.
+  ///
+  /// The stored stamp survives a clock change, so a device set back (or a
+  /// first SNTP sync that pulls the clock back) leaves a stamp in the future.
+  /// The throttle would then hold for the whole offset — hours of a moving
+  /// user reporting nothing — and never expire on its own, because the gap
+  /// only grows more negative as real time passes. A future stamp means the
+  /// window is not measurable, so it does not apply.
+  Duration _windowLeft(int nowMs) {
+    final lastMs = _settings.getInt(SettingKeys.deviceLocationUpdatedAtMs);
+    if (lastMs == null) return Duration.zero;
+    final since = nowMs - lastMs;
+    if (since < 0 || since >= minUploadInterval.inMilliseconds) {
+      return Duration.zero;
+    }
+    return Duration(milliseconds: minUploadInterval.inMilliseconds - since);
+  }
+
   Future<ReportOutcome> _send(GpsFix fix) {
     final attempt = _queue.then((_) => _attempt(fix));
     _queue = attempt.then((_) {});
@@ -137,24 +195,14 @@ class DeviceLocationReporter {
 
   Future<ReportOutcome> _attempt(GpsFix fix) async {
     final nowMs = _now().toUtc().millisecondsSinceEpoch;
-    final lastMs = _settings.getInt(SettingKeys.deviceLocationUpdatedAtMs);
-    // `nowMs - lastMs >= 0` is not redundant: the stored stamp survives a
-    // clock change, so a device set back (or a first SNTP sync that pulls the
-    // clock back) leaves a stamp in the future. The throttle would then hold
-    // for the whole offset — hours of a moving user reporting nothing — and
-    // it would never expire on its own, because the comparison only gets more
-    // negative as real time passes. A future stamp means the window is not
-    // measurable, so it does not apply.
-    final since = lastMs == null ? null : nowMs - lastMs;
-    if (since != null &&
-        since >= 0 &&
-        since < minUploadInterval.inMilliseconds) {
+    if (_windowLeft(nowMs) > Duration.zero) {
       return ReportOutcome.throttled; // silent — no API, no log
     }
 
     try {
       final attempted = await _onMoved(fix);
       if (!attempted) return ReportOutcome.noToken;
+      _lastSent = fix;
       await _settings.setInt(SettingKeys.deviceLocationUpdatedAtMs, nowMs);
     } catch (error, stackTrace) {
       // Cool down after hard failures (incl. HTTP 429) so we don't retry-storm.

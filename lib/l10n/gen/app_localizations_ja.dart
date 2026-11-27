@@ -3825,4 +3825,70 @@ class AppLocalizationsJa extends AppLocalizations {
   String aiErrorServiceSaid(String detail) {
     return 'サービスからのメッセージ：$detail';
   }
+
+  @override
+  String get locationModeTitle => '現在地と通知エリア';
+
+  @override
+  String get locationModeAuto => '自動（GPS）';
+
+  @override
+  String get locationModeAutoSubtitle =>
+      'スマートフォンの位置から現在地と通知エリアを決め、移動すると自動で更新します。おすすめです。';
+
+  @override
+  String get locationModeManual => '町村を手動で指定';
+
+  @override
+  String get locationModeManualSubtitle => '選んだ町村を常に使い、GPS をオフにします。';
+
+  @override
+  String locationModeManualSummary(String place) {
+    return '手動：$place';
+  }
+
+  @override
+  String locationModeManualBanner(String place) {
+    return '手動で設定中です。現在地とすべての通知は$placeに固定され、GPS はオフです。そこにいないときは、現在地の緊急警報を受け取れないことがあります。';
+  }
+
+  @override
+  String get locationModeSwitchToAuto => '自動（GPS）に戻す';
+
+  @override
+  String get locationModeChangeTown => '町村を変更';
+
+  @override
+  String get locationModeWarningTitle => '必要な場合を除き、手動で設定しないでください';
+
+  @override
+  String get locationModeWarningBody =>
+      '手動で設定すると GPS がオフになります。緊急地震速報、津波、各種の警報・注意報など、すべての通知は実際にいる場所ではなく、選んだ町村を対象に送られます。\n\nその町村にいないときは、現在地の緊急警報を受け取れないことがあり、別の地域の通知が届くこともあります。\n\n何をしているかを十分に理解している場合（スマートフォンで位置を取得できないなど）を除き、自動のままにしてください。';
+
+  @override
+  String get locationModeWarningAcknowledge =>
+      '手動設定では現在地の緊急警報を受け取れないことがあると理解しました';
+
+  @override
+  String get locationModeWarningContinue => 'それでも手動で設定';
+
+  @override
+  String get locationModeKeepAuto => '自動のままにする';
+
+  @override
+  String get locationModePickTownTitle => '町村を選択';
+
+  @override
+  String get locationModeSwitchedToAuto => '自動に戻しました。GPS で位置を取得します';
+
+  @override
+  String get homeManualLocationHint => '現在地は手動設定です。タップすると自動に戻せます';
+
+  @override
+  String locationModeWarningDismiss(int days) {
+    return '閉じる（$days 日後に再表示）';
+  }
+
+  @override
+  String get locationModeManualBadge => '現在地を手動で設定中';
 }

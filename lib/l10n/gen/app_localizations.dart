@@ -7253,6 +7253,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Service said: {detail}'**
   String aiErrorServiceSaid(String detail);
+
+  /// Title of the page (and its row on the notification settings page) that chooses where the app takes the user's location from: GPS or a township set by hand.
+  ///
+  /// In en, this message translates to:
+  /// **'Location and alert area'**
+  String get locationModeTitle;
+
+  /// Option: the location comes from the phone's GPS (the default).
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic (GPS)'**
+  String get locationModeAuto;
+
+  /// Explains the automatic option.
+  ///
+  /// In en, this message translates to:
+  /// **'Your location and alert area follow your phone and update as you move. Recommended.'**
+  String get locationModeAutoSubtitle;
+
+  /// Option: the user picks one township and the app always uses it.
+  ///
+  /// In en, this message translates to:
+  /// **'Set a township by hand'**
+  String get locationModeManual;
+
+  /// Explains the manual option.
+  ///
+  /// In en, this message translates to:
+  /// **'Always uses the township you pick, and turns GPS off.'**
+  String get locationModeManualSubtitle;
+
+  /// Short status of a location set by hand; place is the township, e.g. "Taipei City Zhongzheng District".
+  ///
+  /// In en, this message translates to:
+  /// **'Set by hand: {place}'**
+  String locationModeManualSummary(String place);
+
+  /// Warning shown while the location is set by hand; place is the township.
+  ///
+  /// In en, this message translates to:
+  /// **'Set by hand. Your location and every alert are fixed to {place}, and GPS is off. When you are not there, you may miss emergency alerts for where you are.'**
+  String locationModeManualBanner(String place);
+
+  /// Button that returns to the GPS location.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch back to automatic (GPS)'**
+  String get locationModeSwitchToAuto;
+
+  /// Row that picks a different township while the location is set by hand.
+  ///
+  /// In en, this message translates to:
+  /// **'Change township'**
+  String get locationModeChangeTown;
+
+  /// Title of the strong warning shown before setting the location by hand.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t set your location by hand unless you must'**
+  String get locationModeWarningTitle;
+
+  /// Body of that warning: every alert, earthquake early warnings included, will follow the chosen township instead of where the user is.
+  ///
+  /// In en, this message translates to:
+  /// **'Setting it by hand turns GPS off. Every alert — earthquake early warnings, tsunami warnings and weather warnings included — is then sent for the township you pick, not for where you actually are.\n\nWhenever you are not in that township, you may miss emergency alerts for where you are, and get alerts meant for somewhere else.\n\nKeep it automatic unless you know exactly what you are doing (for example, your phone cannot get a location).'**
+  String get locationModeWarningBody;
+
+  /// Checkbox the user must tick before the manual setting is allowed.
+  ///
+  /// In en, this message translates to:
+  /// **'I understand I may miss emergency alerts for where I am'**
+  String get locationModeWarningAcknowledge;
+
+  /// Button that proceeds to set the location by hand after the warning.
+  ///
+  /// In en, this message translates to:
+  /// **'Set by hand anyway'**
+  String get locationModeWarningContinue;
+
+  /// Button that dismisses the warning and keeps the GPS location.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep automatic'**
+  String get locationModeKeepAuto;
+
+  /// Title of the township picker for a location set by hand.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a township'**
+  String get locationModePickTownTitle;
+
+  /// Confirmation after returning to the GPS location.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to automatic — locating with GPS'**
+  String get locationModeSwitchedToAuto;
+
+  /// Tappable hint under the place name on the home screen while the location is set by hand.
+  ///
+  /// In en, this message translates to:
+  /// **'Location set by hand — tap to switch back to automatic'**
+  String get homeManualLocationHint;
+
+  /// Tooltip of the close button on the More page's warning that the location is set by hand; the warning comes back after days.
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss for {days} days'**
+  String locationModeWarningDismiss(int days);
+
+  /// Screen-reader label of the yellow exclamation mark on the notification settings row while the location is set by hand.
+  ///
+  /// In en, this message translates to:
+  /// **'Location set by hand'**
+  String get locationModeManualBadge;
 }
 
 class _AppLocalizationsDelegate

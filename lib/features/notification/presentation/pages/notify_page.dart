@@ -3,6 +3,7 @@
 library;
 
 import 'package:dpip/app/theme/app_spacing.dart';
+import 'package:dpip/core/geo/location_mode.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/features/notification/domain/notify_preset.dart';
 import 'package:dpip/features/notification/domain/notify_repository.dart';
@@ -77,6 +78,34 @@ class _NotifyView extends StatelessWidget {
   }
 }
 
+/// Where the alerts are for — the GPS or a township set by hand — linking to
+/// the page that changes it. A township set by hand reads in the error tone:
+/// every channel below then follows it, not where the user is.
+class _LocationModeTile extends StatelessWidget {
+  const _LocationModeTile();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final colors = Theme.of(context).colorScheme;
+    final manual = context.watch<LocationMode>().manualTown;
+    return ListTile(
+      leading: manual == null
+          ? const Icon(Icons.gps_fixed)
+          : Icon(Icons.edit_location_alt_outlined, color: colors.error),
+      title: Text(l10n.locationModeTitle),
+      subtitle: manual == null
+          ? Text(l10n.locationModeAuto)
+          : Text(
+              l10n.locationModeManualSummary(manual.fullName),
+              style: TextStyle(color: colors.error),
+            ),
+      trailing: const Icon(Icons.chevron_right),
+      onTap: () => context.pushNamed(AppRoutes.locationMode),
+    );
+  }
+}
+
 /// The preset picker, then the grouped list of channels, one section per
 /// domain.
 class _NotifyList extends StatelessWidget {
@@ -118,6 +147,14 @@ class _NotifyList extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.only(bottom: AppSpacing.xl),
       children: [
+        // Where the alerts are for, ahead of which alerts: a township set by
+        // hand changes what every channel below means.
+        const _LocationModeTile(),
+        const Divider(
+          height: 1,
+          indent: AppSpacing.lg,
+          endIndent: AppSpacing.lg,
+        ),
         SectionHeader(l10n.notifyPresetSection),
         _PresetSection(controller: controller),
         for (final section in sections) ...[

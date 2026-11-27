@@ -138,11 +138,15 @@ class PermissionHealth extends ChangeNotifier with WidgetsBindingObserver {
   /// "not granted" on failure, and a diagnostic must not become a crash.
   Future<void> refresh() async {
     final notify = await _notifications.isAllowed();
-    final foreground = await _location.granted();
+    // A township pinned by hand needs no location permission at all, so a
+    // denied one is not something an alert depends on.
+    final manual = _location.isManual;
+    final foreground = manual || await _location.granted();
     // Asking for background while foreground is denied answers "denied" on both
     // platforms, which is true but says nothing new — the foreground flag is
     // already carrying that.
-    final background = foreground ? await _location.backgroundGranted() : false;
+    final background =
+        manual || (foreground && await _location.backgroundGranted());
     final execution = await _execution.status();
     // Only a state the platform actually answered can be a problem, and only
     // one the user can act on: a profile-locked device has nothing to change.

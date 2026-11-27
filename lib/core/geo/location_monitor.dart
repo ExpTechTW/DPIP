@@ -6,6 +6,7 @@ library;
 import 'dart:async';
 
 import 'package:dpip/core/geo/device_location_reporter.dart';
+import 'package:dpip/core/geo/location_mode.dart';
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/geo/location_status.dart';
 import 'package:dpip/core/settings/region_store.dart';
@@ -25,11 +26,15 @@ class LocationMonitor extends ChangeNotifier with WidgetsBindingObserver {
     required this._location,
     required this._reporter,
     required this._regions,
+    this._mode,
   });
 
   final LocationService _location;
   final DeviceLocationReporter _reporter;
   final RegionStore _regions;
+
+  /// The user's choice of location source; a change of it is followed here.
+  final LocationMode? _mode;
 
   StreamSubscription<bool>? _serviceSub;
   StreamSubscription<GpsFix>? _fixSub;
@@ -66,6 +71,29 @@ class LocationMonitor extends ChangeNotifier with WidgetsBindingObserver {
     // on transition, so travelling any distance left the app naming — and
     // alerting for — the township the app happened to start in.
     _fixSub = _reporter.fixes.listen(_onFix, onError: (_, _) {});
+    _mode?.addListener(_onModeChanged);
+  }
+
+  /// The location source changed — a township pinned by hand, or back to the
+  /// GPS. The same recovery as GPS coming back (a fresh position stream and
+  /// township), plus a report of the new place: the server alerts for
+  /// wherever the last report put the device, so it must hear about the change
+  /// even when a report went out a moment ago ([DeviceLocationReporter
+  /// .reportWhenAllowed]).
+  Future<void> _onModeChanged() async {
+    // A pinned location needs no permission, so the reporter may not be
+    // running yet (the user denied the GPS and then pinned a township).
+    if (_location.isManual) {
+      _reporter.start();
+    } else {
+      _reporter.restart();
+    }
+    final town = await _location.currentTown();
+    _publishedCode = town?.code;
+    _regions.setCurrentCode(town?.code);
+    await _refresh();
+    final fix = await _location.currentFix();
+    if (fix != null) unawaited(_reporter.reportWhenAllowed(fix));
   }
 
   /// Republishes the current township for a fix from the foreground position
@@ -126,6 +154,7 @@ class LocationMonitor extends ChangeNotifier with WidgetsBindingObserver {
 
   @override
   void dispose() {
+    _mode?.removeListener(_onModeChanged);
     _fixSub?.cancel();
     _serviceSub?.cancel();
     WidgetsBinding.instance.removeObserver(this);

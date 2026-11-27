@@ -14,6 +14,7 @@ import 'dart:typed_data';
 import 'package:dpip/app/theme/app_gold.dart';
 import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/error/result.dart';
+import 'package:dpip/core/geo/location_mode.dart';
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/geo/town.dart';
 import 'package:dpip/core/geo/town_directory.dart';
@@ -164,6 +165,14 @@ GoRouter _router(List<String> visited) => GoRouter(
           ),
       ],
     ),
+    GoRoute(
+      path: AppRoutes.locationModePath,
+      name: AppRoutes.locationMode,
+      builder: (_, _) {
+        visited.add(AppRoutes.locationMode);
+        return const SizedBox.shrink();
+      },
+    ),
   ],
 );
 
@@ -184,6 +193,7 @@ Future<void> _pump(
   StatusPageMonitor? status,
   ChangelogRepository changelog = const _EmptyChangelogRepository(),
   TownDirectory towns = const TownDirectory({}),
+  LocationMode? locationMode,
   Size size = const Size(800, 4000),
 }) async {
   // Tall enough that every group lays out and hit-tests inside the viewport —
@@ -206,6 +216,9 @@ Future<void> _pump(
         ChangeNotifierProvider(create: (_) => ExperimentalSettings(settings)),
         ChangeNotifierProvider(create: (_) => RegionStore(settings)),
         Provider<TownDirectory>(create: (_) => towns),
+        ChangeNotifierProvider(
+          create: (_) => locationMode ?? LocationMode(settings, towns),
+        ),
         ChangeNotifierProvider(create: (_) => unread ?? MeshUnread(null)),
         // The status card wears the same dot as the More tab.
         ChangeNotifierProvider(create: (_) => EndpointHealthMonitor()),
@@ -539,6 +552,92 @@ void main() {
       tester.getTopLeft(find.text('Support DPIP')).dx,
     ];
     expect(textXs.toSet(), hasLength(1));
+  });
+
+  group('a township set by hand', () {
+    late AppLocalizations l10n;
+    setUpAll(() async {
+      l10n = await AppLocalizations.delegate.load(const Locale('en'));
+    });
+    final towns = TownDirectory.fromJson({
+      '970': {
+        'city': '花蓮',
+        'town': '花蓮',
+        'lat': 23.99,
+        'lng': 121.60,
+        'cityLevel': '縣',
+        'townLevel': '市',
+      },
+    });
+
+    Future<LocationMode> pinned() async {
+      final mode = LocationMode(SettingsStore.inMemory(), towns);
+      await mode.setManual(towns.byCode('970')!);
+      return mode;
+    }
+
+    Finder warning() => find.text(l10n.locationModeManualBanner('花蓮縣 花蓮市'));
+    Finder notifyMark() => find.descendant(
+      of: find.widgetWithText(ListTile, l10n.notifySettingsMenu),
+      matching: find.byIcon(Icons.priority_high_rounded),
+    );
+
+    testWidgets('heads the notification group with a warning and marks '
+        'notification settings', (tester) async {
+      final visited = <String>[];
+      await _pump(
+        tester,
+        _router(visited),
+        towns: towns,
+        locationMode: await pinned(),
+      );
+      expect(warning(), findsOneWidget);
+      expect(notifyMark(), findsOneWidget);
+      // Heading the notification group: under its header, above its rows.
+      expect(
+        tester.getTopLeft(warning()).dy,
+        greaterThan(tester.getTopLeft(find.text(l10n.moreSectionNotify)).dy),
+      );
+      expect(
+        tester.getTopLeft(warning()).dy,
+        lessThan(tester.getTopLeft(find.text(l10n.notifySettingsMenu)).dy),
+      );
+
+      await tester.tap(warning());
+      await tester.pumpAndSettle();
+      expect(visited, [AppRoutes.locationMode]);
+    });
+
+    testWidgets('dismissing the warning keeps the mark', (tester) async {
+      final mode = await pinned();
+      await _pump(tester, _router([]), towns: towns, locationMode: mode);
+      await tester.tap(
+        find.byTooltip(
+          l10n.locationModeWarningDismiss(LocationMode.warningSnooze.inDays),
+        ),
+      );
+      await tester.pump();
+      expect(warning(), findsNothing);
+      expect(mode.showsWarning, isFalse);
+      expect(notifyMark(), findsOneWidget);
+    });
+
+    testWidgets('the warning switches back to automatic', (tester) async {
+      final mode = await pinned();
+      await _pump(tester, _router([]), towns: towns, locationMode: mode);
+      await tester.tap(find.text(l10n.locationModeSwitchToAuto));
+      await tester.pump();
+      expect(mode.isManual, isFalse);
+      expect(warning(), findsNothing);
+      expect(notifyMark(), findsNothing);
+      expect(find.text(l10n.locationModeSwitchedToAuto), findsOneWidget);
+    });
+
+    testWidgets('automatic shows neither', (tester) async {
+      await _pump(tester, _router([]), towns: towns);
+      expect(warning(), findsNothing);
+      expect(notifyMark(), findsNothing);
+    });
   });
 
   testWidgets('the Meshtastic row carries a dot only while unread exists', (

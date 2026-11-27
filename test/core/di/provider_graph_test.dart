@@ -11,6 +11,7 @@ import 'package:dpip/core/di/core_providers.dart';
 import 'package:dpip/core/di/shared_deps.dart';
 import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/error/result.dart';
+import 'package:dpip/core/geo/location_mode.dart';
 import 'package:dpip/core/geo/device_location_reporter.dart';
 import 'package:dpip/core/geo/location_monitor.dart';
 import 'package:dpip/core/geo/location_service.dart';
@@ -261,6 +262,7 @@ SharedDeps _deps() {
       IosWidgetSnapshotWriter(isSupportedPlatform: false),
     ),
     locationService: location,
+    locationMode: LocationMode(settings, townDirectory),
     deviceLocationReporter: reporter,
     backgroundLocation: BackgroundLocationService(
       platform: 0,

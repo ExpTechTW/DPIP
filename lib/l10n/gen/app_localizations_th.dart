@@ -3908,4 +3908,72 @@ class AppLocalizationsTh extends AppLocalizations {
   String aiErrorServiceSaid(String detail) {
     return 'ข้อความจากบริการ: $detail';
   }
+
+  @override
+  String get locationModeTitle => 'ตำแหน่งและพื้นที่รับการแจ้งเตือน';
+
+  @override
+  String get locationModeAuto => 'อัตโนมัติ (GPS)';
+
+  @override
+  String get locationModeAutoSubtitle =>
+      'ตำแหน่งและพื้นที่รับการแจ้งเตือนจะเป็นไปตามโทรศัพท์ของคุณ และอัปเดตอัตโนมัติเมื่อคุณเคลื่อนที่ แนะนำให้ใช้';
+
+  @override
+  String get locationModeManual => 'กำหนดตำบลเอง';
+
+  @override
+  String get locationModeManualSubtitle => 'ใช้ตำบลที่คุณเลือกเสมอ และปิด GPS';
+
+  @override
+  String locationModeManualSummary(String place) {
+    return 'กำหนดเอง: $place';
+  }
+
+  @override
+  String locationModeManualBanner(String place) {
+    return 'กำลังใช้การกำหนดเอง ตำแหน่งและการแจ้งเตือนทั้งหมดถูกกำหนดไว้ที่ $place และ GPS ปิดอยู่ เมื่อคุณไม่ได้อยู่ที่นั่น คุณอาจไม่ได้รับการแจ้งเตือนฉุกเฉินของพื้นที่ที่คุณอยู่';
+  }
+
+  @override
+  String get locationModeSwitchToAuto => 'กลับไปใช้อัตโนมัติ (GPS)';
+
+  @override
+  String get locationModeChangeTown => 'เปลี่ยนตำบล';
+
+  @override
+  String get locationModeWarningTitle => 'อย่ากำหนดตำแหน่งเองหากไม่จำเป็น';
+
+  @override
+  String get locationModeWarningBody =>
+      'เมื่อกำหนดเอง GPS จะถูกปิด การแจ้งเตือนทั้งหมด รวมถึงการเตือนภัยแผ่นดินไหวล่วงหน้า สึนามิ และการเตือนภัยสภาพอากาศ จะถูกส่งตามตำบลที่คุณเลือก ไม่ใช่ตามตำแหน่งที่คุณอยู่จริง\n\nเมื่อใดก็ตามที่คุณไม่ได้อยู่ในตำบลนั้น คุณอาจพลาดการแจ้งเตือนฉุกเฉินของพื้นที่ที่คุณอยู่ และได้รับการแจ้งเตือนของพื้นที่อื่นแทน\n\nโปรดใช้แบบอัตโนมัติไว้ เว้นแต่คุณรู้แน่ชัดว่ากำลังทำอะไร (เช่น โทรศัพท์ระบุตำแหน่งไม่ได้)';
+
+  @override
+  String get locationModeWarningAcknowledge =>
+      'ฉันเข้าใจว่าอาจไม่ได้รับการแจ้งเตือนฉุกเฉินของพื้นที่ที่ฉันอยู่';
+
+  @override
+  String get locationModeWarningContinue => 'กำหนดเองต่อไป';
+
+  @override
+  String get locationModeKeepAuto => 'ใช้อัตโนมัติต่อไป';
+
+  @override
+  String get locationModePickTownTitle => 'เลือกตำบล';
+
+  @override
+  String get locationModeSwitchedToAuto =>
+      'กลับไปใช้อัตโนมัติแล้ว กำลังระบุตำแหน่งด้วย GPS';
+
+  @override
+  String get homeManualLocationHint =>
+      'ตำแหน่งถูกกำหนดเอง แตะเพื่อกลับไปใช้อัตโนมัติ';
+
+  @override
+  String locationModeWarningDismiss(int days) {
+    return 'ปิด (แสดงอีกครั้งใน $days วัน)';
+  }
+
+  @override
+  String get locationModeManualBadge => 'กำหนดตำแหน่งเอง';
 }

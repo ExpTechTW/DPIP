@@ -21,6 +21,7 @@ import 'package:dpip/core/logging/native_log_import.dart';
 import 'package:dpip/core/version/app_build.dart';
 import 'package:dpip/core/logging/log_store.dart';
 import 'package:dpip/core/network/api_client.dart';
+import 'package:dpip/core/geo/location_mode.dart';
 import 'package:dpip/core/platform/background_location.dart';
 import 'package:dpip/core/platform/install_source.dart';
 import 'package:dpip/core/platform/network_changes.dart';
@@ -356,9 +357,13 @@ Future<void> bootstrap() async {
     townDirectory,
     widgetSnapshotWriter,
   );
+  // The user may pin a township by hand instead of the GPS; the location
+  // service answers with it, so everything downstream follows.
+  final locationMode = LocationMode(settings, townDirectory);
   final locationService = LocationService(
     townDirectory,
     boundaries: townBoundaries,
+    manualTown: () => locationMode.manualTown,
   );
 
   // Distance-triggered device-location report: on each meaningful move, POST the
@@ -430,6 +435,7 @@ Future<void> bootstrap() async {
     location: locationService,
     reporter: deviceLocationReporter,
     regions: regionStore,
+    mode: locationMode,
   );
 
   // The mesh link is app-wide, not page-owned: a radio stays attached (and
@@ -468,6 +474,7 @@ Future<void> bootstrap() async {
     regionStore: regionStore,
     widgetLocationCatalogCoordinator: widgetLocationCatalogCoordinator,
     locationService: locationService,
+    locationMode: locationMode,
     deviceLocationReporter: deviceLocationReporter,
     deviceRegistration: deviceRegistration,
     backgroundLocation: backgroundLocation,

@@ -14,6 +14,7 @@ import 'package:dpip/core/di/core_providers.dart';
 import 'package:dpip/core/di/shared_deps.dart';
 import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/error/result.dart';
+import 'package:dpip/core/geo/location_mode.dart';
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/geo/location_status.dart';
 import 'package:dpip/core/geo/town_boundaries.dart';
@@ -754,6 +755,7 @@ SharedDeps _deps({required bool complete, TownDirectory? directory}) {
       IosWidgetSnapshotWriter(isSupportedPlatform: false),
     ),
     locationService: location,
+    locationMode: LocationMode(settings, townDirectory),
     deviceLocationReporter: DeviceLocationReporter(
       positions: () => const Stream.empty(),
       onMoved: (_) async => false,

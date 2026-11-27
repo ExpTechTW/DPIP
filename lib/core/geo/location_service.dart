@@ -46,7 +46,9 @@ class LocationService {
     Future<GpsFix?> Function()? lastKnown,
     Future<LocationStatus> Function()? status,
     Future<ph.PermissionStatus> Function()? requestAlways,
-  }) : _isAvailable = isAvailable ?? _geolocatorAvailable,
+    Town? Function()? manualTown,
+  }) : _manualTown = manualTown ?? _noManualTown,
+       _isAvailable = isAvailable ?? _geolocatorAvailable,
        _fix = fix ?? _geolocatorFix,
        _lastKnownFix = lastKnown ?? _geolocatorLastKnown,
        _status = status ?? _geolocatorStatus,
@@ -67,9 +69,25 @@ class LocationService {
   /// [requestBackground].
   final Future<ph.PermissionStatus> Function() _requestAlways;
 
+  /// The township the user pinned by hand (`LocationMode`), read on every
+  /// call; null while the location comes from the device.
+  ///
+  /// While it is set this service never touches the GPS: every fix, the
+  /// position stream and the current township are the pinned one, and the
+  /// status is [LocationStatus.ready] — a GPS that is off or denied is not a
+  /// problem for a location that does not come from it. The permission
+  /// queries ([granted], [backgroundGranted]) still answer for the device.
+  final Town? Function() _manualTown;
+
+  static Town? _noManualTown() => null;
+
+  /// Whether the location is pinned by hand rather than read from the device.
+  bool get isManual => _manualTown() != null;
+
   /// The combined location-availability [LocationStatus] (services + permission).
   /// Never throws — a fault degrades to [LocationStatus.denied].
   Future<LocationStatus> status() async {
+    if (isManual) return LocationStatus.ready;
     try {
       return await _status();
     } catch (error, stackTrace) {
@@ -238,7 +256,21 @@ class LocationService {
   /// A distance-filtered stream of GPS fixes — each emission is a move of at
   /// least [distanceFilterMeters], which is exactly the trigger for a device-
   /// location report (see `DeviceLocationReporter`). Foreground only.
-  Stream<GpsFix> positionStream({int distanceFilterMeters = 250}) =>
+  ///
+  /// While the location is pinned by hand it is one fix, the pinned township's
+  /// [manualFix], on a stream that stays open: a pinned location never moves,
+  /// and a stream that finished would read as location services going away.
+  Stream<GpsFix> positionStream({int distanceFilterMeters = 250}) {
+    final manual = _manualTown();
+    if (manual != null) {
+      return Stream<GpsFix>.multi((controller) async {
+        controller.add(await manualFix(manual));
+      });
+    }
+    return _devicePositions(distanceFilterMeters);
+  }
+
+  Stream<GpsFix> _devicePositions(int distanceFilterMeters) =>
       Geolocator.getPositionStream(
         locationSettings: LocationSettings(
           accuracy: LocationAccuracy.medium,
@@ -251,6 +283,8 @@ class LocationService {
   /// rather than GPS), else a medium-accuracy live read. Never throws; null
   /// when location is unavailable/denied or no position could be resolved.
   Future<GpsFix?> currentFix() async {
+    final manual = _manualTown();
+    if (manual != null) return manualFix(manual);
     try {
       if (!await _isAvailable()) return null;
       return await _fix();
@@ -275,6 +309,8 @@ class LocationService {
   /// cached fix is null, so it can fall back to the nationwide view right away
   /// instead of holding the previous frame for the live-read window.
   Future<GpsFix?> lastKnownFix() async {
+    final manual = _manualTown();
+    if (manual != null) return manualFix(manual);
     try {
       return await _lastKnownFix();
     } catch (error, stackTrace) {
@@ -289,8 +325,11 @@ class LocationService {
     }
   }
 
-  /// The current township from GPS, or null if unavailable / no fix.
+  /// The current township from GPS, or null if unavailable / no fix; the
+  /// pinned township while the location is set by hand.
   Future<Town?> currentTown() async {
+    final manual = _manualTown();
+    if (manual != null) return manual;
     try {
       if (!await _isAvailable()) return null;
       final fix = await _fix();
@@ -314,7 +353,71 @@ class LocationService {
 
   /// The township containing ([lat], [lng]) — for callers that already hold a
   /// fix (the foreground position stream) and must not pay for another one.
-  Future<Town?> townAt(double lat, double lng) => _resolve(lat, lng);
+  ///
+  /// While the location is pinned by hand every fix is the pinned township's,
+  /// so this is that township without a lookup.
+  Future<Town?> townAt(double lat, double lng) async =>
+      _manualTown() ?? await _resolve(lat, lng);
+
+  /// The point reported for [town] while the location is pinned to it: a
+  /// point inside the township with [_manualMarginDeg] of it on every side.
+  ///
+  /// Not simply the directory's point for the township. The server places a
+  /// device by the coordinates it reports, and the directory point of
+  /// 屏東縣瑪家鄉 lies inside 內埔鄉 — reporting it would pin the user's
+  /// alerts to the neighbouring township. The margin keeps the point clear of
+  /// a border the server's polygons may draw a little differently. Searched
+  /// outward from the directory point, once per township; the directory
+  /// point itself when there are no boundaries to test against.
+  Future<GpsFix> manualFix(Town town) async {
+    final cached = _manualFixes[town.code];
+    if (cached != null) return cached;
+    final boundaries = _boundaries;
+    final GpsFix fix = boundaries == null
+        ? (lat: town.lat, lng: town.lng)
+        : _interiorPoint(await boundaries, town);
+    return _manualFixes[town.code] = fix;
+  }
+
+  final Map<String, GpsFix> _manualFixes = {};
+
+  /// Clearance from the township's border for [manualFix], about 500 m.
+  static const double _manualMarginDeg = 0.005;
+
+  /// Spacing of the points [manualFix] tries, about 200 m.
+  static const double _manualStepDeg = 0.002;
+
+  /// How many rings of points [manualFix] tries around the directory point,
+  /// about 10 km out.
+  static const int _manualRings = 50;
+
+  static GpsFix _interiorPoint(TownBoundaries boundaries, Town town) {
+    bool inside(double lat, double lng) =>
+        boundaries.codeAt(lat, lng) == town.code;
+    bool clear(double lat, double lng) =>
+        inside(lat, lng) &&
+        inside(lat + _manualMarginDeg, lng) &&
+        inside(lat - _manualMarginDeg, lng) &&
+        inside(lat, lng + _manualMarginDeg) &&
+        inside(lat, lng - _manualMarginDeg);
+    // Clear of the border first; failing that (a township narrower than the
+    // margin), anywhere inside it.
+    for (final accept in [clear, inside]) {
+      if (accept(town.lat, town.lng)) return (lat: town.lat, lng: town.lng);
+      for (var ring = 1; ring <= _manualRings; ring++) {
+        for (var dy = -ring; dy <= ring; dy++) {
+          for (var dx = -ring; dx <= ring; dx++) {
+            if (dx.abs() != ring && dy.abs() != ring) continue;
+            final lat = town.lat + dy * _manualStepDeg;
+            final lng = town.lng + dx * _manualStepDeg;
+            if (accept(lat, lng)) return (lat: lat, lng: lng);
+          }
+        }
+      }
+    }
+    Log.warning('location mode: no point found inside ${town.code}');
+    return (lat: town.lat, lng: town.lng);
+  }
 
   /// How far off the coast a fix may be and still belong to the township it is
   /// beside — a phone on a pier whose fix drifts offshore, a boat at the quay.

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math' show Point;
 
 import 'package:dpip/app/theme/app_spacing.dart';
+import 'package:dpip/core/geo/location_mode.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/platform/render_tier.dart';
@@ -150,7 +151,8 @@ class BaseMap extends StatefulWidget {
   /// own location + heading session and starts only once location permission is
   /// granted (Android logs and skips otherwise); nothing is drawn when it is
   /// denied. Styling is whatever the platform provides — the plugin exposes no
-  /// hook for colours.
+  /// hook for colours. Never drawn while the location is pinned by hand
+  /// (`LocationMode`), whatever this says.
   final bool showUserLocation;
 
   /// Whether the initial native style contains the terrain DEM and hillshade.
@@ -536,6 +538,13 @@ class _BaseMapState extends State<BaseMap> with WidgetsBindingObserver {
     // host rather than left to the bare CDN's balance (see [staticLbOrigin]).
     // `watch`, so a region change reloads the style onto the other host.
     final lbRegion = context.watch<RegionSelection>().lb;
+    // A township pinned by hand turns the GPS off, and the native puck runs its
+    // own location session; it is not drawn while the location is manual.
+    // Nullable so a tree without the mode (a widget test) keeps the default.
+    final manualLocation = context.select<LocationMode?, bool>(
+      (mode) => mode?.isManual ?? false,
+    );
+    final showUserLocation = widget.showUserLocation && !manualLocation;
     final palette =
         brightness == Brightness.light && widget.lightPalette != null
         ? widget.lightPalette!
@@ -595,10 +604,10 @@ class _BaseMapState extends State<BaseMap> with WidgetsBindingObserver {
       rotateGesturesEnabled: widget.interactive,
       tiltGesturesEnabled: false,
       dragEnabled: widget.interactive,
-      myLocationEnabled: widget.showUserLocation,
+      myLocationEnabled: showUserLocation,
       // `compass` is the heading-cone mode; MapLibreMap asserts anything other
       // than `normal` requires myLocationEnabled, so pair them.
-      myLocationRenderMode: widget.showUserLocation
+      myLocationRenderMode: showUserLocation
           ? MyLocationRenderMode.compass
           : MyLocationRenderMode.normal,
       onMapClick: widget.onMapClick == null

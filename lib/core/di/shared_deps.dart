@@ -1,5 +1,6 @@
 import 'package:dpip/core/geo/device_location_reporter.dart';
 import 'package:dpip/core/geo/device_registration.dart';
+import 'package:dpip/core/geo/location_mode.dart';
 import 'package:dpip/core/geo/location_monitor.dart';
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/geo/town_boundaries.dart';
@@ -67,6 +68,7 @@ class SharedDeps {
     this.deviceRegistration,
     required this.backgroundLocation,
     required this.locationMonitor,
+    required this.locationMode,
     required this.permissionHealth,
     required this.onboarding,
     required this.locale,
@@ -145,6 +147,9 @@ class SharedDeps {
   /// App-wide location health monitor (also provided) — status + recovery when
   /// GPS / permission changes mid-session.
   final LocationMonitor locationMonitor;
+
+  /// Whether the location comes from the GPS or a township pinned by hand.
+  final LocationMode locationMode;
 
   /// One app-wide answer to whether alerts can still reach the user.
   final PermissionHealth permissionHealth;

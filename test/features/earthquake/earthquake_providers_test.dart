@@ -14,6 +14,7 @@ import 'package:dpip/core/build/demo_flags.dart';
 import 'package:dpip/core/di/shared_deps.dart';
 import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/error/result.dart';
+import 'package:dpip/core/geo/location_mode.dart';
 import 'package:dpip/core/geo/device_location_reporter.dart';
 import 'package:dpip/core/geo/location_monitor.dart';
 import 'package:dpip/core/geo/location_service.dart';
@@ -321,6 +322,7 @@ void main() {
         IosWidgetSnapshotWriter(isSupportedPlatform: false),
       ),
       locationService: location,
+      locationMode: LocationMode(settings, towns),
       deviceLocationReporter: reporter,
       backgroundLocation: BackgroundLocationService(
         platform: 0,

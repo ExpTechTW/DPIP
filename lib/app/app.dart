@@ -7,6 +7,7 @@ import 'package:dpip/core/di/shared_deps.dart';
 import 'package:dpip/core/diagnostics/startup_report.dart';
 import 'package:dpip/core/geo/device_location_reporter.dart';
 import 'package:dpip/core/geo/device_registration.dart';
+import 'package:dpip/core/geo/location_mode.dart';
 import 'package:dpip/core/geo/location_monitor.dart';
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/logging/log.dart';
@@ -62,6 +63,7 @@ class DpipApp extends StatelessWidget {
         deviceRegistration: deps.deviceRegistration,
         backgroundLocation: deps.backgroundLocation,
         locationMonitor: deps.locationMonitor,
+        locationMode: deps.locationMode,
         permissionHealth: deps.permissionHealth,
         statusPage: deps.statusPage,
         onboarding: deps.onboarding,
@@ -159,6 +161,7 @@ class _AppServicesHost extends StatefulWidget {
     required this.deviceRegistration,
     required this.backgroundLocation,
     required this.locationMonitor,
+    required this.locationMode,
     required this.permissionHealth,
     required this.statusPage,
     required this.onboarding,
@@ -174,6 +177,7 @@ class _AppServicesHost extends StatefulWidget {
   final DeviceRegistration? deviceRegistration;
   final BackgroundLocationService backgroundLocation;
   final LocationMonitor locationMonitor;
+  final LocationMode locationMode;
   final PermissionHealth permissionHealth;
   final StatusPageMonitor statusPage;
   final OnboardingStore onboarding;
@@ -212,6 +216,7 @@ class _AppServicesHostState extends State<_AppServicesHost>
     WidgetHomeIntent.onOpen = () => appRouter.goNamed(AppRoutes.home);
     unawaited(WidgetHomeIntent.listen());
     widget.onboarding.addListener(_onOnboardingChanged);
+    widget.locationMode.addListener(_onLocationModeChanged);
     _tokenChanges = widget.notificationService.tokenChanges.listen(
       (_) => _onTokenChanged(),
     );
@@ -244,6 +249,15 @@ class _AppServicesHostState extends State<_AppServicesHost>
 
   void _onOnboardingChanged() {
     if (widget.onboarding.isComplete) _onReady();
+  }
+
+  /// The location source changed. Background reporting follows it — stopped
+  /// while a township is pinned by hand, armed again on the way back to the
+  /// GPS; the location monitor re-places the device itself. Before onboarding
+  /// completes nothing is armed yet, and [_onReady] reads the mode then.
+  void _onLocationModeChanged() {
+    if (!_ready) return;
+    unawaited(_armBackground());
   }
 
   /// Runs the permission-*dependent* app setup once, after onboarding (which
@@ -281,7 +295,11 @@ class _AppServicesHostState extends State<_AppServicesHost>
   /// Resolves the current township and starts reporting — but only when
   /// foreground location is already granted. Never requests (see [_onReady]).
   Future<void> _startLocationIfGranted() async {
-    if (!await widget.locationService.granted()) return;
+    // A township pinned by hand needs no permission.
+    if (!widget.locationService.isManual &&
+        !await widget.locationService.granted()) {
+      return;
+    }
     if (!mounted) return;
     // Independent of the town fix below, which can take up to 10 s cold —
     // foreground move reporting starts immediately rather than behind it.
@@ -325,6 +343,13 @@ class _AppServicesHostState extends State<_AppServicesHost>
   /// and replayed in the in-app log page, which is where this gets diagnosed
   /// from a user's phone.
   Future<void> _armBackground() async {
+    // A pinned location must not be overwritten by the GPS the moment the app
+    // goes to the background — native reporting stays off while it is set.
+    if (widget.locationService.isManual) {
+      Log.info('background location: location set by hand — stopped');
+      await widget.backgroundLocation.stop();
+      return;
+    }
     final token = widget.notificationService.token;
     if (token == null) {
       Log.info('background location: no push token yet — not armed');
@@ -345,6 +370,7 @@ class _AppServicesHostState extends State<_AppServicesHost>
     widget.notificationService.settingsLink.stop();
     WidgetHomeIntent.reset();
     widget.onboarding.removeListener(_onOnboardingChanged);
+    widget.locationMode.removeListener(_onLocationModeChanged);
     unawaited(_tokenChanges?.cancel());
     widget.deviceRegistration?.dispose();
     WidgetsBinding.instance.removeObserver(this);

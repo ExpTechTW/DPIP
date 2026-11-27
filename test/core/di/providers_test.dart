@@ -12,6 +12,7 @@ import 'package:dpip/core/astro/tle_store.dart';
 import 'package:dpip/core/di/core_providers.dart';
 import 'package:dpip/core/di/shared_deps.dart';
 import 'package:dpip/core/error/result.dart';
+import 'package:dpip/core/geo/location_mode.dart';
 import 'package:dpip/core/geo/device_location_reporter.dart';
 import 'package:dpip/core/geo/location_monitor.dart';
 import 'package:dpip/core/geo/location_service.dart';
@@ -221,6 +222,7 @@ SharedDeps _deps() {
       IosWidgetSnapshotWriter(isSupportedPlatform: false),
     ),
     locationService: location,
+    locationMode: LocationMode(settings, const TownDirectory({})),
     deviceLocationReporter: DeviceLocationReporter(
       positions: () => const Stream<GpsFix>.empty(),
       onMoved: (_) async => true,
