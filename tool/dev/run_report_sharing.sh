@@ -31,18 +31,10 @@ eqr_stage_fonts "$package"
 shift 6
 
 flavor=production
-qa_defines=()
+story_qa=false
 if [[ $profile == qa ]]; then
   flavor=storyqa
-  story_symbol="$(python3 - "$package/manifest.json" <<'PYQA'
-import json
-import sys
-with open(sys.argv[1]) as manifest:
-    (symbol,) = (name for name in json.load(manifest)["symbols"] if name.startswith("eqr_qa_"))
-    print(symbol)
-PYQA
-)"
-  qa_defines=(--dart-define="DPIP_EQR_STORY_SYMBOL=$story_symbol")
+  story_qa=true
 fi
 if [[ $platform == ios ]]; then
   # Xcode reads this per-invocation file. The project selects the only matching
@@ -74,4 +66,7 @@ else
 fi
 
 printf 'Report renderer staging: %s\n' "$stage" >&2
-exec tool/run.sh --flavor "$flavor" -d "$device" ${qa_defines[@]+"${qa_defines[@]}"} "$@"
+exec tool/run.sh --flavor "$flavor" -d "$device" "$@" \
+  --dart-define="DPIP_EQR_STORY_QA=$story_qa" \
+  --dart-define="DPIP_EQR_REVISION=$eqr_revision" \
+  --dart-define="DPIP_EQR_MANIFEST_SHA256=$(eqr_manifest_hash "$profile")"

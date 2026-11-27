@@ -15,7 +15,6 @@ import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/features/earthquake/data/earthquake_api.dart';
 import 'package:dpip/features/earthquake/data/report_repository_impl.dart';
 import 'package:dpip/features/earthquake/domain/earthquake_report_snapshot.dart';
-import 'package:dpip/features/earthquake/domain/earthquake_share_input.dart';
 import 'package:dpip/features/earthquake/domain/earthquake_share_input_v3.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -268,30 +267,44 @@ void main() {
     expect(snapshot.sourceNumbers['/list/臺南市/town/新化/int'], '9');
   });
 
-  test('production share source emits v2 only for the verified body', () async {
+  test('each display response retains its own eligible v3 source', () async {
     var body = modern;
-    final repository = _repository(_Origin((_) async => _response(body)));
-    final report = (await repository.get(_modernId)).valueOrNull!;
-    final input = (await repository.getShareInput(report)).valueOrNull!;
-    expect((input as EarthquakeShareInputV2).bytes, _fixture('modern.v2'));
+    final origin = _Origin((_) async => _response(body));
+    final repository = _repository(origin);
+    final first = (await repository.getDetailWithSource(_modernId))
+        .valueOrNull!;
 
-    // The same display model from a revised source needs new evidence.
-    body = utf8.encode(modernText.replaceFirst('"mag":3.9', '"mag":3.90'));
-    final revised = (await repository.getShareInput(report)).valueOrNull;
-    expect(
-      revised,
-      isA<UnsupportedEarthquakeShareInput>().having(
-        (value) => value.code,
-        'code',
-        EarthquakeShareInputError.snapshotMismatch,
-      ),
+    // The same display model can have two distinct source revisions.
+    body = Uint8List.fromList(
+      utf8.encode(modernText.replaceFirst('"mag":3.9', '"mag":3.90')),
     );
+    final revised = (await repository.getDetailWithSource(_modernId))
+        .valueOrNull!;
+    final firstSource = first.source.valueOrNull!;
+    final revisedSource = revised.source.valueOrNull!;
+    expect(revised.report, first.report);
+    expect(firstSource.body, modern);
+    expect(revisedSource.body, body);
+    expect(firstSource.bodySha256, isNot(revisedSource.bodySha256));
+    expect(
+      adaptEarthquakeShareSnapshotV3(firstSource).contentSha256,
+      isNot(adaptEarthquakeShareSnapshotV3(revisedSource).contentSha256),
+    );
+    expect(origin.requests, hasLength(2));
 
     body = _fixture('historical');
-    final historical = (await repository.get(_historicalId)).valueOrNull!;
+    final historical = (await repository.getDetailWithSource(_historicalId))
+        .valueOrNull!;
+    expect(historical.report.id, _historicalId);
     expect(
-      (await repository.getShareInput(historical)).valueOrNull,
-      isA<UnsupportedEarthquakeShareInput>(),
+      () => adaptEarthquakeShareSnapshotV3(historical.source.valueOrNull!),
+      throwsA(
+        isA<EarthquakeReportSourceException>().having(
+          (error) => error.code,
+          'code',
+          EarthquakeReportSourceError.unsupportedProfile,
+        ),
+      ),
     );
   });
 

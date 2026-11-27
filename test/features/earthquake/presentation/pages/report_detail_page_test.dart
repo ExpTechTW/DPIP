@@ -29,7 +29,6 @@ import 'package:dpip/core/realtime/server_time_source.dart';
 import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/features/earthquake/domain/earthquake_report.dart';
-import 'package:dpip/features/earthquake/domain/earthquake_share_input.dart';
 import 'package:dpip/features/earthquake/domain/partial_earthquake_report.dart';
 import 'package:dpip/features/earthquake/domain/report_list_query.dart';
 import 'package:dpip/features/earthquake/domain/report_repository.dart';
@@ -183,9 +182,14 @@ class _Reports implements ReportRepository, EarthquakeShareSource {
   final List<int> replayProbes = [];
 
   @override
-  Future<Result<EarthquakeShareInput>> getShareInput(
-    EarthquakeReport report,
-  ) async => Ok(adaptEarthquakeShareInput(report));
+  Future<Result<SourcedEarthquakeReport>> getDetailWithSource(
+    String id,
+  ) async => (await get(id)).map(
+    (report) => (
+      report: report,
+      source: const Err(DecodeFailure('Invalid source evidence')),
+    ),
+  );
 
   @override
   Future<Result<EarthquakeReport>> get(String id) async {
@@ -372,6 +376,7 @@ void main() {
     required TownDirectory towns,
     required GoRouter router,
     ThemeData? theme,
+    Locale locale = const Locale('en'),
   }) async {
     useSurface(tester);
     await tester.pumpWidget(
@@ -386,7 +391,7 @@ void main() {
         ],
         child: MaterialApp.router(
           theme: theme,
-          locale: const Locale('en'),
+          locale: locale,
           localizationsDelegates: appLocalizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           routerConfig: router,
@@ -482,7 +487,41 @@ void main() {
     expect(modal, findsNothing);
     expect(find.text('Report page').hitTestable(), findsOneWidget);
     expect(share.hitTestable(), findsOneWidget);
+    expect(reports.gets, 1);
   });
+
+  testWidgets(
+    'untrusted share evidence leaves ordinary report detail available',
+    (tester) async {
+      final reports = _Reports()..next = Ok(_report());
+      final settings = SettingsStore.inMemory();
+      final router = nestedRouter(reports);
+      final l10n = lookupAppLocalizations(kHomeLocale);
+      await pumpPage(
+        tester,
+        reports: reports,
+        client: _BytesClient(RegionSelection(settings)),
+        settings: settings,
+        regions: RegionStore(settings),
+        towns: const TownDirectory({}),
+        router: router,
+        locale: kHomeLocale,
+      );
+      await tester.pumpAndSettle();
+      expect(find.byType(ReportDetailPage), findsOneWidget);
+      await tester.tap(find.byTooltip(l10n.reportShareTitle));
+      await tester.pumpAndSettle();
+      expect(find.text(l10n.reportShareUnsupportedReport), findsOneWidget);
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+      expect(find.byType(ReportDetailPage), findsOneWidget);
+      expect(
+        find.byTooltip(l10n.reportShareTitle).hitTestable(),
+        findsOneWidget,
+      );
+      expect(reports.gets, 1);
+    },
+  );
 
   testWidgets('a 404 from the archive probe hides replay', (tester) async {
     final report = _report(origin: DateTime.utc(2024, 2, 19, 15, 59, 59));

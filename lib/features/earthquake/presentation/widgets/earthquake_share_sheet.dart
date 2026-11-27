@@ -13,7 +13,8 @@ import 'package:dpip/core/platform/image_clipboard.dart';
 import 'package:dpip/core/platform/image_saver.dart';
 import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/features/earthquake/domain/earthquake_report.dart';
-import 'package:dpip/features/earthquake/domain/earthquake_share_input.dart';
+import 'package:dpip/features/earthquake/domain/earthquake_report_snapshot.dart';
+import 'package:dpip/features/earthquake/domain/earthquake_share_input_v3.dart';
 import 'package:dpip/features/earthquake/presentation/widgets/earthquake_share_png_cache.dart';
 import 'package:dpip/features/earthquake/presentation/widgets/report_image_save_feedback.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
@@ -32,11 +33,13 @@ enum _ExportAction { save, copy, share }
 typedef _SnapshotKey = ({
   String reportId,
   String bodySha256,
-  String renderSha256,
+  String contentSha256,
 });
 
 typedef _RenderKey = ({
   _SnapshotKey snapshot,
+  int schemaVersion,
+  ({String revision, String assets, String profile}) renderer,
   EqShareFormat format,
   EqMapMode mode,
   EqTheme theme,
@@ -64,7 +67,7 @@ class EarthquakeShareSheet extends StatefulWidget {
   const EarthquakeShareSheet({
     super.key,
     required this.report,
-    required this.loadInput,
+    required this.source,
     required this.saver,
     required this.isReportCurrent,
     this.openRenderer = ReportPicture.open,
@@ -73,7 +76,7 @@ class EarthquakeShareSheet extends StatefulWidget {
   });
 
   final EarthquakeReport report;
-  final Future<Result<EarthquakeShareInput>> Function() loadInput;
+  final Result<CoreEarthquakeReportSnapshot> source;
   final ImageSaver saver;
   final bool Function() isReportCurrent;
   final Future<Result<ReportPicture>> Function() openRenderer;
@@ -106,7 +109,7 @@ class _EarthquakeShareSheetState extends State<EarthquakeShareSheet>
   final _cache = EarthquakeSharePngCache<_RenderKey>();
   final _inFlight = <_RenderKey, Future<Uint8List>>{};
   Future<void> _renderTail = Future.value();
-  _SnapshotKey? _snapshot;
+  EarthquakeShareInputV3? _input;
   _RenderKey? _requested;
   int _cacheEpoch = 0;
   int _generation = 0;
@@ -126,7 +129,7 @@ class _EarthquakeShareSheetState extends State<EarthquakeShareSheet>
   }
 
   void _invalidateSnapshot() {
-    _snapshot = null;
+    _input = null;
     _requested = null;
     _inFlight.clear();
     ++_cacheEpoch;
@@ -167,7 +170,8 @@ class _EarthquakeShareSheetState extends State<EarthquakeShareSheet>
   @override
   void didUpdateWidget(covariant EarthquakeShareSheet oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.report != oldWidget.report) {
+    if (widget.report != oldWidget.report ||
+        !identical(widget.source, oldWidget.source)) {
       _invalidateSnapshot();
       _start();
     }
@@ -227,6 +231,9 @@ class _EarthquakeShareSheetState extends State<EarthquakeShareSheet>
       });
     } catch (error) {
       if (!_isActive(generation)) return;
+      if (error is EarthquakeReportSourceException) {
+        Log.warning('Earthquake sharing source ${widget.report.id}: $error');
+      }
       setState(() {
         _issue = _issueFor(error);
         _replacePreview(null);
@@ -239,36 +246,16 @@ class _EarthquakeShareSheetState extends State<EarthquakeShareSheet>
   Future<Uint8List> _generate(int generation, _ShareOptions options) async {
     final locale = _locale!;
     if (locale != kHomeLocale) throw _ShareIssue.language;
-    final loaded = await widget.loadInput();
     if (!_isCurrent(generation)) throw _ShareIssue.report;
-    if (loaded.failureOrNull case final failure?) {
-      _invalidateSnapshot();
-      throw failure;
-    }
-    final input = loaded.valueOrNull;
-    if (input is! EarthquakeShareInputV2) {
-      _invalidateSnapshot();
-      throw _ShareIssue.report;
-    }
-    final verified = input.verifiedSnapshot;
-    if (verified == null || verified.reportId != widget.report.id) {
-      _invalidateSnapshot();
-      throw _ShareIssue.report;
-    }
-
-    final snapshot = (
-      reportId: verified.reportId,
-      bodySha256: verified.bodySha256,
-      renderSha256: input.renderSha256,
-    );
-    if (_snapshot != snapshot) {
-      setState(() {
-        _invalidateSnapshot();
-        _snapshot = snapshot;
-      });
-    }
+    final input = _input ??= _adaptDisplayedSource();
     final key = (
-      snapshot: snapshot,
+      snapshot: (
+        reportId: input.snapshot.reportId,
+        bodySha256: input.snapshot.bodySha256,
+        contentSha256: input.contentSha256,
+      ),
+      schemaVersion: 3,
+      renderer: ReportPicture.cacheIdentity,
       format: options.format,
       mode: options.mode,
       theme: options.theme,
@@ -279,6 +266,26 @@ class _EarthquakeShareSheetState extends State<EarthquakeShareSheet>
     if (cached != null) return cached;
     setState(() => _rendering = true);
     return _inFlight[key] ?? _scheduleRender(key, input.bytes);
+  }
+
+  EarthquakeShareInputV3 _adaptDisplayedSource() {
+    final source = widget.source;
+    if (source.failureOrNull case final failure?) {
+      final detail = failure is DecodeFailure ? failure.cause : null;
+      Log.warning(
+        'Earthquake sharing source ${widget.report.id}: ${detail ?? failure.message}',
+      );
+      throw _ShareIssue.report;
+    }
+    final snapshot = source.valueOrNull!;
+    if (snapshot.reportId != widget.report.id ||
+        snapshot.report != widget.report) {
+      Log.warning(
+        'Earthquake sharing source does not match ${widget.report.id}',
+      );
+      throw _ShareIssue.report;
+    }
+    return adaptEarthquakeShareSnapshotV3(snapshot);
   }
 
   Future<Uint8List> _scheduleRender(_RenderKey key, Uint8List input) {
@@ -299,7 +306,7 @@ class _EarthquakeShareSheetState extends State<EarthquakeShareSheet>
           final Uint8List png;
           try {
             if (!isPending() || _requested != key) throw _ShareIssue.report;
-            final response = await renderer.renderSharePngV2(
+            final response = await renderer.renderSharePngV3(
               input,
               mode: key.mode,
               theme: key.theme,
@@ -464,6 +471,7 @@ class _EarthquakeShareSheetState extends State<EarthquakeShareSheet>
 
   _ShareIssue _issueFor(Object error) => switch (error) {
     _ShareIssue issue => issue,
+    EarthquakeReportSourceException() => _ShareIssue.report,
     ReportPictureFailure(reason: ReportPictureFailureReason.unavailable) =>
       _ShareIssue.renderer,
     ReportPictureFailure(
@@ -704,7 +712,7 @@ class _EarthquakeShareSheetState extends State<EarthquakeShareSheet>
               label: l10n.reportSharePreview,
               child: RawImage(image: image, fit: BoxFit.contain),
             ),
-            null when _snapshot == null || _rendering => Center(
+            null when _input == null || _rendering => Center(
               child: CircularProgressIndicator(
                 semanticsLabel: l10n.commonLoading,
               ),

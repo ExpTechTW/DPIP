@@ -24,6 +24,7 @@ import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/core/settings/setting_keys.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/features/earthquake/domain/earthquake_report.dart';
+import 'package:dpip/features/earthquake/domain/earthquake_report_snapshot.dart';
 import 'package:dpip/features/earthquake/replay_eew_probe.dart';
 import 'package:dpip/shared/seismic/intensity.dart';
 import 'package:dpip/features/earthquake/domain/report_repository.dart';
@@ -142,16 +143,17 @@ class _ReportDetailPageState extends State<ReportDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    final repository = context.read<ReportRepository>();
+    final source = context.read<EarthquakeShareSource>();
     return Scaffold(
       body: Stack(
         children: [
           Positioned.fill(
-            child: AsyncView<EarthquakeReport>(
+            child: AsyncView<SourcedEarthquakeReport>(
               key: ValueKey(widget.reportId),
-              future: () => repository.get(widget.reportId),
-              builder: (context, report) => _ReportMapDetail(
-                report: report,
+              future: () => source.getDetailWithSource(widget.reportId),
+              builder: (context, detail) => _ReportMapDetail(
+                report: detail.report,
+                source: detail.source,
                 sheetExpanded: _sheetExpanded,
                 imageSaver: _imageSaver,
               ),
@@ -279,11 +281,13 @@ List<_IntensityGroup> _buildIntensityGroups(EarthquakeReport report) {
 class _ReportMapDetail extends StatefulWidget {
   const _ReportMapDetail({
     required this.report,
+    required this.source,
     required this.sheetExpanded,
     required this.imageSaver,
   });
 
   final EarthquakeReport report;
+  final Result<CoreEarthquakeReportSnapshot> source;
 
   /// Hands [ReportDetailPage.imageSaver] down to the sheet's report-image card
   /// — the widget that owns the save button.
@@ -572,7 +576,7 @@ class _ReportMapDetailState extends State<_ReportMapDetail> {
 
   void _openShare() {
     final report = widget.report;
-    final source = context.read<EarthquakeShareSource>();
+    final source = widget.source;
     unawaited(
       showModalBottomSheet<void>(
         context: context,
@@ -587,9 +591,12 @@ class _ReportMapDetailState extends State<_ReportMapDetail> {
           heightFactor: 0.96,
           child: EarthquakeShareSheet(
             report: report,
-            loadInput: () => source.getShareInput(report),
+            source: source,
             saver: widget.imageSaver,
-            isReportCurrent: () => mounted && widget.report == report,
+            isReportCurrent: () =>
+                mounted &&
+                widget.report == report &&
+                identical(widget.source, source),
           ),
         ),
       ),

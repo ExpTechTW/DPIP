@@ -37,7 +37,7 @@ Future<void> main() async {
 Future<int> _renderMatrix() async {
   if (!reportPictureStoryQa) throw StateError('Story QA flavor required');
   final fixture = ReportPictureFixtures.loadVerified();
-  final input = fixture.verifiedInput();
+  final input = fixture.inputV3();
   final sandbox = await getApplicationDocumentsDirectory();
   final directory = await Directory('${sandbox.path}/report-picture-matrix')
       .create(recursive: true);
@@ -54,7 +54,7 @@ Future<int> _renderMatrix() async {
       for (final mode in modes) {
         for (final theme in EqTheme.values) {
           stopwatch.reset();
-          final response = await renderer.renderSharePngV2(
+          final response = await renderer.renderSharePngV3(
             input.bytes,
             format: format,
             mode: mode,

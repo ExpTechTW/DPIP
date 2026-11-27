@@ -94,7 +94,7 @@ Future<Uint8List> renderPreviewPng(
   Uint8List input,
   EqTheme theme, {
   EqShareFormat format = EqShareFormat.landscape16By9,
-  Future<Result<ReportPicture>> Function() open = ReportPicture.open,
+  Future<Result<ReportPicture>> Function() open = ReportPicture.openLegacyV2,
 }) async {
   final opened = await open();
   final renderer = opened.valueOrNull ?? (throw opened.failureOrNull!);

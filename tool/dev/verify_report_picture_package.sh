@@ -8,4 +8,5 @@ if [[ $# != 4 || ! $1 =~ ^(ios|android)$ ]]; then
   printf 'Usage: %s {ios|android} <Runner.app or APK> <staged profile directory> <Xcode link map or Android zipalign path>\n' "$0" >&2
   exit 2
 fi
-exec python3 tool/internal/verify_report_picture_package.py "$@" "$eqr_revision"
+digest="$(eqr_manifest_hash "$(basename "$3")")"
+exec python3 tool/internal/verify_report_picture_package.py "$@" "$eqr_revision" "$eqr_tree" "$digest"

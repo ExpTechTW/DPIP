@@ -10,8 +10,6 @@ fi
 source tool/internal/report_picture_native.sh
 checkout="$(cd "$1" && pwd -P)"
 output="$2"
-# Run the build driver from the pin, independent of the source checkout's HEAD.
-driver="$(mktemp "$checkout/scripts/.dpip-build-story.XXXXXX")"
-trap 'rm -f "$driver"' EXIT
-git -C "$checkout" show "$eqr_revision:scripts/build-story-qa.sh" > "$driver"
-bash "$driver" "$eqr_revision" "$output"
+# The pinned driver uses its script path to locate the Git checkout.
+driver="$(git -C "$checkout" show "$eqr_revision:scripts/build-story-qa.sh")"
+exec bash -c "$driver" "$checkout/scripts/build-story-qa.sh" "$eqr_revision" "$output"

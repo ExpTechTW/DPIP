@@ -8,7 +8,7 @@ import 'package:dpip/core/platform/image_saver.dart';
 import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/features/earthquake/domain/earthquake_report.dart';
 import 'package:dpip/features/earthquake/domain/earthquake_report_snapshot.dart';
-import 'package:dpip/features/earthquake/domain/earthquake_share_input.dart';
+import 'package:dpip/features/earthquake/domain/earthquake_share_input_v3.dart';
 import 'package:dpip/features/earthquake/presentation/widgets/earthquake_share_sheet.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/seismic/report_picture/report_picture.dart';
@@ -58,30 +58,14 @@ class _Saver implements ImageSaver {
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
-  final source = EarthquakeReportSnapshot.decode(
+  final source = CoreEarthquakeReportSnapshot.decode(
     File(
       'test/features/earthquake/domain/fixtures/share_input/exptech-modern.json',
     ).readAsBytesSync(),
     requestedReportId: '115000-2026-0422-111524',
   );
-  EarthquakeShareInputV2 verified(EarthquakeReportSnapshot snapshot) =>
-      adaptEarthquakeShareSnapshot(
-        snapshot,
-        identities: VerifiedEarthquakeReportIdentities(
-          bodySha256: snapshot.bodySha256,
-          scale: ReportIntensityScale.cwa2020,
-          magnitudeIsMl: true,
-          countyCodes: const {'臺東縣': '10014', '花蓮縣': '10015'},
-          stationCodes: const {
-            ('臺東縣', '成功'): 'CHK',
-            ('臺東縣', '長濱'): 'ECB',
-            ('臺東縣', '池上'): 'ECS',
-            ('臺東縣', '東河'): 'EDH',
-            ('花蓮縣', '紅葉'): 'EHY',
-          },
-        ),
-      ) as EarthquakeShareInputV2;
-  final input = verified(source);
+  final input = adaptEarthquakeShareSnapshotV3(source);
+  final trusted = Ok(source);
   final l10n = lookupAppLocalizations(kHomeLocale);
   final retry = find.text(l10n.commonRetry);
   final save = find.text(l10n.reportShareSave);
@@ -95,7 +79,7 @@ void main() {
   });
 
   Widget dialog({
-    Future<Result<EarthquakeShareInput>> Function()? load,
+    Result<CoreEarthquakeReportSnapshot>? evidence,
     Future<Result<ReportPicture>> Function()? open,
     EarthquakeReport? report,
     ImageSaver? saver,
@@ -109,7 +93,7 @@ void main() {
     home: Scaffold(
       body: EarthquakeShareSheet(
         report: report ?? source.report,
-        loadInput: load ?? () async => Ok(input),
+        source: evidence ?? trusted,
         openRenderer: open ?? () async => throw StateError('Unexpected open'),
         saver: saver ?? _Saver(),
         isReportCurrent: () => true,
@@ -349,7 +333,7 @@ void main() {
   testWidgets(
     'a new body hash invalidates the cache even with the same model',
     (tester) async {
-      final revision = EarthquakeReportSnapshot.decode(
+      final revision = CoreEarthquakeReportSnapshot.decode(
         Uint8List.fromList([
           ...File(
             'test/features/earthquake/domain/fixtures/share_input/exptech-modern.json',
@@ -359,31 +343,32 @@ void main() {
         requestedReportId: source.report.id,
       );
       expect(revision.report, source.report);
-      final updated = verified(revision);
-      expect(updated.bytes, input.bytes);
-      var activeInput = input;
-      var renders = 0;
-      await tester.pumpWidget(
-        dialog(
-          load: () async => Ok(activeInput),
-          open: () async => Ok(
-            ReportPicture.forTesting((_, _, theme, _) async {
-              renders++;
-              return theme == EqTheme.light ? lightPng : darkPng;
-            }, () {}),
-          ),
-        ),
+      final updated = adaptEarthquakeShareSnapshotV3(revision);
+      expect(updated.contentSha256, isNot(input.contentSha256));
+      final rendered = <(EqTheme, Uint8List)>[];
+      Future<Result<ReportPicture>> open() async => Ok(
+        ReportPicture.forTesting((bytes, _, theme, _) async {
+          rendered.add((theme, bytes));
+          return theme == EqTheme.light ? lightPng : darkPng;
+        }, () {}),
       );
+      await tester.pumpWidget(dialog(open: open));
       await waitForImage(tester);
       await tester.tap(find.text(l10n.themeDark));
       await waitForImage(tester);
-      expect(renders, 2);
-      activeInput = updated;
+      expect(rendered, hasLength(2));
+      await tester.pumpWidget(dialog(evidence: Ok(revision), open: open));
+      await waitForImage(tester);
       await tester.tap(find.text(l10n.themeLight));
       await waitForImage(tester);
-      await tester.tap(find.text(l10n.themeDark));
-      await waitForImage(tester);
-      expect(renders, 4);
+      expect(rendered.map((render) => render.$1), [
+        EqTheme.light,
+        EqTheme.dark,
+        EqTheme.dark,
+        EqTheme.light,
+      ]);
+      expect(rendered[0].$2, input.bytes);
+      expect(rendered[2].$2, updated.bytes);
     },
   );
 
@@ -484,12 +469,14 @@ void main() {
       ),
     );
     await tester.pump();
-    final historical = source.report.copyWith(id: '105006-2016-0206-035726');
+    final historical = CoreEarthquakeReportSnapshot.decode(
+      File(
+        'test/features/earthquake/domain/fixtures/share_input/exptech-historical.json',
+      ).readAsBytesSync(),
+      requestedReportId: '105006-2016-0206-035726',
+    );
     await tester.pumpWidget(
-      dialog(
-        report: historical,
-        load: () async => Ok(adaptEarthquakeShareInput(historical)),
-      ),
+      dialog(report: historical.report, evidence: Ok(historical)),
     );
     pending.complete(lightPng);
     await tester.pumpAndSettle();
@@ -566,13 +553,33 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('an unsupported locale does not load report evidence', (
+  testWidgets('reopening the sheet renders a new preview session', (
+    tester,
+  ) async {
+    var renders = 0;
+    Future<Result<ReportPicture>> open() async => Ok(
+      ReportPicture.forTesting((_, _, _, _) async {
+        return ++renders == 1 ? lightPng : darkPng;
+      }, () {}),
+    );
+    await tester.pumpWidget(dialog(open: open));
+    await waitForImage(tester);
+    expect(await previewPixel(tester), 0xFFFFFFFF);
+    await tester.pumpWidget(const SizedBox.shrink());
+
+    await tester.pumpWidget(dialog(open: open));
+    await waitForImage(tester);
+    expect(await previewPixel(tester), 0x000000FF);
+    expect(renders, 2);
+  });
+
+  testWidgets('an unsupported locale is rejected before sharing', (
     tester,
   ) async {
     await tester.pumpWidget(
       dialog(
         locale: const Locale('en'),
-        load: () async => throw StateError('Unexpected source load'),
+        evidence: const Err(DecodeFailure('Invalid source evidence')),
       ),
     );
     await tester.pumpAndSettle();

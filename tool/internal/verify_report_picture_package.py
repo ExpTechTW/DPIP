@@ -71,13 +71,17 @@ def check_android(apk, zipalign, manifest):
 
 
 if __name__ == "__main__":
-    platform, artifact, directory, inspection, revision = sys.argv[1:]
+    platform, artifact, directory, inspection, revision, tree, digest = sys.argv[1:]
     stage = Path(directory).resolve()
-    manifest = json.loads((stage / "manifest.json").read_text())
+    contents = (stage / "manifest.json").read_bytes()
+    check(hashlib.sha256(contents).hexdigest() == digest, "Unapproved staged manifest")
+    manifest = json.loads(contents)
     check(manifest["source_commit"] == revision, "The stage uses a different source revision")
+    check(manifest["source_tree"] == tree, "The stage uses a different source tree")
     check(manifest["profile"] == stage.name in {"production", "qa"}, "Invalid staged profile")
-    check(manifest["abi_version"] == "0x00010003", "Wrong renderer ABI")
-    check(manifest["capability_mask"] == "0x31f", "Wrong capability mask")
+    check(manifest["abi_version"] == "0x00010004", "Wrong renderer ABI")
+    mask = "0x1b1f" if stage.name == "qa" else "0xb1f"
+    check(manifest["capability_mask"] == mask, "Wrong capability mask")
     if platform == "ios":
         result = check_ios(Path(artifact), Path(inspection), stage, manifest)
     else:

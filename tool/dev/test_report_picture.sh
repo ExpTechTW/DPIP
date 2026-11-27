@@ -26,6 +26,15 @@ build_fixture abi-1-3 -DABI=0x00010003 -DCAPS=0x310 -DWITH_OPTIONS
 build_fixture story-qa -DABI=0x00010003 -DCAPS=0x31f -DWITH_OPTIONS -DWITH_STORY
 build_fixture missing-4-5-symbol -DABI=0x00010003 -DCAPS=0x310
 build_fixture missing-4-5-capability -DABI=0x00010003 -DWITH_OPTIONS
+build_fixture v3-production -DABI=0x00010004 -DCAPS=0xb1f -DWITH_OPTIONS -DWITH_V3
+build_fixture v3-qa -DABI=0x00010004 -DCAPS=0x1b1f -DWITH_OPTIONS -DWITH_V3 -DWITH_STORY -DWITH_STORY_V3
+build_fixture v3-old-minor -DABI=0x00010003 -DCAPS=0xb1f -DWITH_OPTIONS -DWITH_V3
+build_fixture v3-wrong-major -DABI=0x00020004 -DCAPS=0xb1f -DWITH_OPTIONS -DWITH_V3
+build_fixture v3-missing-capability -DABI=0x00010004 -DCAPS=0x31f -DWITH_OPTIONS -DWITH_V3
+build_fixture v3-missing-format -DABI=0x00010004 -DCAPS=0x91f -DWITH_OPTIONS -DWITH_V3
+build_fixture v3-missing-symbol -DABI=0x00010004 -DCAPS=0xb1f -DWITH_OPTIONS
+build_fixture v3-missing-qa-symbol -DABI=0x00010004 -DCAPS=0x1b1f -DWITH_OPTIONS -DWITH_V3 -DWITH_STORY
+build_fixture v3-reserved-story -DABI=0x00010004 -DCAPS=0xf1f -DWITH_OPTIONS -DWITH_V3
 build_fixture missing-abi -DOMIT_ABI
 build_fixture old-abi -DABI=0x00010001
 build_fixture incompatible-major -DABI=0x00020002
@@ -34,7 +43,7 @@ build_fixture missing-16-9-capability -DCAPS=0x010
 build_fixture missing-render -DOMIT_RENDER
 
 pinned flutter test --flavor storyqa \
-  --dart-define=DPIP_EQR_STORY_SYMBOL=eqr_qa_render_story_png_v1 --dart-define="DPIP_EQR_FFI_FIXTURES=$fixtures" \
+  --dart-define=DPIP_EQR_STORY_QA=true --dart-define="DPIP_EQR_FFI_FIXTURES=$fixtures" \
   test/core/platform/native_library_test.dart \
   test/shared/seismic/report_picture_test.dart \
   test/shared/seismic/eq_report_pic_bindings_test.dart "$@"

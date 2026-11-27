@@ -1,39 +1,41 @@
 # 地震分享圖 QA
 
-在 DPIP 根目錄執行。相鄰的 eq-report-pic checkout 必須含有已合併的
-`76662bb9710eafa2a77a694605513163db7c5967`（Rust #17）。需要 Rust 鎖定工具鏈、
-Xcode、Android NDK `28.2.13676358`，以及 Rust 的 iOS arm64、iOS Simulator
-arm64／x86_64、Android arm64／x86_64 targets。
+在 DPIP 根目錄執行。相鄰的 eq-report-pic checkout 須含有合併提交
+`6c2ca6e21c9a50cd386d5c83064a261227a49326`（Rust #19）。原生 staging
+使用此提交的驗證器、固定的 Git tree 與兩份獨立核准的 manifest SHA-256。
+需要 Xcode 與 Android NDK `28.2.13676358`。
 
 ```sh
-DPIP_EQR_BUILD="$PWD/native/eq_report_pic/reviewed-76662bb"
-mkdir -p "$(dirname "$DPIP_EQR_BUILD")"
-tool/dev/build_report_picture.sh ../eq-report-pic "$DPIP_EQR_BUILD"
-export DPIP_EQR_BUILD
+export DPIP_EQR_BUILD="/Users/yincheng/development/eq-report-pic/out/v3-post-merge.nh4HTH/native"
+rust_checkout="/Users/yincheng/development/eq-report-pic"
 ```
 
-已備妥相同修訂的可信套件時可直接設定 `DPIP_EQR_BUILD`。自行建置時輸出須為新目錄。
-腳本從已審查的 Git 修訂建置兩個 profile，並在套件目錄外
-產生個別的可信 manifest。使用來自受信任建置或受控管道的 manifest。啟動器每次把
-已驗證的套件放入新的 staging 目錄。Flutter Hot Reload 沿用該次建置連結的 Rust 函式庫。
+啟動器每次把已驗證的套件放入新的 staging 目錄。Flutter Hot Reload 沿用該次
+建置連結的 Rust 函式庫。若需重建套件，`tool/dev/build_report_picture.sh` 接受
+Rust checkout 和新的絕對輸出目錄。重建結果仍須符合核准的 manifest SHA-256。
 
 ## 從一般地震報告詳情頁操作
 
 ```sh
-# device_id 請換成模擬器 UDID 或 Android Emulator ID
-report_route=/data/earthquake/115000-2026-0422-111524
+# 裝置 ID 請依環境替換。
+ios_device_id=F7FD1D34-DDAD-4EF9-96E6-879F9ADBD34C
+android_device_id=emulator-5554
+report_route=/data/earthquake/115000-2026-1124-161135
 
-tool/dev/run_report_sharing.sh ios qa "$ios_device_id" ../eq-report-pic \
-  "$DPIP_EQR_BUILD/packages/qa" "$DPIP_EQR_BUILD/trusted/qa.json" \
-  --no-pub --route "$report_route"
+run_report() {
+  tool/dev/run_report_sharing.sh "$1" "$2" "$3" "$rust_checkout" \
+    "$DPIP_EQR_BUILD/packages/$2" "$DPIP_EQR_BUILD/trusted/$2.json" \
+    --no-pub --route "$report_route"
+}
 
-tool/dev/run_report_sharing.sh android qa "$android_device_id" ../eq-report-pic \
-  "$DPIP_EQR_BUILD/packages/qa" "$DPIP_EQR_BUILD/trusted/qa.json" \
-  --no-pub --route "$report_route"
+run_report ios production "$ios_device_id"
+run_report ios qa "$ios_device_id"
+run_report android production "$android_device_id"
+run_report android qa "$android_device_id"
 ```
 
 首次安裝會先顯示初次設定。選擇繁體中文（臺灣）後，重新執行上方指令可直接開啟
-臺東縣近海報告。點地圖右上角、地圖設定左邊的分享按鈕。詳情展開時，也可從
+指定報告。點地圖右上角、地圖設定左邊的分享按鈕。詳情展開時，也可從
 標頭右側開啟分享面板。修改 Flutter 元件後，可在仍在執行的終端機按 `r`。
 UI 的修改入口在
 [earthquake_share_sheet.dart](../../lib/features/earthquake/presentation/widgets/earthquake_share_sheet.dart)
@@ -51,10 +53,10 @@ UI 的修改入口在
 切換選項時，應保留上一張預覽。複製、儲存和分享固定在底部，待所選圖片解碼完成後
 可操作。切回已產圖的組合時，快取命中不會顯示載入動畫。從不同地圖模式回到 4:5
 應選到同一張資訊卡。關閉分享面板再開啟時應重新產圖。改選報告時確認舊結果無法匯出。
-臺東縣近海樣本應顯示 ML 3.9、深度 43.5 km、
-臺東縣震度 2 與花蓮縣震度 1。報告舊版資料請看
-[原始本文與身分證據](../../test/features/earthquake/domain/fixtures/share_input/README.md)。
-現有報告若缺少身分或行政區證據，應顯示不支援。另檢查非臺灣繁體中文顯示的語言狀態。
+以 `115000-2026-0422-111524` 開啟臺東縣近海樣本時，應顯示 ML 3.9、深度
+43.5 km、臺東縣震度 2 與花蓮縣震度 1。v3 使用與詳情相同的原始本文和快照內身分。
+來源不可信或屬於未驗證歷史報告時，分享面板應顯示不支援。另檢查非臺灣繁體中文顯示的語言狀態。
+[現代與歷史樣本清單](../../test/features/earthquake/domain/fixtures/share_input_v3/corpus.json)
 
 選一張圖，依序複製、儲存和分享，確認接收方讀到相同尺寸及 SHA-256。先關閉分享
 對話框，再到支援貼上圖片的 App 貼上。iOS 以 `public.png` 存入系統剪貼簿。
@@ -116,15 +118,30 @@ PNG 可供預覽及匯出，使用離線報告 fixture，未包含網路或面�
 ## 離線煙霧測試與矩陣
 
 ```sh
-tool/dev/qa_report_picture.sh "$device_id" --smoke-story
+tool/dev/qa_report_picture.sh "$ios_device_id" --smoke-4x5
+tool/dev/qa_report_picture.sh "$ios_device_id" --smoke-story
+tool/dev/qa_report_picture.sh "$android_device_id" --smoke-4x5
+tool/dev/qa_report_picture.sh "$android_device_id" --smoke-story
 tool/dev/qa_report_picture.sh "$device_id" --smoke-matrix
 ```
 
-煙霧測試驗證已查證臺東樣本，包含工作 isolate 排隊、原生錯誤、重試與釋放。
+煙霧測試驗證 v3 臺東樣本、支援的版型、原生符號及遮罩，以及工作 isolate 排隊、原生錯誤、重試與釋放。
 矩陣另逐幅解碼十四張圖，記錄尺寸、SHA-256、產圖耗時及程序 RSS。兩個工具 target
 只用於 QA。在 iOS 的 App 沙盒 `Documents/report-picture-matrix`，或 Android 的
 `run-as com.exptech.dpip.storyqa` 下的 `app_flutter/report-picture-matrix`，
 可以取得原始 PNG 和 `matrix.json`。完成後再啟動上方的一般詳情頁流程。
+
+主機可對六份來源樣本執行核准 PNG 的位元組比對。每個程序只載入一個 profile。
+下列指令使用交接目錄內的 ABI 1.4 macOS 函式庫與已核准的參考輸出。
+
+```sh
+export DPIP_EQR_MATRIX_REFERENCE="$rust_checkout/out/v3-delivery.NTkfMT/matrix-one"
+for profile in production qa; do
+  DPIP_EQR_MATRIX_PROFILE="$profile" \
+    DPIP_EQR_MATRIX_LIBRARY="$(dirname "$DPIP_EQR_BUILD")/host-$profile/release/libeq_report_pic.dylib" \
+    tool/dev/test.sh test/shared/seismic/report_picture_v3_matrix_test.dart
+done
+```
 
 ## 最終套件查核與發行限制
 
@@ -136,7 +153,7 @@ tool/dev/verify_report_picture_package.sh android "$apk" "$android_stage" "$zipa
 `stage` 指 launcher 輸出路徑底下的 `qa` 或 `production` 目錄。iOS 使用同次
 建置的 `Runner-LinkMap-normal-arm64.txt`。Android 使用 SDK Build Tools 的
 `zipalign`。正式設定將啟動參數改成 `production`，候選目錄及 manifest 一併切換。
-正式 app 只提供 16:9 和 4:5。ABI 維持 1.3、能力遮罩為 `0x31f`，bit 10 關閉。
+正式 app 只提供 16:9 和 4:5。ABI 為 1.4，production 遮罩為 `0xb1f`，QA 為 `0x1b1f`，兩者的 bit 10 皆關閉。
 
 Story 保留「開發預覽・底圖完整性未驗證」頁尾。底圖與字型散布權利、地理完整性、
 實體裝置簽署版本與公開發行需各自驗收。Rust #17 將臺東樣本標為「小區域有感地震」。
