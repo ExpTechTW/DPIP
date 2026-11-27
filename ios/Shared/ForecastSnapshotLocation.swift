@@ -2,7 +2,7 @@ import Foundation
 
 /// The one place the per-target hourly-forecast cache's location is written.
 ///
-/// It lives in `Shared` rather than beside `ForecastWidgetSnapshotStore`, which
+/// It lives in `Shared` rather than beside `WidgetTargetStore`, which
 /// is the only thing that reads and writes files in it, because two targets
 /// need the path and only one of them can see that store. The store is built on
 /// `WidgetLocationTarget`, `ForecastWidgetSnapshot` and `ForecastWidgetExpiry`,
@@ -23,7 +23,7 @@ enum ForecastSnapshotLocation {
 
     /// Removes the whole cache under one delete claim.
     ///
-    /// `ForecastWidgetSnapshotStore.write` coordinates on the individual file,
+    /// `WidgetTargetStore.writeForecast` coordinates on the individual file,
     /// which is a descendant of this directory, so the claim conflicts with a
     /// refresh already writing — without it a forecast published a moment
     /// before the clear could recreate the directory and survive it.

@@ -24,4 +24,12 @@ struct SavedWidgetLocationResolver: Sendable {
             longitude: location.longitude
         )
     }
+
+    /// The app's catalog is readable and no longer lists this saved place:
+    /// the user removed it in the app. False without a catalog, which cannot
+    /// tell a removed place from one never published.
+    func isRemoved(target: WidgetLocationTarget) -> Bool {
+        guard case .saved = target, catalog != nil else { return false }
+        return resolve(target: target) == nil
+    }
 }

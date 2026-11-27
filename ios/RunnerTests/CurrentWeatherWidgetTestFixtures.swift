@@ -108,7 +108,7 @@ enum CurrentWeatherWidgetTestFixtures {
         at address: CurrentWeatherSnapshotAddress,
         containerURL: URL
     ) throws -> Data {
-        let writer = CurrentWeatherWidgetSnapshotWriter(containerURL: containerURL)
+        let writer = WidgetTargetStore(containerURL: containerURL)
         try write(snapshot, to: address, using: writer)
         return try cachedData(at: address, containerURL: containerURL)
     }
@@ -116,10 +116,10 @@ enum CurrentWeatherWidgetTestFixtures {
     static func write(
         _ snapshot: CurrentWeatherWidgetSnapshot,
         to address: CurrentWeatherSnapshotAddress,
-        using writer: CurrentWeatherWidgetSnapshotWriter
+        using writer: WidgetTargetStore
     ) throws {
-        let token = try writer.beginWrite(for: address)
-        _ = try writer.write(snapshot, using: token)
+        let token = try writer.beginCurrentWrite(for: address)
+        _ = try writer.commitCurrent(snapshot, using: token)
     }
 
     static func cachedData(

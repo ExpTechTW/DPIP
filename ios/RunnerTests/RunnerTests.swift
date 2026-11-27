@@ -171,7 +171,7 @@ final class RunnerTests: XCTestCase {
     )
     try data.write(to: legacyTarget, options: .atomic)
 
-    // Written by ForecastWidgetSnapshotStore, in the extension. The app never
+    // Written by WidgetTargetStore, in the extension. The app never
     // puts a file here, which is why clearing used to walk past it: a forecast
     // survived "clear" and the widget went on drawing it.
     let cache = ForecastSnapshotLocation.directoryURL(in: container)

@@ -125,7 +125,9 @@ final class WidgetCurrentLocationClient {
     typealias MakeManager = @MainActor () -> any WidgetLocationManaging
     typealias Now = @MainActor () -> Date
 
-    nonisolated static let defaultTimeout: TimeInterval = 10
+    /// A fresh fix gets half of the refresh's twelve-second budget, so the
+    /// observation and forecast requests behind it still have time to land.
+    nonisolated static let defaultTimeout: TimeInterval = 6
     /// A township-level answer does not need a new fix. A widget process
     /// rarely gets one quickly in the background, and waiting for it used to
     /// end most Current Location refreshes in a timeout and no update.

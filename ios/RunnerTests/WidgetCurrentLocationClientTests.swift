@@ -402,7 +402,7 @@ final class WidgetCurrentLocationClientTests: XCTestCase {
         XCTAssertEqual(manager.stopCount, 0)
     }
 
-    func testAcquisitionUsesTownshipAppropriateAccuracyAndTenSecondTimeout() async {
+    func testAcquisitionUsesTownshipAppropriateAccuracyAndDefaultTimeout() async {
         let expected = WidgetCurrentLocation(
             latitude: 25.033,
             longitude: 121.5654
