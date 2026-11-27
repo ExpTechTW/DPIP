@@ -21,8 +21,6 @@ typedef CurrentWeatherWidgetPublish = Future<void> Function({
   required WeatherRealtime weather,
 });
 
-typedef CurrentWeatherWidgetClear = Future<void> Function();
-
 /// Whether this platform has a home-screen Widget fed by the app's own Home
 /// selection.
 ///
@@ -32,6 +30,13 @@ bool _hasHomeScreenWidget(TargetPlatform platform) =>
     platform == TargetPlatform.iOS || platform == TargetPlatform.android;
 
 /// Adapts the home controller callback to the Widget coordinator.
+///
+/// There is deliberately no counterpart that clears on a selection change.
+/// Both platforms cache one snapshot per configured target, and each widget
+/// refreshes its own target natively. iOS used to clear the whole kind here,
+/// which blanked every *other* widget — a saved town, or Current Location —
+/// each time the app started or Home switched towns, until that widget's own
+/// background refresh happened to succeed.
 @visibleForTesting
 RealtimeWeatherLoadedCallback? createCurrentWeatherWidgetCallback({
   required TargetPlatform platform,
@@ -41,22 +46,6 @@ RealtimeWeatherLoadedCallback? createCurrentWeatherWidgetCallback({
 
   return (regionCode, weather) =>
       publish(regionCode: regionCode, weather: weather);
-}
-
-/// The invalidation callback for the platform's Widget.
-///
-/// Android widgets own their location independently of Home. Even a source-
-/// scoped clear would erase a valid snapshot a desktop widget still shows, so
-/// Home invalidation must not clear Android's cache. Keep iOS's existing clear.
-@visibleForTesting
-RealtimeWeatherInvalidatedCallback?
-createCurrentWeatherWidgetInvalidatedCallback({
-  required TargetPlatform platform,
-  required CurrentWeatherWidgetClear clear,
-}) {
-  if (platform != TargetPlatform.iOS) return null;
-
-  return clear;
 }
 
 /// Home providers: sheet-extent chrome, tab-reset, map hand-offs, weather
@@ -82,10 +71,6 @@ List<SingleChildWidget> homeProviders() => [
         onRealtimeLoaded: createCurrentWeatherWidgetCallback(
           platform: defaultTargetPlatform,
           publish: widgetSync.publish,
-        ),
-        onRealtimeInvalidated: createCurrentWeatherWidgetInvalidatedCallback(
-          platform: defaultTargetPlatform,
-          clear: widgetSync.clear,
         ),
       );
     },

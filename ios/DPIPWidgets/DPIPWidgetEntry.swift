@@ -37,6 +37,31 @@ struct DPIPWidgetEntry: TimelineEntry {
         )
     }
 
+    /// The one mark the header carries beside the observation time.
+    enum HeaderCue: Equatable, Sendable {
+        /// The current weather is past the stale threshold.
+        case staleObservation
+        /// The hourly forecast is old enough to doubt.
+        case outdatedForecast
+    }
+
+    /// An old observation outranks an old forecast: the whole card is out of
+    /// date, and the forecast row still marks itself with its refresh button.
+    ///
+    /// The widget keeps a target's last good reading rather than blanking it
+    /// when a refresh fails, so a reading past `isStale` must say so; its
+    /// clock alone reads like a current one.
+    func headerCue(for family: WidgetFamily) -> HeaderCue? {
+        if snapshot != nil, isStale {
+            return .staleObservation
+        }
+        if forecastFreshness == .stale,
+           !upcomingForecastPoints(for: family).isEmpty {
+            return .outdatedForecast
+        }
+        return nil
+    }
+
     init(date: Date, snapshot: CurrentWeatherWidgetSnapshot?,
          isStale: Bool, isNight: Bool,
          forecast: ForecastWidgetSnapshot? = nil,

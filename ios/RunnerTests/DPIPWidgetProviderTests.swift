@@ -1,4 +1,5 @@
 import Foundation
+import WidgetKit
 import XCTest
 
 final class DPIPWidgetProviderTests: XCTestCase {
@@ -431,5 +432,95 @@ private final class ProviderTimelineTestStore: @unchecked Sendable {
         case .invalid(let identifier):
             return "invalid:\(identifier)"
         }
+    }
+}
+
+final class WidgetHeaderCueTests: XCTestCase {
+    /// 15:21 in Taipei.
+    private let now = Date(timeIntervalSince1970: 1_790_320_860)
+
+    private func current(observedMinutesAgo minutes: Double = 10) -> CurrentWeatherWidgetSnapshot {
+        CurrentWeatherWidgetSnapshot(
+            schemaVersion: 7, sourceIdentifier: "region:407", regionCode: "407",
+            regionName: "西屯區", observationTime: Int(now.timeIntervalSince1970 - minutes * 60),
+            stationName: "西屯", weather: "晴", weatherCode: 100,
+            condition: .clear, isNight: false, nextDayNightTransitionTime: 0,
+            calibratedTimeOffsetMilliseconds: 0,
+            temperature: 28, humidity: 70, rain: 0
+        )
+    }
+
+    /// Hourly points from 16:00, published `minutes` ago.
+    private func forecast(publishedMinutesAgo minutes: Double) -> ForecastWidgetSnapshot {
+        ForecastWidgetSnapshot(
+            sourceIdentifier: "region:407", regionCode: "407",
+            updateTime: Int64((now.timeIntervalSince1970 - minutes * 60) * 1_000),
+            receivedAt: Int64(now.timeIntervalSince1970 * 1_000),
+            points: (16...20).map {
+                ForecastWidgetPoint(
+                    time: "\($0):00", temperature: 22, weather: "晴",
+                    weatherCode: 100, pop: 10
+                )!
+            }
+        )!
+    }
+
+    private func entry(
+        isStale: Bool,
+        forecast: ForecastWidgetSnapshot? = nil,
+        snapshot: CurrentWeatherWidgetSnapshot? = nil,
+        hasSnapshot: Bool = true
+    ) -> DPIPWidgetEntry {
+        DPIPWidgetEntry(
+            date: now, snapshot: hasSnapshot ? (snapshot ?? current()) : nil,
+            isStale: isStale, isNight: false, forecast: forecast,
+            locationTarget: .saved(regionCode: "407")
+        )
+    }
+
+    func testAStaleObservationIsMarkedInEveryFamily() {
+        for family: WidgetFamily in [.systemSmall, .systemMedium, .systemLarge] {
+            XCTAssertEqual(entry(isStale: true).headerCue(for: family), .staleObservation, "\(family)")
+            XCTAssertNil(entry(isStale: false).headerCue(for: family), "\(family)")
+        }
+        XCTAssertNil(
+            entry(isStale: true, hasSnapshot: false).headerCue(for: .systemMedium),
+            "No reading, nothing to mark"
+        )
+    }
+
+    func testAStaleObservationOutranksAnOutdatedForecast() {
+        let outdated = forecast(publishedMinutesAgo: 45)
+
+        XCTAssertEqual(
+            entry(isStale: false, forecast: outdated).headerCue(for: .systemMedium),
+            .outdatedForecast
+        )
+        XCTAssertEqual(
+            entry(isStale: true, forecast: outdated).headerCue(for: .systemMedium),
+            .staleObservation
+        )
+        XCTAssertNil(
+            entry(isStale: false, forecast: forecast(publishedMinutesAgo: 15))
+                .headerCue(for: .systemLarge)
+        )
+        // Small draws no forecast, so only the observation can be marked.
+        XCTAssertNil(entry(isStale: false, forecast: outdated).headerCue(for: .systemSmall))
+    }
+
+    func testTheCueAppearsFromTheTimelinesStaleBoundary() {
+        // Observed 45 minutes ago: stale fifteen minutes from now.
+        let snapshot = current(observedMinutesAgo: 45)
+        let states = CurrentWeatherWidgetTimeline.states(
+            snapshot: snapshot, deviceNow: now, staleAfter: 60 * 60
+        )
+
+        XCTAssertEqual(states.map(\.date), [now, now.addingTimeInterval(15 * 60)])
+        XCTAssertEqual(states.map {
+            DPIPWidgetEntry(
+                date: $0.date, snapshot: snapshot, isStale: $0.isStale,
+                isNight: $0.isNight, locationTarget: .saved(regionCode: "407")
+            ).headerCue(for: .systemMedium)
+        }, [nil, .staleObservation])
     }
 }

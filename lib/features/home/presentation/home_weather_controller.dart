@@ -21,8 +21,6 @@ typedef RealtimeWeatherLoadedCallback = Future<void> Function(
   WeatherRealtime weather,
 );
 
-typedef RealtimeWeatherInvalidatedCallback = Future<void> Function();
-
 /// Fetches nearest-station realtime weather, the township hourly forecast, and
 /// the next-hour rain trend for the home sheet, following the selected
 /// [RegionStore] township. 全國 has no point weather — [areaCode] is null and
@@ -40,7 +38,6 @@ class HomeWeatherController extends ChangeNotifier {
     this._directory, {
     this.gpsFix,
     this.onRealtimeLoaded,
-    this.onRealtimeInvalidated,
   }) {
     _regions.addListener(_sync);
     _sync();
@@ -56,7 +53,6 @@ class HomeWeatherController extends ChangeNotifier {
   /// Live GPS fix for the debug log; null when unavailable.
   final Future<GpsFix?> Function()? gpsFix;
   final RealtimeWeatherLoadedCallback? onRealtimeLoaded;
-  final RealtimeWeatherInvalidatedCallback? onRealtimeInvalidated;
 
   WeatherRealtime? _weather;
   String? _weatherCode;
@@ -115,11 +111,6 @@ class HomeWeatherController extends ChangeNotifier {
 
     if (_hasSyncedRegion && code == _loadedCode) {
       return;
-    }
-
-    final callback = onRealtimeInvalidated;
-    if (callback != null) {
-      unawaited(callback());
     }
 
     _hasSyncedRegion = true;

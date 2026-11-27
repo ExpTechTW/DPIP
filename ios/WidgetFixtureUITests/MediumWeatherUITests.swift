@@ -26,6 +26,17 @@ final class MediumWeatherUITests: XCTestCase {
             }
         }
 
+        /// The stale observation's cue, word or symbol.
+        var staleLabel: String {
+            switch self {
+            case .en: "Outdated"
+            case .traditionalChinese: "較舊"
+            case .simplifiedChinese: "已过时"
+            case .ja: "古いデータ"
+            case .ko: "오래된 정보"
+            }
+        }
+
         func timeLabel(utcHour: Int) -> String {
             let formatter = DateFormatter()
             formatter.locale = Locale(identifier: expected.locale)
@@ -85,6 +96,10 @@ final class MediumWeatherUITests: XCTestCase {
 
     private enum Family: String {
         case small, medium, large
+    }
+
+    private enum ObservationAge: String {
+        case current, stale
     }
 
     private let hours = ["16:00", "17:00", "18:00", "19:00", "20:00"]
@@ -174,7 +189,8 @@ final class MediumWeatherUITests: XCTestCase {
 
     private func launch(
         _ forecast: Forecast, language: Language, size: TextSize, location: Location, card: Card,
-        family: Family = .medium, dark: Bool = false, smallObservation: SmallObservation = .regular
+        family: Family = .medium, dark: Bool = false, smallObservation: SmallObservation = .regular,
+        observationAge: ObservationAge = .current
     ) -> XCUIApplication {
         let app = XCUIApplication()
         app.launchEnvironment = [
@@ -186,6 +202,7 @@ final class MediumWeatherUITests: XCTestCase {
             "DPIP_FIXTURE_FAMILY": family.rawValue,
             "DPIP_FIXTURE_DARK": dark ? "1" : "0",
             "DPIP_FIXTURE_SMALL_OBSERVATION": smallObservation.rawValue,
+            "DPIP_FIXTURE_OBSERVATION_AGE": observationAge.rawValue,
         ]
         app.launch()
         return app
@@ -591,6 +608,74 @@ extension MediumWeatherUITests {
             for frame in frames {
                 assertInside(frame, content, "Detail '\(label)'")
                 XCTAssertGreaterThanOrEqual(frame.minY, forecastBottom - tolerance)
+            }
+        }
+    }
+
+    func testStaleObservationIsMarkedBesideItsTime() {
+        for family in [Family.medium, .large] {
+            for size in [TextSize.normal, .accessibility5] {
+                for language in [Language.en, .traditionalChinese] {
+                    let name = "stale-observation-\(family.rawValue)-\(size.rawValue)-\(language.rawValue)"
+                    XCTContext.runActivity(named: name) { _ in
+                        // The forecast is stale too: the header has one place for a cue.
+                        let app = launch(.stale, language: language, size: size, location: .short,
+                                         card: .narrow, family: family, observationAge: .stale)
+                        capture(name)
+                        guard let layout = assertCurrentWeather(app, language: language, location: .short,
+                                                                card: .narrow, family: family),
+                              let cue = requireOne(elements(app, label: language.staleLabel),
+                                                   "Stale observation cue") else { return }
+                        if size.isAccessibility {
+                            XCTAssertEqual(cue.elementType, .image, "The adaptive header marks with the symbol")
+                        }
+                        let frame = cue.frame
+                        assertInside(frame, layout.bounds.insetBy(dx: margin, dy: margin), "Stale observation cue")
+                        XCTAssertLessThanOrEqual(layout.location.maxX, frame.minX + tolerance,
+                                                 "Location must precede the stale cue")
+                        XCTAssertLessThanOrEqual(frame.maxX, layout.time.minX + tolerance,
+                                                 "The stale cue must precede the observation time")
+                        XCTAssertGreaterThan(min(frame.maxY, layout.time.maxY), max(frame.minY, layout.time.minY),
+                                             "The stale cue and observation time must share a row")
+                        XCTAssertEqual(warningElements(app, language: language).count, 0,
+                                       "A stale observation outranks the forecast warning")
+                    }
+                }
+            }
+        }
+    }
+
+    func testCurrentObservationCarriesNoStaleCue() {
+        for family in [Family.small, .medium, .large] {
+            let app = launch(.fresh, language: .en, size: .normal, location: .compact, card: .narrow, family: family)
+            guard assertCurrentWeather(app, language: .en, location: .compact, card: .narrow, family: family) != nil
+            else { return }
+            XCTAssertEqual(elements(app, label: Language.en.staleLabel).count, 0, "\(family)")
+        }
+    }
+
+    func testSmallMarksAStaleObservationBesideItsTime() {
+        for language in [Language.en, .traditionalChinese] {
+            for size in [TextSize.normal, .accessibility5] {
+                let name = "small-stale-observation-\(size.rawValue)-\(language.rawValue)"
+                XCTContext.runActivity(named: name) { _ in
+                    let app = launch(.stale, language: language, size: size, location: .compact, card: .narrow,
+                                     family: .small, observationAge: .stale)
+                    capture(name)
+                    let timeLabel = language.timeLabel(utcHour: 6)
+                    guard let bounds = smallBounds(app, card: .narrow),
+                          let time = requireOne(texts(app, label: timeLabel), "Observation time"),
+                          let cue = requireOne(elements(app, label: language.staleLabel),
+                                               "Stale observation cue") else { return }
+                    let content = bounds.insetBy(dx: margin, dy: margin)
+                    let frame = cue.frame
+                    assertInside(frame, content, "Stale observation cue")
+                    assertInside(time.frame, content, "Observation time")
+                    XCTAssertLessThanOrEqual(frame.maxX, time.frame.minX + tolerance,
+                                             "The stale cue must precede the observation time")
+                    XCTAssertGreaterThan(min(frame.maxY, time.frame.maxY), max(frame.minY, time.frame.minY),
+                                         "The stale cue and observation time must share a row")
+                }
             }
         }
     }

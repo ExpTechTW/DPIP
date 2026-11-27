@@ -153,8 +153,14 @@ private struct WeatherScenario {
         }
     }
 
+    /// Whether the entry is past the current weather's stale threshold.
+    private enum ObservationAge: String {
+        case current, stale
+    }
+
     static let timeZone = TimeZone(identifier: "Asia/Taipei")!
     private let forecast: Forecast
+    private let observationAge: ObservationAge
     private let language: Language
     private let textSize: TextSize
     private let location: Location
@@ -169,6 +175,7 @@ private struct WeatherScenario {
         textSize = Self.option("DPIP_FIXTURE_TEXT_SIZE", default: .normal, environment: environment)
         location = Self.option("DPIP_FIXTURE_LOCATION", default: .short, environment: environment)
         smallObservation = Self.option("DPIP_FIXTURE_SMALL_OBSERVATION", default: .regular, environment: environment)
+        observationAge = Self.option("DPIP_FIXTURE_OBSERVATION_AGE", default: .current, environment: environment)
         card = Self.option("DPIP_FIXTURE_CARD", default: Card.narrow, environment: environment).size(for: family)
     }
 
@@ -217,6 +224,7 @@ private struct WeatherScenario {
                 }
             )!
         }
-        return DPIPWidgetEntry(date: date, snapshot: snapshot, isStale: false, isNight: false, forecast: forecastSnapshot)
+        return DPIPWidgetEntry(date: date, snapshot: snapshot, isStale: observationAge == .stale, isNight: false,
+                               forecast: forecastSnapshot)
     }
 }

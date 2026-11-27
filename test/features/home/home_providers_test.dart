@@ -159,7 +159,7 @@ void main() {
   });
 
   testWidgets(
-    'an Android selection change preserves the previous widget snapshot',
+    'a selection change preserves the previous widget snapshot',
     (tester) async {
       final regions = RegionStore(
         SettingsStore.inMemory({
@@ -210,9 +210,9 @@ void main() {
       final cached = writer.currentWeatherSnapshots['region:660'];
       expect(cached, isNotNull);
 
-      // Run the real provider wiring and the controller's invalidation callback.
-      // No replacement observation arrives: an offline selection change must not
-      // erase the snapshot a desktop widget still uses for the previous town.
+      // Run the real provider wiring. No replacement observation arrives: an
+      // offline selection change must not erase the snapshot a home-screen
+      // widget still uses for the previous town, on either platform.
       regions.select(3);
       await tester.pump();
       expect(writer.currentWeatherSnapshots['region:660'], cached);
@@ -225,66 +225,11 @@ void main() {
       expect(writer.clears, isEmpty);
       expect(writer.blanketClears, 0);
     },
-    variant: TargetPlatformVariant({TargetPlatform.android}),
+    variant: TargetPlatformVariant({
+      TargetPlatform.android,
+      TargetPlatform.iOS,
+    }),
   );
-
-  test('an iOS selection change still clears the whole kind', () async {
-    final writer = _RecordingWriter();
-    final coordinator = CurrentWeatherWidgetCoordinator(
-      RegionStore(
-        SettingsStore.inMemory({
-          'home.savedRegionCodes': ['660'],
-        }),
-      ),
-      _directoryWithXitun(),
-      CurrentWeatherWidgetPublisher(writer),
-      time: () => (
-        calibratedNow: DateTime.utc(2026, 9, 16, 4),
-        calibratedTimeOffset: Duration.zero,
-      ),
-      isTimeSynced: () => true,
-      syncTime: () async {},
-    );
-
-    final invalidate = createCurrentWeatherWidgetInvalidatedCallback(
-      platform: TargetPlatform.iOS,
-      clear: coordinator.clear,
-    );
-    await invalidate!();
-
-    expect(writer.blanketClears, 1);
-    expect(writer.clears, isEmpty);
-  });
-
-  test('iOS invalidation callback invokes Widget clear once', () async {
-    var clearCallCount = 0;
-    final callback = createCurrentWeatherWidgetInvalidatedCallback(
-      platform: TargetPlatform.iOS,
-      clear: () async {
-        clearCallCount += 1;
-      },
-    );
-
-    expect(callback, isNotNull);
-
-    await callback!();
-
-    expect(clearCallCount, 1);
-  });
-
-  test('invalidation callback is disabled where there is no Widget', () {
-    for (final platform in TargetPlatform.values.where(
-      (platform) =>
-          platform != TargetPlatform.iOS && platform != TargetPlatform.android,
-    )) {
-      final callback = createCurrentWeatherWidgetInvalidatedCallback(
-        platform: platform,
-        clear: _unusedClear,
-      );
-
-      expect(callback, isNull, reason: '$platform must not clear iOS Widgets');
-    }
-  });
 
   testWidgets('each home provider builds its controller', (tester) async {
     final store = RegionStore(SettingsStore.inMemory());
@@ -355,8 +300,6 @@ Future<void> _unusedPublish({
   required String regionCode,
   required WeatherRealtime weather,
 }) async {}
-
-Future<void> _unusedClear() async {}
 
 WeatherRealtime _weather() => WeatherRealtime(
   id: 'C0X160',
