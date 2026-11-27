@@ -41,7 +41,7 @@ import pathlib
 import sys
 import urllib.request
 
-REPO = pathlib.Path(__file__).resolve().parent.parent
+REPO = pathlib.Path(__file__).resolve().parents[2]
 FONT_OUT = REPO / "assets" / "fonts" / "DpipWeatherIcons.ttf"
 DART_OUT = REPO / "lib" / "core" / "weather" / "weather_icons.dart"
 
