@@ -30,11 +30,13 @@ import 'package:dpip/core/network/endpoint_health.dart';
 import 'package:dpip/core/network/notify_request_lane.dart';
 import 'package:dpip/core/network/region_selection.dart';
 import 'package:dpip/core/network/status_page_monitor.dart';
+import 'package:dpip/core/notifications/live_activity_registration.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/notifications/notification_tap.dart';
 import 'package:dpip/core/notifications/notification_taps.dart';
 import 'package:dpip/core/permissions/permission_health.dart';
 import 'package:dpip/core/platform/background_location.dart';
+import 'package:dpip/core/platform/live_activity_tokens.dart';
 import 'package:dpip/core/platform/widget_location_catalog_coordinator.dart';
 import 'package:dpip/core/platform/widget_snapshot_writer.dart';
 import 'package:dpip/core/realtime/clock.dart';
@@ -222,9 +224,79 @@ void main() {
     await tester.pumpWidget(const SizedBox());
     await tester.pump();
   });
+
+  testWidgets(
+    'at launch the Live Activity report waits for the location work',
+    (tester) async {
+      final settings = SettingsStore.inMemory();
+      await settings.setString(SettingKeys.locale, 'en');
+      // A fix the last run could not send, and a township that takes a while.
+      await settings.setString(
+        SettingKeys.pendingLocationReport,
+        '{"lat":25.03,"lng":121.56,"takenAt":1768435200000}',
+      );
+      final lane = NotifyRequestLane(spacing: Duration.zero);
+      final order = <String>[];
+      final liveActivity = LiveActivityRegistration(
+        settings: settings,
+        token: () => 'token-1',
+        registered: () => true,
+        // Its first state arrives the moment it is listened to.
+        states: Stream<LiveActivityState>.value((token: 'pts', enabled: true)),
+        report: (token, pushToStart, enabled) => lane.run(
+          () async => order.add('live activity'),
+          priority: NotifyRequestPriority.deferred,
+        ),
+      );
+      final deps = _deps(
+        settings,
+        lane: lane,
+        fix: () async {
+          await Future<void>.delayed(const Duration(seconds: 2));
+          return null;
+        },
+        onMoved: (fix) => lane.run(() async {
+          order.add('location');
+          return true;
+        }),
+        liveActivity: liveActivity,
+      );
+      geo.permission = LocationPermission.whileInUse;
+
+      await tester.pumpWidget(
+        DpipApp(
+          deps: deps,
+          providers: [
+            ...coreProviders(deps),
+            ...mapProviders(),
+            ChangeNotifierProvider<MapCameraHandoff>.value(
+              value: MapCameraHandoff(),
+            ),
+          ],
+        ),
+      );
+      await tester.pump();
+      // Finishing onboarding is what starts the launch work.
+      await deps.onboarding.complete();
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 3));
+
+      expect(order, ['location', 'live activity']);
+
+      await tester.pumpWidget(const SizedBox());
+      await tester.pump();
+    },
+  );
 }
 
-SharedDeps _deps(SettingsStore settings, {LocationMode? mode}) {
+SharedDeps _deps(
+  SettingsStore settings, {
+  LocationMode? mode,
+  NotifyRequestLane? lane,
+  Future<GpsFix?> Function()? fix,
+  Future<bool> Function(GpsFix fix)? onMoved,
+  LiveActivityRegistration? liveActivity,
+}) {
   final regions = RegionSelection(settings);
   final mesh = FakeMeshService();
   const townDirectory = TownDirectory({});
@@ -233,14 +305,14 @@ SharedDeps _deps(SettingsStore settings, {LocationMode? mode}) {
   final location = LocationService(
     townDirectory,
     manualTown: () => locationMode.manualTown,
-    isAvailable: () async => false,
-    fix: () async => null,
+    isAvailable: () async => fix != null,
+    fix: fix ?? () async => null,
     lastKnown: () async => null,
     status: () async => LocationStatus.denied,
   );
   final reporter = DeviceLocationReporter(
     positions: () => const Stream.empty(),
-    onMoved: (_) async => false,
+    onMoved: onMoved ?? (_) async => false,
     settings: settings,
     now: () => DateTime.utc(2026, 1, 15),
   );
@@ -267,7 +339,8 @@ SharedDeps _deps(SettingsStore settings, {LocationMode? mode}) {
     locationService: location,
     locationMode: locationMode,
     deviceLocationReporter: reporter,
-    notifyLane: NotifyRequestLane(),
+    liveActivityRegistration: liveActivity,
+    notifyLane: lane ?? NotifyRequestLane(),
     backgroundLocation: BackgroundLocationService(
       platform: 0,
       version: '1',

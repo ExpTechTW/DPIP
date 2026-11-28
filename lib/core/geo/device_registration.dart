@@ -8,6 +8,7 @@ import 'package:crypto/crypto.dart';
 import 'package:dpip/core/geo/device_location_reporter.dart';
 import 'package:dpip/core/geo/location_service.dart' show GpsFix;
 import 'package:dpip/core/logging/log.dart';
+import 'package:dpip/core/network/notify_request_lane.dart';
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/core/settings/setting_keys.dart';
 import 'package:dpip/core/settings/settings_store.dart';
@@ -37,6 +38,12 @@ import 'package:dpip/core/settings/settings_store.dart';
 /// stays pending in the reporter, which retries it until the server answers —
 /// this class keeps no retry of its own, so nothing is sent twice.
 ///
+/// Each check holds the notify lane's deferred requests
+/// ([NotifyRequestLane.holdDeferred]) for as long as it runs: it can spend
+/// seconds on a fix before it has a request to queue, and the Live Activity
+/// report — which the backend refuses until this registration has landed —
+/// must not take the lane meanwhile.
+///
 /// What it remembers lives in settings: a **hash** of the last token a 2xx
 /// answered for (the token itself is already stored once, and need not be
 /// twice), and when that was. Every successful report from the foreground
@@ -50,6 +57,7 @@ class DeviceRegistration {
     required this._fix,
     required this._report,
     required this._resend,
+    required this._lane,
     this._nativeLastSuccess,
     DateTime Function()? now,
     this.maxAge = const Duration(hours: 24),
@@ -65,6 +73,8 @@ class DeviceRegistration {
   /// Sends the reporter's pending fix, if there is one; null when there is
   /// none.
   final Future<ReportOutcome?> Function() _resend;
+
+  final NotifyRequestLane _lane;
 
   /// When the native background reporter last had a 2xx, in device time.
   final Future<DateTime?> Function()? _nativeLastSuccess;
@@ -87,10 +97,22 @@ class DeviceRegistration {
     );
   }
 
+  /// Whether a 2xx has answered for the push token stored now — whether the
+  /// backend knows this device. False without a token.
+  bool get registered {
+    final token = _token();
+    return token != null &&
+        _settings.getString(SettingKeys.registeredTokenHash) == _hash(token);
+  }
+
   /// Reports once if the server's record may be out of date. [reason] is for
   /// the log. Concurrent calls share one check; never throws.
+  ///
+  /// Deferred requests in the notify lane wait from this call until the check
+  /// is done — taken synchronously, so a Live Activity report triggered right
+  /// after it queues behind whatever it sends.
   Future<void> ensure(String reason) =>
-      _running ??= _ensure(reason).whenComplete(() {
+      _running ??= _lane.holdDeferred(() => _ensure(reason)).whenComplete(() {
         _running = null;
       });
 

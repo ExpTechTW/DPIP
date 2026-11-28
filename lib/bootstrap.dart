@@ -15,6 +15,8 @@ import 'package:dpip/core/diagnostics/prerelease_diagnostics.dart';
 import 'package:dpip/core/diagnostics/startup_report.dart';
 import 'package:dpip/core/geo/device_location_reporter.dart';
 import 'package:dpip/core/geo/device_registration.dart';
+import 'package:dpip/core/notifications/live_activity_registration.dart';
+import 'package:dpip/core/platform/live_activity_tokens.dart';
 import 'package:dpip/core/geo/location_api.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/logging/native_log_import.dart';
@@ -88,6 +90,7 @@ import 'package:dpip/features/events/events_providers.dart';
 import 'package:dpip/features/home/home_providers.dart';
 import 'package:dpip/features/map/map_providers.dart';
 import 'package:dpip/features/meshtastic/meshtastic_providers.dart';
+import 'package:dpip/features/notification/data/notify_api.dart';
 import 'package:dpip/features/notification/notification_providers.dart';
 import 'package:dpip/features/sponsor/sponsor_providers.dart';
 import 'package:dpip/features/bug_tracker/bug_tracker_providers.dart';
@@ -375,7 +378,8 @@ Future<void> bootstrap() async {
   // it — see [DeviceLocationReporter].
   //
   // Every request the notify backend rate-limits per address shares one lane:
-  // the location report, the registration riding on it, the notify settings.
+  // the location report, the registration riding on it, the notify settings
+  // and the Live Activity report.
   final notifyLane = NotifyRequestLane();
   final locationApi = LocationApi(apiClient, notifyLane);
   final versionStart = Log.sinceStartMs;
@@ -387,9 +391,25 @@ Future<void> bootstrap() async {
     platform: reportPlatform,
     version: appVersion,
   );
-  // Late because the two refer to each other: the registration reports through
-  // the reporter, and the reporter tells the registration about every 2xx.
+  // Late because they refer to each other: the registration reports through
+  // the reporter, the reporter tells the registration about every 2xx, and
+  // the Live Activity report waits until the registration has one.
   late final DeviceRegistration deviceRegistration;
+  // iOS 18+: the Live Activity push-to-start token goes to the notify backend,
+  // through the same lane as everything else it rate-limits, behind any
+  // location report or registration (see [LiveActivityRegistration]). The
+  // backend refuses it until a location report has registered this push
+  // token, so it waits for that, and every accepted report gives it another
+  // chance — free when nothing changed.
+  final liveActivityRegistration = Platform.isIOS
+      ? LiveActivityRegistration(
+          settings: settings,
+          token: () => notificationService.token,
+          registered: () => deviceRegistration.registered,
+          states: LiveActivityTokens.stream,
+          report: NotifyApi(apiClient, notifyLane).reportLiveActivity,
+        )
+      : null;
   final deviceLocationReporter = DeviceLocationReporter(
     positions: () => locationService.positionStream(),
     settings: settings,
@@ -398,6 +418,10 @@ Future<void> bootstrap() async {
     onReported: (fix) async {
       await deviceRegistration.recordSuccess();
       await backgroundLocation.recordReport(lat: fix.lat, lng: fix.lng);
+      final liveActivity = liveActivityRegistration;
+      if (liveActivity != null) {
+        unawaited(liveActivity.ensure('device registered'));
+      }
     },
     // A pending fix older than the background path's own last report is not
     // sent. Its own only: the record every path writes counts the 2xx above
@@ -452,6 +476,7 @@ Future<void> bootstrap() async {
     fix: locationService.currentFix,
     report: deviceLocationReporter.reportNow,
     resend: deviceLocationReporter.retryPending,
+    lane: notifyLane,
     nativeLastSuccess: backgroundLocation.lastSuccessAt,
   );
 
@@ -510,6 +535,7 @@ Future<void> bootstrap() async {
     locationMode: locationMode,
     deviceLocationReporter: deviceLocationReporter,
     deviceRegistration: deviceRegistration,
+    liveActivityRegistration: liveActivityRegistration,
     notifyLane: notifyLane,
     backgroundLocation: backgroundLocation,
     locationMonitor: locationMonitor,

@@ -63,6 +63,8 @@ import UserNotifications
     ImageSaverPlugin.register(with: registry.registrar(forPlugin: "ImageSaverPlugin")!)
     SecretStorePlugin.register(with: registry.registrar(forPlugin: "SecretStorePlugin")!)
     ApnsTokenPlugin.register(with: registry.registrar(forPlugin: "ApnsTokenPlugin")!)
+    LiveActivityTokenPlugin.register(
+      with: registry.registrar(forPlugin: "LiveActivityTokenPlugin")!)
     BackgroundLocationPlugin.register(
       with: registry.registrar(forPlugin: "BackgroundLocationPlugin")!)
     BackgroundExecutionPlugin.register(

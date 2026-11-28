@@ -124,18 +124,23 @@ void main() {
       lng: 0,
     );
 
-    expect(lane.runs, 1);
+    expect(lane.priorities, [NotifyRequestPriority.device]);
     expect(adapter.hits, hasLength(1));
   });
 }
 
-/// Counts the requests that went through it.
+/// Records the priority of every request that went through it.
 class _CountingLane extends NotifyRequestLane {
-  int runs = 0;
+  final priorities = <NotifyRequestPriority>[];
+
+  int get runs => priorities.length;
 
   @override
-  Future<T> run<T>(Future<T> Function() request) {
-    runs++;
-    return super.run(request);
+  Future<T> run<T>(
+    Future<T> Function() request, {
+    NotifyRequestPriority priority = NotifyRequestPriority.device,
+  }) {
+    priorities.add(priority);
+    return super.run(request, priority: priority);
   }
 }

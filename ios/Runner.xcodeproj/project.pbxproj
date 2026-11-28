@@ -75,6 +75,7 @@
 		SK0S00000000000000000002 /* SecretStorePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = SK0S00000000000000000001 /* SecretStorePlugin.swift */; };
 		SK0S00000000000000000004 /* SecretStorePluginTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = SK0S00000000000000000003 /* SecretStorePluginTests.swift */; };
 		AA0000000000000000000F02 /* ApnsTokenPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000F01 /* ApnsTokenPlugin.swift */; };
+		AB0000000000000000000A02 /* LiveActivityTokenPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB0000000000000000000A01 /* LiveActivityTokenPlugin.swift */; };
 		AA0000000000000000000G02 /* LocationTrackStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000G01 /* LocationTrackStore.swift */; };
 		AA0000000000000000000H02 /* NetworkPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000H01 /* NetworkPlugin.swift */; };
 		ABEE1236B8BD0A23137A1A34 /* ForecastSnapshotLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4553486EA71F5D516CD34E0 /* ForecastSnapshotLocation.swift */; };
@@ -274,6 +275,7 @@
 		SK0S00000000000000000001 /* SecretStorePlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecretStorePlugin.swift; sourceTree = "<group>"; };
 		SK0S00000000000000000003 /* SecretStorePluginTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecretStorePluginTests.swift; sourceTree = "<group>"; };
 		AA0000000000000000000F01 /* ApnsTokenPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApnsTokenPlugin.swift; sourceTree = "<group>"; };
+		AB0000000000000000000A01 /* LiveActivityTokenPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityTokenPlugin.swift; sourceTree = "<group>"; };
 		AA0000000000000000000G01 /* LocationTrackStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationTrackStore.swift; sourceTree = "<group>"; };
 		AA0000000000000000000H01 /* NetworkPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkPlugin.swift; sourceTree = "<group>"; };
 		AACCDA9BE69E45C4342BE158 /* WidgetLocationTarget.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WidgetLocationTarget.swift; path = DPIPWidgets/WidgetLocationTarget.swift; sourceTree = "<group>"; };
@@ -345,6 +347,7 @@
 			membershipExceptions = (
 				CurrentWeatherSnapshotAddress.swift,
 				CurrentWeatherSnapshotStorage.swift,
+				EEWActivityAttributes.swift,
 				ForecastSnapshotLocation.swift,
 				NativeLog.swift,
 			);
@@ -693,6 +696,7 @@
 				SK0S00000000000000000001 /* SecretStorePlugin.swift */,
 				AA0000000000000000000G01 /* LocationTrackStore.swift */,
 				AA0000000000000000000F01 /* ApnsTokenPlugin.swift */,
+				AB0000000000000000000A01 /* LiveActivityTokenPlugin.swift */,
 				AA0000000000000000000D01 /* DeviceInfoPlugin.swift */,
 				NL0G00000000000000000001 /* NativeLogPlugin.swift */,
 				IMSV00000000000000000001 /* ImageSaverPlugin.swift */,
@@ -1232,6 +1236,7 @@
 				SK0S00000000000000000002 /* SecretStorePlugin.swift in Sources */,
 				AA0000000000000000000G02 /* LocationTrackStore.swift in Sources */,
 				AA0000000000000000000F02 /* ApnsTokenPlugin.swift in Sources */,
+				AB0000000000000000000A02 /* LiveActivityTokenPlugin.swift in Sources */,
 				AA0000000000000000000D02 /* DeviceInfoPlugin.swift in Sources */,
 				NL0G00000000000000000002 /* NativeLogPlugin.swift in Sources */,
 				IMSV00000000000000000002 /* ImageSaverPlugin.swift in Sources */,

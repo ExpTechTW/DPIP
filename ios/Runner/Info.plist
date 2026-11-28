@@ -65,6 +65,8 @@
 	<string>DPIP 需要你的位置，以提供你所在地的地震、天氣等災害警報。</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>DPIP 需要相簿權限，才能將地震報告圖儲存到你的照片。</string>
+	<key>NSSupportsLiveActivities</key>
+	<true/>
 	<key>NSUserActivityTypes</key>
 	<array>
 		<string>WeatherWidgetConfigurationIntent</string>

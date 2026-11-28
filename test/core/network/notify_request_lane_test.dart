@@ -1,7 +1,9 @@
 /// The lane every request to the notify backend's per-IP-limited routes goes
-/// through: one at a time, spaced to the server's one-a-second limit, and no
-/// wait when nothing came before.
+/// through: one at a time, spaced to the server's one-a-second limit, no wait
+/// when nothing came before, and device requests ahead of deferred ones.
 library;
+
+import 'dart:async';
 
 import 'package:dpip/core/network/notify_request_lane.dart';
 import 'package:fake_async/fake_async.dart';
@@ -22,6 +24,7 @@ class _Bench {
     String name, {
     Duration takes = const Duration(milliseconds: 200),
     Object? error,
+    NotifyRequestPriority priority = NotifyRequestPriority.device,
   }) => lane.run(() async {
     starts[name] = async.elapsed;
     order.add(name);
@@ -29,7 +32,7 @@ class _Bench {
     ends[name] = async.elapsed;
     if (error != null) throw error;
     return name;
-  });
+  }, priority: priority);
 }
 
 void main() {
@@ -141,6 +144,101 @@ void main() {
           greaterThanOrEqualTo(NotifyRequestLane.minSpacing),
         );
       }
+    });
+  });
+
+  group('priority', () {
+    const deferred = NotifyRequestPriority.deferred;
+
+    test('queued together, the location report goes first', () {
+      fakeAsync((async) {
+        final bench = _Bench(async);
+        // The deferred one even arrives first; the lane is busy, so both wait.
+        bench.send('settings');
+        bench.send('live activity', priority: deferred);
+        bench.send('location');
+        async.elapse(const Duration(seconds: 10));
+        expect(bench.order, ['settings', 'location', 'live activity']);
+        expect(
+          bench.starts['live activity']! - bench.ends['location']!,
+          greaterThanOrEqualTo(NotifyRequestLane.minSpacing),
+        );
+      });
+    });
+
+    test('a device request that arrives during the spacing still goes '
+        'first', () {
+      fakeAsync((async) {
+        final bench = _Bench(async);
+        bench.send('settings');
+        bench.send('live activity', priority: deferred);
+        // The settings request has ended; the Live Activity is waiting out
+        // the spacing when the location report arrives.
+        async.elapse(const Duration(milliseconds: 600));
+        bench.send('location');
+        async.elapse(const Duration(seconds: 10));
+        expect(bench.order, ['settings', 'location', 'live activity']);
+      });
+    });
+
+    test('an idle lane starts a deferred request at once too', () {
+      fakeAsync((async) {
+        final bench = _Bench(async);
+        bench.send('live activity', priority: deferred);
+        async.flushMicrotasks();
+        expect(bench.starts['live activity'], Duration.zero);
+      });
+    });
+
+    test('a hold keeps deferred requests back, never device ones', () {
+      fakeAsync((async) {
+        final bench = _Bench(async);
+        final fix = Completer<void>();
+        bench.lane.holdDeferred(() async {
+          await fix.future;
+          await bench.send('location');
+        });
+        bench.send('live activity', priority: deferred);
+        bench.send('settings');
+        async.elapse(const Duration(seconds: 5));
+        // Idle lane, open hold: the device request went, the deferred waits.
+        expect(bench.order, ['settings']);
+
+        fix.complete();
+        async.elapse(const Duration(seconds: 5));
+        expect(bench.order, ['settings', 'location', 'live activity']);
+      });
+    });
+
+    test('a hold ends when its work fails', () {
+      fakeAsync((async) {
+        final bench = _Bench(async);
+        Object? caught;
+        bench.lane
+            .holdDeferred<void>(() async => throw StateError('no fix'))
+            .catchError((Object e) => caught = e);
+        bench.send('live activity', priority: deferred);
+        async.elapse(const Duration(seconds: 1));
+        expect(caught, isA<StateError>());
+        expect(bench.order, ['live activity']);
+      });
+    });
+
+    test('overlapping holds release on the last one', () {
+      fakeAsync((async) {
+        final bench = _Bench(async);
+        final first = Completer<void>();
+        final second = Completer<void>();
+        bench.lane.holdDeferred(() => first.future);
+        bench.lane.holdDeferred(() => second.future);
+        bench.send('live activity', priority: deferred);
+        first.complete();
+        async.elapse(const Duration(seconds: 5));
+        expect(bench.order, isEmpty);
+        second.complete();
+        async.elapse(const Duration(seconds: 1));
+        expect(bench.order, ['live activity']);
+      });
     });
   });
 }

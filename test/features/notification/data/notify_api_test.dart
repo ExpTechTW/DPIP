@@ -25,9 +25,10 @@ import 'package:flutter_test/flutter_test.dart';
 
 /// A Dio adapter that records requested URLs and answers a fixed JSON body.
 class _RecordingAdapter implements HttpClientAdapter {
-  _RecordingAdapter({this.body = '[2,1,0,2,1,0,1,1,0]'});
+  _RecordingAdapter({this.body = '[2,1,0,2,1,0,1,1,0]', this.status = 200});
 
   final String body;
+  final int status;
   final List<String> urls = [];
 
   @override
@@ -39,9 +40,10 @@ class _RecordingAdapter implements HttpClientAdapter {
     urls.add(options.uri.toString());
     return ResponseBody.fromString(
       body,
-      200,
+      status,
       headers: {
-        Headers.contentTypeHeader: [Headers.jsonContentType],
+        if (body.isNotEmpty)
+          Headers.contentTypeHeader: [Headers.jsonContentType],
       },
     );
   }
@@ -50,16 +52,19 @@ class _RecordingAdapter implements HttpClientAdapter {
   void close({bool force = false}) {}
 }
 
-/// Counts the requests that went through it.
+/// Records the priority of every request that went through it.
 class _CountingLane extends NotifyRequestLane {
   _CountingLane() : super(spacing: Duration.zero);
 
-  int runs = 0;
+  final priorities = <NotifyRequestPriority>[];
 
   @override
-  Future<T> run<T>(Future<T> Function() request) {
-    runs++;
-    return super.run(request);
+  Future<T> run<T>(
+    Future<T> Function() request, {
+    NotifyRequestPriority priority = NotifyRequestPriority.device,
+  }) {
+    priorities.add(priority);
+    return super.run(request, priority: priority);
   }
 }
 
@@ -87,7 +92,7 @@ void main() {
         'https://api.core-tnn1.exptech.dev/api/v2/notify/push-token-1',
       ]);
       expect(result, [2, 1, 0, 2, 1, 0, 1, 1, 0]);
-      expect(lane.runs, 1);
+      expect(lane.priorities, [NotifyRequestPriority.device]);
     },
   );
 
@@ -106,7 +111,31 @@ void main() {
         'https://api.core-tnn1.exptech.dev/api/v2/notify/push-token-1/4/1',
       ]);
       expect(result, [0, 0, 0, 0, 0, 0, 0, 0, 0]);
-      expect(lane.runs, 1);
+      expect(lane.priorities, [NotifyRequestPriority.device]);
+    },
+  );
+
+  test(
+    'reportLiveActivity sends /{token}/liveactivity/{pushToStartToken}/{0|1}',
+    () async {
+      final adapter = _RecordingAdapter(body: '', status: 204);
+      final api = NotifyApi(
+        ApiClient(Dio()..httpClientAdapter = adapter, regions),
+        lane,
+      );
+
+      await api.reportLiveActivity('push-token-1', 'abcd', true);
+      await api.reportLiveActivity('push-token-1', 'abcd', false);
+
+      expect(adapter.urls, [
+        'https://api.core-tnn1.exptech.dev/api/v2/notify/push-token-1/liveactivity/abcd/1',
+        'https://api.core-tnn1.exptech.dev/api/v2/notify/push-token-1/liveactivity/abcd/0',
+      ]);
+      // Behind any location report or settings request waiting with it.
+      expect(lane.priorities, [
+        NotifyRequestPriority.deferred,
+        NotifyRequestPriority.deferred,
+      ]);
     },
   );
 }
