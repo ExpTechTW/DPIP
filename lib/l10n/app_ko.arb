@@ -1028,6 +1028,10 @@
   },
   "notifyOptAll": "전체 수신",
   "displayTheme": "테마",
+  "displayNavBar": "내비게이션 바",
+  "displayNavBarDesc": "플로팅은 아이콘만 화면 아래쪽에 띄워 표시합니다.",
+  "displayNavBarStandard": "표준",
+  "displayNavBarFloating": "플로팅",
   "mapLayerSatelliteB07": "히마와리 단파 적외(B07)",
   "@skyTimeSunrise": {
     "description": "Label for the skyTimeSunrise option in the experimental backdrop settings."

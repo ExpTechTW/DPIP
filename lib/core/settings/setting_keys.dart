@@ -69,6 +69,12 @@ abstract final class SettingKeys {
     'app.contrast',
   );
 
+  /// Bottom navigation bar's shape (`floating`; absent = Material's strip).
+  /// See `DisplaySettings.navBarStyle`.
+  static const SettingKey<String> navBarStyle = SettingKey<String>._(
+    'app.navBarStyle',
+  );
+
   /// Which colour-vision deficiency the app corrects for, or absent for none.
   /// See `core/a11y/color_vision.dart` and `ColorVisionController`.
   static const SettingKey<String> colorVision = SettingKey<String>._(

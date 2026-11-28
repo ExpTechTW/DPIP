@@ -1028,6 +1028,10 @@
   },
   "notifyOptAll": "Terima semua",
   "displayTheme": "Tema",
+  "displayNavBar": "Bilah navigasi",
+  "displayNavBarDesc": "Gaya melayang hanya menyisakan ikon, melayang di atas tepi bawah layar.",
+  "displayNavBarStandard": "Standar",
+  "displayNavBarFloating": "Melayang",
   "mapLayerSatelliteB07": "Himawari Shortwave Infrared (B07)",
   "@skyTimeSunrise": {
     "description": "Label for the skyTimeSunrise option in the experimental backdrop settings."

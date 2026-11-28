@@ -1,8 +1,10 @@
 import 'dart:async';
 
+import 'package:dpip/app/shell/system_rail.dart';
 import 'package:dpip/core/diagnostics/prerelease_diagnostics.dart';
 import 'package:dpip/core/diagnostics/startup_report.dart';
 import 'package:dpip/core/settings/default_map_layer_controller.dart';
+import 'package:dpip/core/settings/display_settings.dart';
 import 'package:dpip/features/home/presentation/home_chrome.dart';
 import 'package:dpip/features/home/presentation/home_sheet_extent.dart';
 import 'package:dpip/features/home/presentation/home_reset_signal.dart';
@@ -221,6 +223,11 @@ class _MainShellState extends State<MainShell>
       );
     }
     final mapLayer = context.watch<DefaultMapLayerController>().layer;
+    // `select`, not `watch`: a text-size or contrast change must not rebuild
+    // every mounted tab with the shell.
+    final navBarStyle = context.select<DisplaySettings, NavBarStyle>(
+      (display) => display.navBarStyle,
+    );
     // `select`, not `watch`: the whole shell (every mounted tab with it) must
     // not rebuild because an unrelated permission field moved.
     final needsPermissionAttention = context.select<PermissionHealth, bool>(
@@ -313,22 +320,88 @@ class _MainShellState extends State<MainShell>
       ),
     ];
 
+    final body = Column(
+      children: [
+        // Renders nothing; checks once after the first frame whether this
+        // build's channel has a newer release, and says so once per version.
+        const UpdatePrompt(),
+        Expanded(
+          child: VisibleTabScope(
+            visibleTab: _visibleTab,
+            child: widget.navigationShell,
+          ),
+        ),
+      ],
+    );
+
+    // iPhone Duo with the system rail showing: the tab bar goes down the rail
+    // instead of along the bottom (see system_rail.dart).
+    //
+    // Pages draw edge to edge and never read a horizontal inset, so every tab
+    // is laid out beside the rail: the content area ends where the rail
+    // begins, with that side's inset removed so nothing pads for it twice.
+    final railEdge = systemRailEdge(context);
+    if (railEdge != null) {
+      final padding = MediaQuery.viewPaddingOf(context);
+      final onRight = railEdge == AxisDirection.right;
+      final railWidth = onRight ? padding.right : padding.left;
+      final content = Padding(
+        padding: EdgeInsets.only(
+          left: onRight ? 0 : railWidth,
+          right: onRight ? railWidth : 0,
+        ),
+        child: MediaQuery.removePadding(
+          context: context,
+          removeLeft: !onRight,
+          removeRight: onRight,
+          child: body,
+        ),
+      );
+      final rail = Positioned(
+        top: 0,
+        bottom: 0,
+        width: railWidth,
+        left: onRight ? null : 0,
+        right: onRight ? 0 : null,
+        child: ClipRect(
+          child: ValueListenableBuilder<double>(
+            valueListenable: _navDismiss,
+            builder: (context, dismiss, child) {
+              // Same dismissal as the bottom bar, but out through the rail's
+              // own edge; the strip itself stays, it is the system's.
+              return IgnorePointer(
+                ignoring: dismiss > 0.5,
+                child: Opacity(
+                  opacity: 1 - dismiss,
+                  child: FractionalTranslation(
+                    translation: Offset(onRight ? dismiss : -dismiss, 0),
+                    child: child,
+                  ),
+                ),
+              );
+            },
+            child: SystemRailTabBar(
+              selectedIndex: index,
+              destinations: destinations,
+              onDestinationSelected: _onDestinationSelected,
+            ),
+          ),
+        ),
+      );
+      return Scaffold(
+        body: Stack(
+          children: [
+            Positioned.fill(child: content),
+            rail,
+          ],
+        ),
+      );
+    }
+
     return Scaffold(
       // Let the Home weather backdrop show through behind the bar.
       extendBody: true,
-      body: Column(
-        children: [
-          // Renders nothing; checks once after the first frame whether this
-          // build's channel has a newer release, and says so once per version.
-          const UpdatePrompt(),
-          Expanded(
-            child: VisibleTabScope(
-              visibleTab: _visibleTab,
-              child: widget.navigationShell,
-            ),
-          ),
-        ],
-      ),
+      body: body,
       bottomNavigationBar: ValueListenableBuilder<double>(
         valueListenable: _navDismiss,
         builder: (context, dismiss, child) {
@@ -345,11 +418,18 @@ class _MainShellState extends State<MainShell>
             ),
           );
         },
-        child: NavigationBar(
-          selectedIndex: index,
-          destinations: destinations,
-          onDestinationSelected: _onDestinationSelected,
-        ),
+        child: switch (navBarStyle) {
+          NavBarStyle.standard => NavigationBar(
+            selectedIndex: index,
+            destinations: destinations,
+            onDestinationSelected: _onDestinationSelected,
+          ),
+          NavBarStyle.floating => FloatingTabBar(
+            selectedIndex: index,
+            destinations: destinations,
+            onDestinationSelected: _onDestinationSelected,
+          ),
+        },
       ),
     );
   }

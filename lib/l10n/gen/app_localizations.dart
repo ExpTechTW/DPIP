@@ -4146,6 +4146,30 @@ abstract class AppLocalizations {
   /// **'Theme'**
   String get displayTheme;
 
+  /// Section header for the bottom navigation bar style on the Display settings page
+  ///
+  /// In en, this message translates to:
+  /// **'Navigation bar'**
+  String get displayNavBar;
+
+  /// One line under the navigation bar header saying what the floating style changes
+  ///
+  /// In en, this message translates to:
+  /// **'Floating keeps only the icons, in a pill that floats above the bottom edge.'**
+  String get displayNavBarDesc;
+
+  /// Display settings option: the Material bottom navigation strip
+  ///
+  /// In en, this message translates to:
+  /// **'Standard'**
+  String get displayNavBarStandard;
+
+  /// Display settings option: the iPhone Duo rail pill, laid along the bottom edge
+  ///
+  /// In en, this message translates to:
+  /// **'Floating'**
+  String get displayNavBarFloating;
+
   /// Himawari shortwave-infrared channel (B07, 3.9 µm) layer name
   ///
   /// In en, this message translates to:

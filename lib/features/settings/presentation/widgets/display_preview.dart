@@ -1,12 +1,13 @@
 /// The live sample at the top of the Display settings page: one mock
 /// earthquake-report list plus the CWA intensity scale, drawn under whatever
-/// the five display settings currently say.
+/// the display settings currently say — the navigation bar style excepted, as
+/// the sample carries no shell chrome.
 ///
-/// **Nothing is plumbed in, on purpose.** All five settings are applied at the
-/// app root (`app/app.dart`), so this widget only has to read the ambient
-/// `Theme` and `MediaQuery` to already be live: contrast and weight arrive as a
-/// new `ThemeData` (cross-faded by `MaterialApp`'s `AnimatedTheme`), size as a
-/// `TextScaler`.
+/// **Nothing is plumbed in, on purpose.** Every setting the sample shows is
+/// applied at the app root (`app/app.dart`), so this widget only has to read
+/// the ambient `Theme` and `MediaQuery` to already be live: contrast and weight
+/// arrive as a new `ThemeData` (cross-faded by `MaterialApp`'s
+/// `AnimatedTheme`), size as a `TextScaler`.
 ///
 /// **Colour vision is the one exception**, and it is a trap. It never touches
 /// `ThemeData` — it lives in the `AppColorVision` global that `IntensityColors`

@@ -2178,6 +2178,18 @@ class AppLocalizationsJa extends AppLocalizations {
   String get displayTheme => 'テーマ';
 
   @override
+  String get displayNavBar => 'ナビゲーションバー';
+
+  @override
+  String get displayNavBarDesc => 'フローティングではアイコンだけを画面下端に浮かせて表示します。';
+
+  @override
+  String get displayNavBarStandard => '標準';
+
+  @override
+  String get displayNavBarFloating => 'フローティング';
+
+  @override
   String get mapLayerSatelliteB07 => 'ひまわり 短波長赤外(B07)';
 
   @override

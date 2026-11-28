@@ -71,6 +71,24 @@ enum ContrastStep {
   };
 }
 
+/// How the shell's bottom navigation is drawn.
+///
+/// [floating] is the pill the iPhone Duo rail shows, laid along the bottom edge
+/// instead of down the rail (see `app/shell/system_rail.dart`). It carries no
+/// labels, so it is opt-in: the Material strip stays the default. A device that
+/// is showing the system rail keeps the rail either way.
+enum NavBarStyle {
+  standard,
+  floating;
+
+  String get token => name;
+
+  static NavBarStyle fromToken(String? token) => switch (token) {
+    'floating' => NavBarStyle.floating,
+    _ => NavBarStyle.standard,
+  };
+}
+
 /// The display-accessibility settings, persisted and published to the app root.
 ///
 /// Each default is stored as absence, so an untouched install has no keys at
@@ -96,6 +114,9 @@ class DisplaySettings extends ChangeNotifier {
   ContrastStep get contrast =>
       ContrastStep.fromToken(_settings.getString(SettingKeys.contrast));
 
+  NavBarStyle get navBarStyle =>
+      NavBarStyle.fromToken(_settings.getString(SettingKeys.navBarStyle));
+
   Future<void> setTextScale(TextScaleStep next) =>
       _write(SettingKeys.textScale, next.token, next == TextScaleStep.normal);
 
@@ -104,6 +125,9 @@ class DisplaySettings extends ChangeNotifier {
 
   Future<void> setContrast(ContrastStep next) =>
       _write(SettingKeys.contrast, next.token, next == ContrastStep.standard);
+
+  Future<void> setNavBarStyle(NavBarStyle next) =>
+      _write(SettingKeys.navBarStyle, next.token, next == NavBarStyle.standard);
 
   Future<void> _write(
     SettingKey<String> key,

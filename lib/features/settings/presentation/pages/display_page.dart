@@ -1,7 +1,7 @@
-/// Display settings: theme mode, text size, text weight, contrast, and
-/// colour-vision correction.
+/// Display settings: theme mode, bottom navigation bar, text size, text weight,
+/// contrast, and colour-vision correction.
 ///
-/// One sample at the top, the five settings below it. The sample stays put
+/// One sample at the top, the six settings below it. The sample stays put
 /// while the options scroll, because the whole argument of the page is *look
 /// what this does* — a preview that scrolls away as you reach for the control
 /// that changes it is no preview at all. It needs no state plumbing: every one
@@ -132,7 +132,7 @@ class DisplayPage extends StatelessWidget {
   }
 }
 
-/// The five settings.
+/// The six settings.
 ///
 /// Two shapes, chosen by what the options *are*. Text size, weight and contrast
 /// are ordinal — three or four points on one scale — so they read as a strip of
@@ -173,6 +173,25 @@ class _OptionList extends StatelessWidget {
             glyph: _ThemeGlyph(mode: mode),
             onTap: () => context.read<ThemeController>().setMode(mode),
           ),
+
+        SectionHeader(l10n.displayNavBar),
+        _Description(l10n.displayNavBarDesc),
+        _ChipRow(
+          children: [
+            for (final (style, label) in [
+              (NavBarStyle.standard, l10n.displayNavBarStandard),
+              (NavBarStyle.floating, l10n.displayNavBarFloating),
+            ])
+              _OptionChip(
+                label: label,
+                selected: display.navBarStyle == style,
+                // No specimen: the difference is a shape at the bottom of the
+                // screen, and a 20 dp drawing of it would be a grey blob in
+                // both chips. The checkmark carries the choice instead.
+                onSelected: () => display.setNavBarStyle(style),
+              ),
+          ],
+        ),
 
         SectionHeader(l10n.displayTextSize),
         _Description(l10n.displayTextSizeDesc),

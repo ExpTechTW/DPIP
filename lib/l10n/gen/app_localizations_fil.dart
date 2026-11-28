@@ -2241,6 +2241,19 @@ class AppLocalizationsFil extends AppLocalizations {
   String get displayTheme => 'Tema';
 
   @override
+  String get displayNavBar => 'Navigation bar';
+
+  @override
+  String get displayNavBarDesc =>
+      'Ang lumulutang ay nagpapanatili lamang ng mga icon, na lumulutang sa itaas ng ilalim ng screen.';
+
+  @override
+  String get displayNavBarStandard => 'Karaniwan';
+
+  @override
+  String get displayNavBarFloating => 'Lumulutang';
+
+  @override
   String get mapLayerSatelliteB07 => 'Himawari Shortwave Infrared (B07)';
 
   @override

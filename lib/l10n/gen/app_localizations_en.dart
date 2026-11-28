@@ -2226,6 +2226,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get displayTheme => 'Theme';
 
   @override
+  String get displayNavBar => 'Navigation bar';
+
+  @override
+  String get displayNavBarDesc =>
+      'Floating keeps only the icons, in a pill that floats above the bottom edge.';
+
+  @override
+  String get displayNavBarStandard => 'Standard';
+
+  @override
+  String get displayNavBarFloating => 'Floating';
+
+  @override
   String get mapLayerSatelliteB07 => 'Himawari Shortwave Infrared (B07)';
 
   @override

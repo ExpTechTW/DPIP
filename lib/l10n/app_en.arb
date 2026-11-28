@@ -2824,6 +2824,22 @@
   },
   "notifyOptAll": "Receive all",
   "displayTheme": "Theme",
+  "displayNavBar": "Navigation bar",
+  "displayNavBarDesc": "Floating keeps only the icons, in a pill that floats above the bottom edge.",
+  "displayNavBarStandard": "Standard",
+  "displayNavBarFloating": "Floating",
+  "@displayNavBar": {
+    "description": "Section header for the bottom navigation bar style on the Display settings page"
+  },
+  "@displayNavBarDesc": {
+    "description": "One line under the navigation bar header saying what the floating style changes"
+  },
+  "@displayNavBarStandard": {
+    "description": "Display settings option: the Material bottom navigation strip"
+  },
+  "@displayNavBarFloating": {
+    "description": "Display settings option: the iPhone Duo rail pill, laid along the bottom edge"
+  },
   "@reportFilterOrderDesc": {
     "description": "Sort order: newest / largest first"
   },
