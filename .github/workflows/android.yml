@@ -159,6 +159,47 @@ jobs:
           bash tool/dev/deps.sh
           bash tool/dev/codegen.sh
 
+      # Robolectric's Android runtimes: an android-all-instrumented jar per
+      # SDK level the suite runs on, 90-200 MB each. Robolectric fetches them
+      # itself, at test time, into ~/.m2/repository — not through Gradle, so
+      # setup-java's Gradle cache never sees them, and every run downloaded
+      # about 420 MB from Maven Central, which answers a busy runner pool with
+      # HTTP 429.
+      #
+      # Keyed on exactly what decides those jars: the Robolectric version,
+      # which pins one runtime build per level, and the levels themselves —
+      # robolectric.properties' default and every `sdk = [...]` in the suite's
+      # `@Config`s. Nothing else moves the key, so there is no restore-keys
+      # fallback: a new key means a new set of jars, and restoring an old
+      # entry into it would carry ones nobody uses into every entry after.
+      #
+      # Not covered: what Gradle itself resolves for the suite, such as
+      # nativeruntime-dist-compat. That lives in Gradle's cache, whose
+      # setup-java entry is saved by whichever job sharing its key ends first
+      # (`Instrumented`, or release.yml's build) and never by this, the
+      # slowest, so it does not hold the unit-test classpath either.
+      - name: Robolectric runtime cache key
+        id: robolectric
+        if: needs.changes.outputs.unit_tests == 'true'
+        run: |
+          version="$(sed -n 's/.*"org\.robolectric:robolectric:\([^"]*\)".*/\1/p' android/app/build.gradle.kts)"
+          sdks="$( {
+            sed -n 's/^sdk=//p' android/app/src/test/resources/robolectric.properties
+            grep -rhoE 'sdk *= *\[[0-9, ]+\]' android/app/src/test | tr -cs '0-9' '\n'
+          } | grep . | sort -nu | paste -sd- -)"
+          if [[ -z $version || -z $sdks ]]; then
+            echo "::error::no Robolectric version in android/app/build.gradle.kts, or no SDK level in its tests"
+            exit 1
+          fi
+          echo "key=$RUNNER_OS-robolectric-$version-sdk-$sdks" | tee -a "$GITHUB_OUTPUT"
+
+      - name: Cache Robolectric runtimes
+        if: needs.changes.outputs.unit_tests == 'true'
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.m2/repository/org/robolectric
+          key: ${{ steps.robolectric.outputs.key }}
+
       # The Kotlin Widget tests, which `tool/dev/test.sh` cannot see: its suite
       # is Dart, and none of it compiles a line of the native policy. Before
       # this step existed, a change to the Widget's JSON decoding, ordering or
