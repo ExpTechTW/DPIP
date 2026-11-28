@@ -393,6 +393,7 @@ App 的圖層選擇器為每個 channel 註冊一個獨立圖層（`satellite` �
 | `LocationApi.updateDeviceLocation` | `/api/v2/location/{platform}/{token}/{version}/{lat},{lng}` | `coreExclusiveApi` |
 | `NotifyApi.getNotify` | `/api/v2/notify/{token}` | `coreExclusiveApi` |
 | `NotifyApi.setNotify` | `/api/v2/notify/{token}/{channel}/{status}` | `coreExclusiveApi` |
+| `NotifyApi.reportLiveActivity` | `/api/v2/notify/{token}/liveactivity/{pushToStartToken}/{0\|1}` | `coreExclusiveApi` |
 
 > **熱備援，不是多活。** 一區是 primary、另一區是 standby：寫入只落在 primary，
 > standby 對同一條路徑回 **`307`**（不是 301 —— 307 不會被當成永久導向快取）加
@@ -402,6 +403,22 @@ App 的圖層選擇器為每個 channel 註冊一個獨立圖層（`satellite` �
 > tyo1 直接回 200。Dio 預設跟隨 redirect（`followRedirects: true`、
 > `maxRedirects: 5`），所以 tier 維持 `coreExclusiveApi`：沒有第二個 origin 可以
 > 換，只有一個指向 primary 的導向。
+
+這四條共用後端的**每 IP 限流**（同一個 IP 兩次至少隔 1 秒、每分鐘 20 次，被拒的不算），所以 App 的請求全部走同一條
+`NotifyRequestLane`：一次只有一個在路上，下一個在前一個結束後至少隔 1.1 秒才出發；閒著的時候不等。
+
+`reportLiveActivity` 只在 iOS 18 以上送（`LiveActivityRegistration`）：Live Activity 的 push-to-start token 與系統的「即時動態」開關。
+後端回 `204`，照這台裝置的鄉鎮保存起來，目前還不會用它啟動任何 Live Activity。
+
+- **什麼時候送**：（推播 token、push-to-start token、開關）跟上次收到 2xx 的那組不同，或距上次 2xx 滿 6 小時。只有 2xx 會清掉。
+- **排在後面**：在 lane 裡是 `deferred`，位置回報、裝置註冊、通知設定有在等的都先走；啟動與回到前景時，位置那邊還在拿定位、
+  還沒排進來的時候也先等它（`holdDeferred`）。所以兩個不會落在同一秒，也就不會互相吃到 `429`。
+- **還沒註冊就不送**：推播 token 還沒有位置回報拿到 2xx（`registeredTokenHash` 對不上）時不送，那次位置回報成功後才送，
+  不再每次啟動都先吃一個 `401`。萬一還是 `401`，等下一次位置回報成功。
+- **失敗**：逾時、5xx、408、429 保留待送，5 分鐘後重試，連續失敗加倍、最多 1 小時；下次啟動、回到前景或位置回報成功也會再試。
+  其他 4xx 照後端的建議記下來，同一組值 6 小時內不再送。
+
+後端的完整規格在 notify-server-go 的 `docs/LIVE_ACTIVITY.md` §10–11。
 
 ### 舊 server `api-1`（逐步淘汰中）
 
