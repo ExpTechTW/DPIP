@@ -105,7 +105,7 @@ final class EEWLiveActivityManager {
             estimatedSArrivalAt: now.addingTimeInterval(25),
             waveArrived: false
         )
-        _ = try Activity.request(attributes: attributes, contentState: state, pushType: nil)
+        try Self.request(attributes, state)
     }
 
     #if DEBUG
@@ -125,9 +125,24 @@ final class EEWLiveActivityManager {
             estimatedSArrivalAt: nil,
             waveArrived: false
         )
-        _ = try Activity.request(attributes: attributes, contentState: state, pushType: nil)
+        try Self.request(attributes, state)
     }
     #endif
+
+    /// Like the server, the mock sends the ETA as the stale-date: the widget
+    /// shows 抵達 once it passes, and only then (see EEWPresentation.arrival).
+    private static func request(
+        _ attributes: EEWActivityAttributes, _ state: EEWActivityAttributes.ContentState
+    ) throws {
+        if #available(iOS 16.2, *) {
+            _ = try Activity.request(
+                attributes: attributes,
+                content: ActivityContent(state: state, staleDate: state.estimatedSArrivalAt),
+                pushType: nil)
+        } else {
+            _ = try Activity.request(attributes: attributes, contentState: state, pushType: nil)
+        }
+    }
 
     func update(reportNo: Int) async throws {
         #if DEBUG
@@ -152,7 +167,11 @@ final class EEWLiveActivityManager {
             estimatedSArrivalAt: Date().addingTimeInterval(reportNo == 2 ? 18 : 10),
             waveArrived: false
         )
-        await activity.update(using: state)
+        if #available(iOS 16.2, *) {
+            await activity.update(ActivityContent(state: state, staleDate: state.estimatedSArrivalAt))
+        } else {
+            await activity.update(using: state)
+        }
     }
 
     func markWaveArrived() async throws {
@@ -363,17 +382,6 @@ final class EEWMockArrivalUpdater {
         // No await between checking and reserving. Both arrival actions share
         // this guard, so a silent arrival cannot later be upgraded to an alert.
         arrivedActivityIds.insert(activityId)
-        let state = EEWActivityAttributes.ContentState(
-            reportNo: previous.reportNo,
-            originAt: previous.originAt,
-            magnitude: previous.magnitude,
-            depthKm: previous.depthKm,
-            epicenter: previous.epicenter,
-            reportMaxIntensity: previous.reportMaxIntensity,
-            estimatedLocalIntensity: previous.estimatedLocalIntensity,
-            estimatedSArrivalAt: previous.estimatedSArrivalAt,
-            waveArrived: true
-        )
-        await send(state, mode.alertConfiguration)
+        await send(previous.markingWaveArrived(), mode.alertConfiguration)
     }
 }

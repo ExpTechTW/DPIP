@@ -112,7 +112,7 @@ final class EEWLiveActivityManagerTests: XCTestCase {
                     XCTAssertEqual(content.reportMaxIntensity, previous.reportMaxIntensity)
                     XCTAssertEqual(content.estimatedLocalIntensity, local)
                     XCTAssertEqual(content.estimatedSArrivalAt, eta)
-                    XCTAssertEqual(Runner.EEWPresentation.intensity(for: content), local ?? 5)
+                    XCTAssertEqual(Runner.EEWPresentation.localIntensity(for: content), local)
                     XCTAssertEqual(Runner.EEWPresentation.arrival(for: content), .arrived)
                     XCTAssertNotNil(alert)
                 }
