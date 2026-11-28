@@ -3931,7 +3931,7 @@ class AppLocalizationsYue extends AppLocalizations {
   String get eventReportKindUpdate => '更新';
 
   @override
-  String get eventReportKindCorrect => '更正';
+  String get eventReportKindCorrect => '已更正';
 
   @override
   String get eventReportKindCancel => '取消';

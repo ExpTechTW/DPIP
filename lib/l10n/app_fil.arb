@@ -2234,7 +2234,7 @@
   "eventReportSerial": "Ulat {serial}",
   "eventReportKindIssue": "Inilabas",
   "eventReportKindUpdate": "Update",
-  "eventReportKindCorrect": "Pagwawasto",
+  "eventReportKindCorrect": "Naiwasto na",
   "eventReportKindCancel": "Pagbawi",
   "eventReportKindUnknown": "Hindi alam",
   "eventDetailTitle": "Detalye ng kaganapan",

@@ -4071,7 +4071,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get eventReportKindUpdate => 'Pembaruan';
 
   @override
-  String get eventReportKindCorrect => 'Koreksi';
+  String get eventReportKindCorrect => 'Dikoreksi';
 
   @override
   String get eventReportKindCancel => 'Pembatalan';

@@ -4060,7 +4060,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get eventReportKindUpdate => 'Update';
 
   @override
-  String get eventReportKindCorrect => 'Correction';
+  String get eventReportKindCorrect => 'Corrected';
 
   @override
   String get eventReportKindCancel => 'Cancellation';

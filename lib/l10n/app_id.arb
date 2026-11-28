@@ -2234,7 +2234,7 @@
   "eventReportSerial": "Laporan {serial}",
   "eventReportKindIssue": "Diterbitkan",
   "eventReportKindUpdate": "Pembaruan",
-  "eventReportKindCorrect": "Koreksi",
+  "eventReportKindCorrect": "Dikoreksi",
   "eventReportKindCancel": "Pembatalan",
   "eventReportKindUnknown": "Tidak diketahui",
   "eventDetailTitle": "Detail kejadian",

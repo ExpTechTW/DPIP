@@ -3968,7 +3968,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get eventReportKindUpdate => '갱신';
 
   @override
-  String get eventReportKindCorrect => '정정';
+  String get eventReportKindCorrect => '정정됨';
 
   @override
   String get eventReportKindCancel => '취소';

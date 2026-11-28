@@ -2234,7 +2234,7 @@
   "eventReportSerial": "รายงาน {serial}",
   "eventReportKindIssue": "ออกประกาศ",
   "eventReportKindUpdate": "อัปเดต",
-  "eventReportKindCorrect": "แก้ไข",
+  "eventReportKindCorrect": "แก้ไขแล้ว",
   "eventReportKindCancel": "ยกเลิก",
   "eventReportKindUnknown": "ไม่ทราบ",
   "eventDetailTitle": "รายละเอียดเหตุการณ์",

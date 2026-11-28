@@ -2234,7 +2234,7 @@
   "eventReportSerial": "제 {serial} 보",
   "eventReportKindIssue": "발표",
   "eventReportKindUpdate": "갱신",
-  "eventReportKindCorrect": "정정",
+  "eventReportKindCorrect": "정정됨",
   "eventReportKindCancel": "취소",
   "eventReportKindUnknown": "알 수 없음",
   "eventDetailTitle": "이벤트 상세",

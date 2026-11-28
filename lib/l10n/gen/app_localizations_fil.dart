@@ -4085,7 +4085,7 @@ class AppLocalizationsFil extends AppLocalizations {
   String get eventReportKindUpdate => 'Update';
 
   @override
-  String get eventReportKindCorrect => 'Pagwawasto';
+  String get eventReportKindCorrect => 'Naiwasto na';
 
   @override
   String get eventReportKindCancel => 'Pagbawi';

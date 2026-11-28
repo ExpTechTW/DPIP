@@ -5023,9 +5023,9 @@
   "@eventReportKindUpdate": {
     "description": "Kind of an event report: a later report"
   },
-  "eventReportKindCorrect": "Correction",
+  "eventReportKindCorrect": "Corrected",
   "@eventReportKindCorrect": {
-    "description": "Kind of an event report: a correction"
+    "description": "Tag on an event report that was corrected after it was issued (by its source or by hand); the report shows the corrected content"
   },
   "eventReportKindCancel": "Cancellation",
   "@eventReportKindCancel": {

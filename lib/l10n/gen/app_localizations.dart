@@ -7506,10 +7506,10 @@ abstract class AppLocalizations {
   /// **'Update'**
   String get eventReportKindUpdate;
 
-  /// Kind of an event report: a correction
+  /// Tag on an event report that was corrected after it was issued (by its source or by hand); the report shows the corrected content
   ///
   /// In en, this message translates to:
-  /// **'Correction'**
+  /// **'Corrected'**
   String get eventReportKindCorrect;
 
   /// Kind of an event report: the issuer withdrew the event

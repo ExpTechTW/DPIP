@@ -6,6 +6,7 @@ library;
 
 import 'dart:async';
 
+import 'package:dpip/app/theme/app_caution.dart';
 import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/realtime/app_time.dart';
@@ -159,6 +160,49 @@ void main() {
     expect(find.text(_l10n.eventReportKindIssue), findsOneWidget);
     expect(find.text(_l10n.eventReportKindUpdate), findsOneWidget);
     expect(find.text(_l10n.eventReportKindCancel), findsOneWidget);
+  });
+
+  testWidgets('a corrected report carries a "corrected" tag in the caution '
+      'tone, and nothing of what it said before', (tester) async {
+    final now = AppTime.utc;
+    await _pump(
+      tester,
+      _Repo(
+        Ok(
+          EventCardDetail(
+            lang: 'en',
+            reports: [
+              eventReport(
+                serial: 1,
+                kind: EventReportKind.issue,
+                title: 'Heavy rain advisory',
+                send: now.subtract(const Duration(hours: 2)),
+                expires: now.add(const Duration(hours: 3)),
+              ),
+              eventReport(
+                serial: 2,
+                kind: EventReportKind.correct,
+                title: 'Heavy rain advisory (corrected)',
+                send: now.subtract(const Duration(hours: 1)),
+                expires: now.add(const Duration(hours: 3)),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    final tag = find.text(_l10n.eventReportKindCorrect);
+    expect(tag, findsOneWidget);
+    final box = tester.widget<DecoratedBox>(
+      find.ancestor(of: tag, matching: find.byType(DecoratedBox)).first,
+    );
+    final context = tester.element(tag);
+    expect(
+      (box.decoration as BoxDecoration).color,
+      AppCaution.container(context),
+    );
+    // The issue report keeps its own tag; only the corrected one is marked.
+    expect(find.text(_l10n.eventReportKindIssue), findsOneWidget);
   });
 
   testWidgets('a cancelled card says so at the top, never "in effect"', (

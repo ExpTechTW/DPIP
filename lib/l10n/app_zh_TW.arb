@@ -2234,7 +2234,7 @@
   "eventReportSerial": "第 {serial} 報",
   "eventReportKindIssue": "發布",
   "eventReportKindUpdate": "更新",
-  "eventReportKindCorrect": "更正",
+  "eventReportKindCorrect": "已更正",
   "eventReportKindCancel": "撤銷",
   "eventReportKindUnknown": "未知",
   "eventDetailTitle": "事件詳情",
