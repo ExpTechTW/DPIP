@@ -144,7 +144,8 @@ generated code is in `lib/l10n/gen/`. Each ARB **self-describes** with a
 language is added by just dropping in `app_<locale>.arb` (with `languageName`);
 the home/fallback locale is the one constant in
 `core/settings/locale_config.dart`. Enforced by `tool/check/l10n.sh` (a CI
-gate, no packages): ARB key-parity with the template + no hardcoded
+gate, no packages): ARB key-parity with the template, no key defined twice
+in one ARB object (JSON keeps only the last copy) + no hardcoded
 CJK/kana/Hangul/Thai string literals in `features/*/presentation/**` or
 `shared/widgets/**`. A genuinely non-display or throwaway literal is exempted
 with `// l10n-ignore: <reason>` (that line/the one above) or
