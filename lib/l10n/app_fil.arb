@@ -1860,6 +1860,9 @@
       "vendor": {}
     }
   },
+  "permissionLiveActivities": "Live Activities",
+  "permissionLiveActivitiesDesc": "Ipinapakita ang pinakabagong detalye ng babala sa lindol sa Lock Screen at sa Dynamic Island habang may bisa ito. Kapag naka-off, darating pa rin ang mga babala bilang notipikasyon.",
+  "permissionGuideLiveActivities": "Buksan ang System Settings upang i-on ang “Live Activities”.",
   "permissionStillRequired": "Kailangan pa rin — buksan ang Settings para paganahin.",
   "permissionVerifyManually": "Mangyaring i-verify nang manu-mano na naka-enable ang pahintulot na ito sa System Settings.",
   "permissionBackgroundLocationOption": "“Payagan sa lahat ng oras”",

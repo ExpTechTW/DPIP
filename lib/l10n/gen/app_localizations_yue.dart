@@ -2971,6 +2971,16 @@ class AppLocalizationsYue extends AppLocalizations {
   }
 
   @override
+  String get permissionLiveActivities => '即時動態';
+
+  @override
+  String get permissionLiveActivitiesDesc =>
+      '強震即時警報發布期間，喺鎖定畫面同動態島持續顯示最新資訊。關閉咗都會照常收到通知。';
+
+  @override
+  String get permissionGuideLiveActivities => '請到系統設定中開啟「即時動態」。';
+
+  @override
   String get permissionStillRequired => '仍然需要此權限,請到設定中開啟。';
 
   @override

@@ -43,6 +43,7 @@ enum _PermissionItem {
   battery,
   unusedApp,
   vendor,
+  liveActivities,
 }
 
 enum PermissionRowFeedback { stillNeeded, verifyManually }
@@ -69,10 +70,22 @@ class PermissionState {
 }
 
 class PermissionChecklist extends StatefulWidget {
-  const PermissionChecklist({super.key, this.onChanged});
+  const PermissionChecklist({
+    super.key,
+    this.onChanged,
+    this.showLiveActivities = false,
+  });
 
   /// Called after every re-check, so the host can update around it.
   final ValueChanged<PermissionState>? onChanged;
+
+  /// Whether to include the Live Activities row (iOS 18+; hidden elsewhere
+  /// either way). Onboarding leaves it off: every other row there decides
+  /// whether an alert arrives, and this one only decides how it is shown. The
+  /// switch also starts on, so on a first launch the row could only ever be a
+  /// tick. The 權限檢查 page turns it on — that is where someone looks once
+  /// the Lock Screen has stopped showing an alert.
+  final bool showLiveActivities;
 
   @override
   State<PermissionChecklist> createState() => _PermissionChecklistState();
@@ -197,7 +210,20 @@ class _PermissionChecklistState extends State<PermissionChecklist>
     // The shell's badge reads PermissionHealth, not this widget's private copy,
     // so without this the page would show a fresh grant while the dot stayed
     // up — the two surfaces disagreeing about the same fact.
-    unawaited(context.read<PermissionHealth>().refresh());
+    final health = context.read<PermissionHealth>();
+    final healthRead = health.refresh();
+    // The Live Activities row has no private copy: it renders PermissionHealth's
+    // own reading. So judging that row's feedback has to wait for the read just
+    // started, or it would be judged on the state from before the trip to
+    // Settings. Every other row's state is already in hand.
+    if (feedbackFor == _PermissionItem.liveActivities ||
+        _feedbackItem == _PermissionItem.liveActivities) {
+      await healthRead;
+      if (!mounted || epoch != _refreshEpoch) return;
+    } else {
+      unawaited(healthRead);
+    }
+    final liveActivities = health.liveActivitiesAllowed;
     final satisfied = _isSatisfied(
       feedbackFor,
       notify: notify,
@@ -207,6 +233,7 @@ class _PermissionChecklistState extends State<PermissionChecklist>
       execution: execution,
       battery: batteryOk,
       unusedApp: unusedApp,
+      liveActivities: liveActivities,
     );
     setState(() {
       _notify = notify;
@@ -240,6 +267,7 @@ class _PermissionChecklistState extends State<PermissionChecklist>
             execution: execution,
             battery: batteryOk,
             unusedApp: unusedApp,
+            liveActivities: liveActivities,
           )) {
         _feedbackItem = null;
         _feedback = null;
@@ -265,6 +293,7 @@ class _PermissionChecklistState extends State<PermissionChecklist>
     required BackgroundExecutionStatus execution,
     required bool battery,
     required UnusedAppRestrictions unusedApp,
+    required bool? liveActivities,
   }) => switch (item) {
     _PermissionItem.notify => notify,
     _PermissionItem.critical => critical,
@@ -278,6 +307,9 @@ class _PermissionChecklistState extends State<PermissionChecklist>
     _PermissionItem.execution => !execution.restricted,
     _PermissionItem.battery => battery,
     _PermissionItem.unusedApp => unusedApp == UnusedAppRestrictions.exempt,
+    // Null is "does not apply", and a row that no longer applies has nothing
+    // left to ask for.
+    _PermissionItem.liveActivities => liveActivities != false,
     _PermissionItem.vendor || null => false,
   };
 
@@ -559,6 +591,18 @@ class _PermissionChecklistState extends State<PermissionChecklist>
     );
   }
 
+  /// Live Activities have no request API — the switch lives only on the app's
+  /// own Settings page — so this goes straight to the guided trip there.
+  Future<void> _openLiveActivitySettings() {
+    final l10n = AppLocalizations.of(context);
+    return _openGuidedSettings(
+      _PermissionItem.liveActivities,
+      l10n.permissionLiveActivities,
+      PermissionSettingsGuide(instruction: l10n.permissionGuideLiveActivities),
+      openAppSettingsPage,
+    );
+  }
+
   bool _loading(_PermissionItem item) => _busy == item;
 
   PermissionRowFeedback? _rowFeedback(_PermissionItem item) =>
@@ -567,6 +611,13 @@ class _PermissionChecklistState extends State<PermissionChecklist>
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    // Watched, not copied: PermissionHealth re-reads on every return to the
+    // foreground and after every [_refresh], and this row has no read of its
+    // own. Null — not applicable, or not read yet — hides it.
+    final liveActivities = context.select<PermissionHealth, bool?>(
+      (health) =>
+          widget.showLiveActivities ? health.liveActivitiesAllowed : null,
+    );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -704,6 +755,24 @@ class _PermissionChecklistState extends State<PermissionChecklist>
               onGrant: _openVendorSettings,
             ),
           ],
+        ],
+        // Last, because it is the one row here that an alert does not depend
+        // on: with it off the notification still arrives, and only the Lock
+        // Screen and Dynamic Island presentation is lost. It is not part of
+        // [PermissionHealth.needsAttention] for the same reason.
+        if (liveActivities != null) ...[
+          const SizedBox(height: AppSpacing.sm),
+          PermissionRow(
+            icon: Icons.screen_lock_portrait_outlined,
+            title: l10n.permissionLiveActivities,
+            description: l10n.permissionLiveActivitiesDesc,
+            granted: liveActivities,
+            loading: _loading(_PermissionItem.liveActivities),
+            blocked: _busy != null,
+            feedback: _rowFeedback(_PermissionItem.liveActivities),
+            settingsAction: true,
+            onGrant: _openLiveActivitySettings,
+          ),
         ],
       ],
     );

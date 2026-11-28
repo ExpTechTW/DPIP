@@ -1860,6 +1860,9 @@
       "vendor": {}
     }
   },
+  "permissionLiveActivities": "实时活动",
+  "permissionLiveActivitiesDesc": "地震预警发布期间，在锁定屏幕和灵动岛上持续显示最新信息。关闭后仍会照常收到通知。",
+  "permissionGuideLiveActivities": "请到系统设置中开启「实时活动」。",
   "permissionStillRequired": "仍然需要此权限,请到设置中打开。",
   "permissionVerifyManually": "请手动确认此权限已在系统设置中打开。",
   "permissionBackgroundLocationOption": "「允许所有时间」",

@@ -3757,6 +3757,18 @@
       "vendor": {}
     }
   },
+  "permissionLiveActivities": "Live Activities",
+  "@permissionLiveActivities": {
+    "description": "Permission-page row title: iOS Live Activities for this app. Use Apple's own localized name for the feature, as shown in Settings."
+  },
+  "permissionLiveActivitiesDesc": "Keeps an earthquake early warning's latest details on the Lock Screen and in the Dynamic Island while it is in effect. Alerts still arrive as notifications when this is off.",
+  "@permissionLiveActivitiesDesc": {
+    "description": "Permission-page row description: what Live Activities show, and that alerts still arrive as notifications without them"
+  },
+  "permissionGuideLiveActivities": "Open System Settings to turn on “Live Activities”.",
+  "@permissionGuideLiveActivities": {
+    "description": "Instruction for turning Live Activities back on in the app's Settings page; the quoted name matches Apple's Settings label"
+  },
   "permissionStillRequired": "Still needs attention. Check the highlighted option in Settings.",
   "permissionVerifyManually": "Please verify this permission is enabled in System Settings.",
   "permissionBackgroundLocationOption": "“Allow all the time”",

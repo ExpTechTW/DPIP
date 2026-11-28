@@ -2971,6 +2971,16 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get permissionLiveActivities => '即時動態';
+
+  @override
+  String get permissionLiveActivitiesDesc =>
+      '強震即時警報發布期間，在鎖定畫面與動態島持續顯示最新資訊。關閉時仍會照常收到通知。';
+
+  @override
+  String get permissionGuideLiveActivities => '請到系統設定中開啟「即時動態」。';
+
+  @override
   String get permissionStillRequired => '仍然需要此權限,請到設定中開啟。';
 
   @override
@@ -7011,6 +7021,16 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String permissionGuideVendorPower(Object vendor) {
     return '请到「$vendor」的省电设置中,将本应用设为「不限制」。';
   }
+
+  @override
+  String get permissionLiveActivities => '实时活动';
+
+  @override
+  String get permissionLiveActivitiesDesc =>
+      '地震预警发布期间，在锁定屏幕和灵动岛上持续显示最新信息。关闭后仍会照常收到通知。';
+
+  @override
+  String get permissionGuideLiveActivities => '请到系统设置中开启「实时活动」。';
 
   @override
   String get permissionStillRequired => '仍然需要此权限,请到设置中打开。';
@@ -11054,6 +11074,16 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   }
 
   @override
+  String get permissionLiveActivities => '即時動態';
+
+  @override
+  String get permissionLiveActivitiesDesc =>
+      '強震即時警報發布期間，在鎖定畫面與動態島持續顯示最新資訊。關閉時仍會照常收到通知。';
+
+  @override
+  String get permissionGuideLiveActivities => '請到系統設定中開啟「即時動態」。';
+
+  @override
   String get permissionStillRequired => '仍然需要此權限,請到設定中開啟。';
 
   @override
@@ -15094,6 +15124,16 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String permissionGuideVendorPower(Object vendor) {
     return '請到「$vendor」的省電設定中,將本應用程式設為「不限制」。';
   }
+
+  @override
+  String get permissionLiveActivities => '即時動態';
+
+  @override
+  String get permissionLiveActivitiesDesc =>
+      '強震即時警報發布期間，在鎖定畫面與動態島持續顯示最新資訊。關閉時仍會照常收到通知。';
+
+  @override
+  String get permissionGuideLiveActivities => '請到系統設定中開啟「即時動態」。';
 
   @override
   String get permissionStillRequired => '仍然需要此權限,請到設定中開啟。';

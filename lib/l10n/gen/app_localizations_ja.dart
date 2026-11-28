@@ -2986,6 +2986,16 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String get permissionLiveActivities => 'ライブアクティビティ';
+
+  @override
+  String get permissionLiveActivitiesDesc =>
+      '緊急地震速報の発表中、ロック画面とダイナミックアイランドに最新の情報を表示し続けます。オフでも通知は通常どおり届きます。';
+
+  @override
+  String get permissionGuideLiveActivities => 'システム設定で「ライブアクティビティ」をオンにしてください。';
+
+  @override
   String get permissionStillRequired => 'まだ必要です。設定から有効にしてください。';
 
   @override

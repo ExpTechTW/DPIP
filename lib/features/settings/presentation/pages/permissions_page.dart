@@ -6,6 +6,10 @@
 /// a permission that was declined months ago, and the system settings app does
 /// not explain which of DPIP's four grants is the missing one. Each row states
 /// its own status and offers the only action that can still change it.
+///
+/// Plus one onboarding leaves out: Live Activities (iOS 18+), which decide how
+/// an alert is shown rather than whether it arrives — see
+/// [PermissionChecklist.showLiveActivities].
 library;
 
 import 'package:dpip/app/theme/app_spacing.dart';
@@ -37,7 +41,7 @@ class PermissionsPage extends StatelessWidget {
             ),
           ),
           const SizedBox(height: AppSpacing.lg),
-          const PermissionChecklist(),
+          const PermissionChecklist(showLiveActivities: true),
         ],
       ),
     );

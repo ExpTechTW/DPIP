@@ -1860,6 +1860,9 @@
       "vendor": {}
     }
   },
+  "permissionLiveActivities": "Hoạt động trực tiếp",
+  "permissionLiveActivitiesDesc": "Hiển thị thông tin mới nhất của cảnh báo động đất trên Màn hình khóa và Dynamic Island trong suốt thời gian cảnh báo còn hiệu lực. Nếu tắt, cảnh báo vẫn đến dưới dạng thông báo như bình thường.",
+  "permissionGuideLiveActivities": "Mở Cài đặt Hệ thống để bật “Hoạt động trực tiếp”.",
   "permissionStillRequired": "Vẫn cần thiết — mở Cài đặt để bật.",
   "permissionVerifyManually": "Vui lòng xác minh thủ công rằng quyền này đã được bật trong Cài đặt Hệ thống.",
   "permissionBackgroundLocationOption": "“Cho phép mọi lúc”",

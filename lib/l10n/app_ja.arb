@@ -1860,6 +1860,9 @@
       "vendor": {}
     }
   },
+  "permissionLiveActivities": "ライブアクティビティ",
+  "permissionLiveActivitiesDesc": "緊急地震速報の発表中、ロック画面とダイナミックアイランドに最新の情報を表示し続けます。オフでも通知は通常どおり届きます。",
+  "permissionGuideLiveActivities": "システム設定で「ライブアクティビティ」をオンにしてください。",
   "permissionStillRequired": "まだ必要です。設定から有効にしてください。",
   "permissionVerifyManually": "システム設定でこの権限が有効かどうか手動で確認してください。",
   "permissionBackgroundLocationOption": "「常に許可」",

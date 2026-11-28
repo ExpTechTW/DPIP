@@ -8,6 +8,7 @@ import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/notifications/urgent_notification_settings.dart';
 import 'package:dpip/core/permissions/permission_health.dart';
+import 'package:dpip/core/platform/live_activity_authorization.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/widgets/permission_checklist.dart';
@@ -208,6 +209,7 @@ void main() {
     Object? requestResult = false;
     Completer<List<String>>? requestGate;
     var settingsOpened = true;
+    var settingsCalls = <String>[];
 
     setUp(() {
       AwesomeNotificationsPlatform.operatingSystem = 'ios';
@@ -220,6 +222,7 @@ void main() {
       requestResult = false;
       requestGate = null;
       settingsOpened = true;
+      settingsCalls = <String>[];
       messenger.setMockMethodCallHandler(awesome, (call) async {
         return switch (call.method) {
           'isNotificationAllowed' => allowed,
@@ -232,6 +235,7 @@ void main() {
         };
       });
       messenger.setMockMethodCallHandler(settingsChannel, (call) async {
+        settingsCalls.add(call.method);
         if (!settingsOpened) return false;
         return true;
       });
@@ -248,6 +252,8 @@ void main() {
     Widget host({
       ValueChanged<PermissionState>? onChanged,
       ph.PermissionStatus alwaysAnswer = ph.PermissionStatus.permanentlyDenied,
+      LiveActivityAuthorization? liveActivities,
+      bool showLiveActivities = false,
     }) {
       final notifications = NotificationService(SettingsStore.inMemory());
       final location = LocationService(
@@ -267,10 +273,16 @@ void main() {
             create: (_) => PermissionHealth(
               location: location,
               notifications: notifications,
+              liveActivities: liveActivities,
             ),
           ),
         ],
-        child: _wrap(PermissionChecklist(onChanged: onChanged)),
+        child: _wrap(
+          PermissionChecklist(
+            onChanged: onChanged,
+            showLiveActivities: showLiveActivities,
+          ),
+        ),
       );
     }
 
@@ -400,7 +412,155 @@ void main() {
       expect(find.text('Grant it in Settings'), findsNothing);
       expect(geo.permission, LocationPermission.always);
     });
+
+    group('Live Activities', () {
+      Finder row() => find.ancestor(
+        of: find.text('Live Activities'),
+        matching: find.byType(PermissionRow),
+      );
+
+      Finder inRow(Finder finder) =>
+          find.descendant(of: row(), matching: finder);
+
+      Future<void> settle(WidgetTester tester) async {
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 50));
+      }
+
+      void tall(WidgetTester tester) {
+        tester.view.physicalSize = const Size(400, 1600);
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
+      }
+
+      testWidgets('are left out unless the host asks for them', (tester) async {
+        // Onboarding's checklist: the switch exists and is even off, and the
+        // row still stays out — that list is for what decides delivery.
+        await tester.pumpWidget(
+          host(liveActivities: _ChecklistLiveActivities(false)),
+        );
+        await settle(tester);
+
+        expect(find.text('Notifications'), findsOneWidget);
+        expect(find.text('Live Activities'), findsNothing);
+      });
+
+      testWidgets('are left out where they do not apply', (tester) async {
+        // Android and iOS 17 and earlier, where the read answers null.
+        await tester.pumpWidget(
+          host(
+            liveActivities: _ChecklistLiveActivities(null),
+            showLiveActivities: true,
+          ),
+        );
+        await settle(tester);
+
+        expect(find.text('Notifications'), findsOneWidget);
+        expect(find.text('Live Activities'), findsNothing);
+      });
+
+      testWidgets('on shows a tick and nothing to do', (tester) async {
+        tall(tester);
+        await tester.pumpWidget(
+          host(
+            liveActivities: _ChecklistLiveActivities(true),
+            showLiveActivities: true,
+          ),
+        );
+        await settle(tester);
+
+        expect(row(), findsOneWidget);
+        expect(inRow(find.byIcon(Icons.check_circle)), findsOneWidget);
+        expect(inRow(find.text('Open Settings')), findsNothing);
+      });
+
+      testWidgets('off offers Settings, and coming back rechecks', (
+        tester,
+      ) async {
+        tall(tester);
+        final switchState = _ChecklistLiveActivities(false);
+        await tester.pumpWidget(
+          host(liveActivities: switchState, showLiveActivities: true),
+        );
+        await settle(tester);
+
+        expect(inRow(find.byIcon(Icons.check_circle)), findsNothing);
+        await tester.tap(inRow(find.text('Open Settings')));
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 300));
+        expect(
+          find.text('Open System Settings to turn on “Live Activities”.'),
+          findsOneWidget,
+        );
+
+        await tester.tap(find.widgetWithText(FilledButton, 'Open Settings'));
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 300));
+        expect(settingsCalls, contains('openAppSettings'));
+
+        switchState.enabled = true;
+        tester.binding.handleAppLifecycleStateChanged(
+          AppLifecycleState.resumed,
+        );
+        await settle(tester);
+
+        expect(inRow(find.byIcon(Icons.check_circle)), findsOneWidget);
+        expect(inRow(find.text('Open Settings')), findsNothing);
+        expect(
+          find.text(
+            'Still needs attention. Check the highlighted option in Settings.',
+          ),
+          findsNothing,
+        );
+      });
+
+      testWidgets('coming back with it still off says so', (tester) async {
+        tall(tester);
+        await tester.pumpWidget(
+          host(
+            liveActivities: _ChecklistLiveActivities(false),
+            showLiveActivities: true,
+          ),
+        );
+        await settle(tester);
+
+        await tester.tap(inRow(find.text('Open Settings')));
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 300));
+        await tester.tap(find.widgetWithText(FilledButton, 'Open Settings'));
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 300));
+
+        tester.binding.handleAppLifecycleStateChanged(
+          AppLifecycleState.resumed,
+        );
+        await settle(tester);
+
+        expect(
+          inRow(
+            find.text(
+              'Still needs attention. Check the highlighted option in '
+              'Settings.',
+            ),
+          ),
+          findsOneWidget,
+        );
+        expect(inRow(find.text('Open Settings')), findsOneWidget);
+      });
+    });
   });
+}
+
+/// The Live Activities switch as the platform would report it; null is a
+/// device it does not apply to.
+class _ChecklistLiveActivities extends LiveActivityAuthorization {
+  _ChecklistLiveActivities(this.enabled);
+
+  bool? enabled;
+
+  @override
+  Future<bool?> isEnabled() async => enabled;
 }
 
 class _ChecklistGeo extends GeolocatorPlatform {
