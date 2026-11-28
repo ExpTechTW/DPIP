@@ -384,6 +384,18 @@ final class EEWContentStateTests: XCTestCase {
             measured(EEWLockScreenView(report: withNote), width: 375).height)
     }
 
+    /// The Smart Stack card keeps the phone's order and rules and never runs
+    /// wider than the watch.
+    @MainActor
+    func testWatchLayoutFitsTheSmartStack() throws {
+        for language in ["zh-Hant", "en", "ja", "ko", "zh-Hans"] {
+            for report in try reports(Self.catalogStrings(language), stale: false) {
+                let size = measured(EEWWatchView(report: report), width: 162)
+                XCTAssertLessThanOrEqual(size.width, 162.5, "\(language) \(report.payload)")
+            }
+        }
+    }
+
     // MARK: - Helpers
 
     private lazy var strings = Self.catalogStrings("zh-Hant")

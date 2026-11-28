@@ -8,6 +8,16 @@ import WidgetKit
 @available(iOS 16.1, *)
 struct EEWLiveActivity: Widget {
     var body: some WidgetConfiguration {
+        // iOS 18 also shows a Live Activity in the Apple Watch Smart Stack.
+        // Without `.small` the watch gets the compact Island pieces; with it,
+        // EEWWatchView. SE-0360 lets the two branches differ in type.
+        if #available(iOS 18.0, *) {
+            return configuration.supplementalActivityFamilies([.small])
+        }
+        return configuration
+    }
+
+    private var configuration: some WidgetConfiguration {
         ActivityConfiguration(for: EEWActivityAttributes.self) { context in
             EEWActivityContent(report: EEWActivityReport(context))
         } dynamicIsland: { context in
@@ -51,7 +61,8 @@ struct EEWLiveActivity: Widget {
     }
 }
 
-/// The activity's own view: the Lock Screen card.
+/// The activity's own view: the Lock Screen card, or on iOS 18 and later the
+/// watch layout when the system asks for the `.small` family.
 @available(iOS 16.1, *)
 private struct EEWActivityContent: View {
     let report: EEWActivityReport?
@@ -59,11 +70,28 @@ private struct EEWActivityContent: View {
     var body: some View {
         Group {
             if let report {
-                EEWLockScreenView(report: report)
+                if #available(iOS 18.0, *) {
+                    EEWActivityFamilyContent(report: report)
+                } else {
+                    EEWLockScreenView(report: report)
+                }
             }
         }
         .activityBackgroundTint(report?.style.tint.color)
         .activitySystemActionForegroundColor(.white)
+    }
+}
+
+@available(iOS 18.0, *)
+private struct EEWActivityFamilyContent: View {
+    @Environment(\.activityFamily) private var family
+    let report: EEWActivityReport
+
+    var body: some View {
+        switch family {
+        case .small: EEWWatchView(report: report)
+        default: EEWLockScreenView(report: report)
+        }
     }
 }
 
@@ -209,6 +237,27 @@ extension EEWActivityReport {
                 EEWLockScreenView(report: report)
                     .frame(width: 360)
                     .background(report.style.tint.color, in: RoundedRectangle(cornerRadius: 22))
+            }
+        }
+        .padding()
+        .background(.black)
+    }
+
+    @available(iOS 17.0, *)
+    #Preview("Apple Watch — Smart Stack") {
+        VStack(spacing: 12) {
+            ForEach(
+                Array(
+                    [
+                        EEWActivityPreviewData.report("cwa", EEWActivityPreviewData.cwaStandard, travelSeconds: 28),
+                        EEWActivityPreviewData.report("trem", EEWActivityPreviewData.tremLocalFromNsspe, travelSeconds: 18),
+                        EEWActivityPreviewData.report("trem", EEWActivityPreviewData.tremNoSource, travelSeconds: 0),
+                        EEWActivityPreviewData.report("trem", EEWActivityPreviewData.tremCancelled, travelSeconds: 0),
+                    ].compactMap { $0 }.enumerated()), id: \.offset
+            ) { _, report in
+                EEWWatchView(report: report)
+                    .frame(width: 178)
+                    .background(report.style.tint.color, in: RoundedRectangle(cornerRadius: 20))
             }
         }
         .padding()
