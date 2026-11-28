@@ -480,6 +480,31 @@ and `DeviceRegistration` reports once more whenever the stored token changes
 and once a day without a successful report — a device that never moves would
 otherwise never tell the server its new token.
 
+**Report heartbeat.** The backend counts a device as active from these
+reports, and a township pinned by hand, or a phone that never moves, sends
+none. So native keeps one record of the device's last successful report —
+when, in device time, and the point it sent — written by every path: the
+background reporters, the heartbeat, and each Dart 2xx through `recordReport`
+on the background-location channel. Once that record is older than three days
+plus a per-install jitter in [0, 24 h), drawn once and kept, the heartbeat
+reports once. It never takes a fix: it sends the pinned township's point while
+one is pinned, else the record's own point, with the token and version Dart
+handed over (`ReportHeartbeatSync` → `setReportIdentity`, `setManualPoint`,
+`clearManualPoint`), and `stop` clears none of it. No record means nothing to
+resend; a 429 or a failure leaves the record as it was, so the next run
+retries. Android runs it as a daily, network-bound, unique WorkManager job
+(`ReportHeartbeat.kt`), enqueued on every app start and by
+`LocationBootReceiver` on a reboot or an app update, in every mode, so an
+update that is never opened still gets it. iOS runs it as a
+`BGAppRefreshTask` (`ReportHeartbeat.swift`, `com.exptech.dpip.report-heartbeat`
+in `BGTaskSchedulerPermittedIdentifiers`, the `fetch` background mode),
+registered before launch finishes and rescheduled on every launch and after
+every run for the moment the device comes due — or an hour on when that has
+passed, a day on with no record. **iOS decides when an app refresh actually
+runs**: the date is only the earliest, the system favours apps the user opens,
+and an app that is seldom opened — or has Background App Refresh off — may be
+refreshed rarely or never, so on iOS the heartbeat is best effort.
+
 **Delivery breadcrumbs (iOS).** `ios/NotificationService` is a Notification
 Service Extension that records one line per push it sees — the alert's id, its
 channel and the APNs request id, never the text — into the app group's native
