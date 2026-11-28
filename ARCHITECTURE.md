@@ -413,7 +413,11 @@ sends **data** messages (`channel`/`id`/`title`/`body`, or the same fields
 packed into a JSON `content` string); `onFcmSilentData` displays them via
 awesome so each honours its channel. A `notification`-payload message in the
 background is shown by the OS — on Android against the plain channel ids
-`PlainChannels` mirrors, so it still gets its channel's sound. On iOS, a push
+`PlainChannels` mirrors, so it still gets its channel's sound. Those ids are
+created **before** awesome registers anything: the first creator of a channel
+fixes its sound and volume for good, awesome would put every one on the
+notification volume, and only a `DefaultRingtoneType.Alarm` channel belongs on
+the alarm volume. On iOS, a push
 published straight to APNs is one awesome cannot present in the foreground;
 `NotificationDelegateProxy` in `AppDelegate.swift` presents it and forwards
 everything else to awesome. Alert categories live in
