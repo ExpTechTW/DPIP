@@ -691,23 +691,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get feedReplaying => 'Replaying';
 
   @override
-  String get replayEewWaiting => 'No EEW yet for this instant';
-
-  @override
-  String get replayEewRetrying => 'Couldn\'t load the EEW replay — retrying';
-
-  @override
-  String get replayEewUnavailable =>
-      'The EEW replay is temporarily unavailable';
-
-  @override
-  String get replayEewNone => 'No EEW was detected for this replay';
-
-  @override
-  String get replayEewNoneDetail =>
-      'Sampled the start, middle, and end of the event';
-
-  @override
   String get mapLayerStyleBd => 'Dvorak BD';
 
   @override
@@ -925,6 +908,23 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get moonPhaseWaningGibbous => 'Waning gibbous';
+
+  @override
+  String get replayEewWaiting => 'No EEW yet for this instant';
+
+  @override
+  String get replayEewRetrying => 'Couldn\'t load the EEW replay — retrying';
+
+  @override
+  String get replayEewUnavailable =>
+      'The EEW replay is temporarily unavailable';
+
+  @override
+  String get replayEewNone => 'No EEW was detected for this replay';
+
+  @override
+  String get replayEewNoneDetail =>
+      'Sampled the start, middle, and end of the event';
 
   @override
   String get reportFilterIntensityInfoModernTitle => 'Current (from 2020)';

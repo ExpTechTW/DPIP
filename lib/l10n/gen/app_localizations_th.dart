@@ -686,24 +686,6 @@ class AppLocalizationsTh extends AppLocalizations {
   String get feedReplaying => 'กำลังเล่นซ้ำ';
 
   @override
-  String get replayEewWaiting => 'ยังไม่มีประกาศเตือนภัย ณ เวลานี้';
-
-  @override
-  String get replayEewRetrying =>
-      'โหลดข้อมูลประกาศเตือนภัยไม่สำเร็จ กำลังลองใหม่';
-
-  @override
-  String get replayEewUnavailable =>
-      'ไม่สามารถดึงข้อมูลประกาศเตือนภัยได้ชั่วคราว';
-
-  @override
-  String get replayEewNone => 'ไม่พบประกาศเตือนภัยในการเล่นซ้ำนี้';
-
-  @override
-  String get replayEewNoneDetail =>
-      'สุ่มตรวจช่วงเริ่ม กลาง และสิ้นสุดของเหตุการณ์แล้ว';
-
-  @override
   String get mapLayerStyleBd => 'Dvorak BD';
 
   @override
@@ -921,6 +903,24 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get moonPhaseWaningGibbous => 'จันทร์นูนข้างแรม';
+
+  @override
+  String get replayEewWaiting => 'ยังไม่มีประกาศเตือนภัย ณ เวลานี้';
+
+  @override
+  String get replayEewRetrying =>
+      'โหลดข้อมูลประกาศเตือนภัยไม่สำเร็จ กำลังลองใหม่';
+
+  @override
+  String get replayEewUnavailable =>
+      'ไม่สามารถดึงข้อมูลประกาศเตือนภัยได้ชั่วคราว';
+
+  @override
+  String get replayEewNone => 'ไม่พบประกาศเตือนภัยในการเล่นซ้ำนี้';
+
+  @override
+  String get replayEewNoneDetail =>
+      'สุ่มตรวจช่วงเริ่ม กลาง และสิ้นสุดของเหตุการณ์แล้ว';
 
   @override
   String get reportFilterIntensityInfoModernTitle => 'แบบใหม่ (ตั้งแต่ 2020)';

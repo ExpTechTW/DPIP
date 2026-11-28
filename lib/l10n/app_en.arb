@@ -882,11 +882,6 @@
     }
   },
   "feedReplaying": "Replaying",
-  "replayEewWaiting": "No EEW yet for this instant",
-  "replayEewRetrying": "Couldn't load the EEW replay — retrying",
-  "replayEewUnavailable": "The EEW replay is temporarily unavailable",
-  "replayEewNone": "No EEW was detected for this replay",
-  "replayEewNoneDetail": "Sampled the start, middle, and end of the event",
   "mapLayerStyleBd": "Dvorak BD",
   "@mapLayerSatelliteB09": {
     "description": "Himawari mid-level water-vapour channel (B09, 6.9 µm) layer name"

@@ -1326,36 +1326,6 @@ abstract class AppLocalizations {
   /// **'Replaying'**
   String get feedReplaying;
 
-  /// Low-key line on the replay page when the replayed instant has no EEW yet: the replay is running and the feed is healthy, this second simply carries no bulletin
-  ///
-  /// In en, this message translates to:
-  /// **'No EEW yet for this instant'**
-  String get replayEewWaiting;
-
-  /// Replay EEW line after repeated request failures. The feed is being retried; this must never read as 'no data'
-  ///
-  /// In en, this message translates to:
-  /// **'Couldn\'t load the EEW replay — retrying'**
-  String get replayEewRetrying;
-
-  /// Replay EEW line once the feed has gone offline: nothing usable has come back for long enough, whatever the reason. Says the data cannot be had right now, never that the event had no EEW
-  ///
-  /// In en, this message translates to:
-  /// **'The EEW replay is temporarily unavailable'**
-  String get replayEewUnavailable;
-
-  /// Replay EEW line when three samples taken across the event found no bulletin. Deliberately 'was not detected', never 'none exists' — three samples cannot prove absence
-  ///
-  /// In en, this message translates to:
-  /// **'No EEW was detected for this replay'**
-  String get replayEewNone;
-
-  /// Second line under replayEewNone, naming which instants were sampled so the headline is not read as a stronger claim
-  ///
-  /// In en, this message translates to:
-  /// **'Sampled the start, middle, and end of the event'**
-  String get replayEewNoneDetail;
-
   /// Colour-style option: Dvorak BD curve stepped grayscale
   ///
   /// In en, this message translates to:
@@ -1769,6 +1739,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Waning gibbous'**
   String get moonPhaseWaningGibbous;
+
+  /// Low-key line on the replay page when the replayed instant has no EEW yet: the replay is running and the feed is healthy, this second simply carries no bulletin
+  ///
+  /// In en, this message translates to:
+  /// **'No EEW yet for this instant'**
+  String get replayEewWaiting;
+
+  /// Replay EEW line after repeated request failures. The feed is being retried; this must never read as 'no data'
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load the EEW replay — retrying'**
+  String get replayEewRetrying;
+
+  /// Replay EEW line once the feed has gone offline: nothing usable has come back for long enough, whatever the reason. Says the data cannot be had right now, never that the event had no EEW
+  ///
+  /// In en, this message translates to:
+  /// **'The EEW replay is temporarily unavailable'**
+  String get replayEewUnavailable;
+
+  /// Replay EEW line when three samples taken across the event found no bulletin. Deliberately 'was not detected', never 'none exists' — three samples cannot prove absence
+  ///
+  /// In en, this message translates to:
+  /// **'No EEW was detected for this replay'**
+  String get replayEewNone;
+
+  /// Second line under replayEewNone, naming which instants were sampled so the headline is not read as a stronger claim
+  ///
+  /// In en, this message translates to:
+  /// **'Sampled the start, middle, and end of the event'**
+  String get replayEewNoneDetail;
 
   /// No description provided for @reportFilterIntensityInfoModernTitle.
   ///

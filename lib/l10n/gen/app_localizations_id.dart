@@ -689,23 +689,6 @@ class AppLocalizationsId extends AppLocalizations {
   String get feedReplaying => 'Memutar ulang';
 
   @override
-  String get replayEewWaiting => 'Belum ada peringatan untuk waktu ini';
-
-  @override
-  String get replayEewRetrying => 'Gagal memuat data peringatan — mencoba lagi';
-
-  @override
-  String get replayEewUnavailable => 'Data peringatan sementara tidak tersedia';
-
-  @override
-  String get replayEewNone =>
-      'Tidak ada peringatan yang terdeteksi pada putar ulang ini';
-
-  @override
-  String get replayEewNoneDetail =>
-      'Sudah mengambil sampel awal, tengah, dan akhir peristiwa';
-
-  @override
   String get mapLayerStyleBd => 'Dvorak BD';
 
   @override
@@ -926,6 +909,23 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get moonPhaseWaningGibbous => 'Bulan cembung memudar';
+
+  @override
+  String get replayEewWaiting => 'Belum ada peringatan untuk waktu ini';
+
+  @override
+  String get replayEewRetrying => 'Gagal memuat data peringatan — mencoba lagi';
+
+  @override
+  String get replayEewUnavailable => 'Data peringatan sementara tidak tersedia';
+
+  @override
+  String get replayEewNone =>
+      'Tidak ada peringatan yang terdeteksi pada putar ulang ini';
+
+  @override
+  String get replayEewNoneDetail =>
+      'Sudah mengambil sampel awal, tengah, dan akhir peristiwa';
 
   @override
   String get reportFilterIntensityInfoModernTitle => 'Baru (sejak 2020)';

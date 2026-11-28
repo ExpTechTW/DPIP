@@ -694,24 +694,6 @@ class AppLocalizationsFil extends AppLocalizations {
   String get feedReplaying => 'Nire-replay';
 
   @override
-  String get replayEewWaiting => 'Wala pang alerto para sa oras na ito';
-
-  @override
-  String get replayEewRetrying =>
-      'Hindi na-load ang datos ng alerto — sinusubukang muli';
-
-  @override
-  String get replayEewUnavailable =>
-      'Pansamantalang hindi available ang datos ng alerto';
-
-  @override
-  String get replayEewNone => 'Walang nakitang alerto sa replay na ito';
-
-  @override
-  String get replayEewNoneDetail =>
-      'Na-sample ang simula, gitna, at huli ng pangyayari';
-
-  @override
   String get mapLayerStyleBd => 'Dvorak BD';
 
   @override
@@ -933,6 +915,24 @@ class AppLocalizationsFil extends AppLocalizations {
 
   @override
   String get moonPhaseWaningGibbous => 'Humihinang bilog';
+
+  @override
+  String get replayEewWaiting => 'Wala pang alerto para sa oras na ito';
+
+  @override
+  String get replayEewRetrying =>
+      'Hindi na-load ang datos ng alerto — sinusubukang muli';
+
+  @override
+  String get replayEewUnavailable =>
+      'Pansamantalang hindi available ang datos ng alerto';
+
+  @override
+  String get replayEewNone => 'Walang nakitang alerto sa replay na ito';
+
+  @override
+  String get replayEewNoneDetail =>
+      'Na-sample ang simula, gitna, at huli ng pangyayari';
 
   @override
   String get reportFilterIntensityInfoModernTitle => 'Bago (mula 2020)';
