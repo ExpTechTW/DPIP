@@ -1812,6 +1812,144 @@ abstract class AppLocalizations {
   /// **'Capacity'**
   String get shelterCapacityLabel;
 
+  /// No description provided for @reportShareTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Earthquake share image'**
+  String get reportShareTitle;
+
+  /// No description provided for @reportSharePreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Image preview'**
+  String get reportSharePreview;
+
+  /// No description provided for @reportShareFormat.
+  ///
+  /// In en, this message translates to:
+  /// **'Format'**
+  String get reportShareFormat;
+
+  /// No description provided for @reportShareMapMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Map style'**
+  String get reportShareMapMode;
+
+  /// No description provided for @reportShareTheme.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme'**
+  String get reportShareTheme;
+
+  /// No description provided for @reportShareCluster.
+  ///
+  /// In en, this message translates to:
+  /// **'Clusters'**
+  String get reportShareCluster;
+
+  /// No description provided for @reportShareStations.
+  ///
+  /// In en, this message translates to:
+  /// **'Stations'**
+  String get reportShareStations;
+
+  /// No description provided for @reportShareTowns.
+  ///
+  /// In en, this message translates to:
+  /// **'Townships'**
+  String get reportShareTowns;
+
+  /// No description provided for @reportDetailImageSaveSettingsRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow photo access in Settings, then try saving again.'**
+  String get reportDetailImageSaveSettingsRequired;
+
+  /// No description provided for @reportDetailImageSaveRestricted.
+  ///
+  /// In en, this message translates to:
+  /// **'Your device restricts access to photos.'**
+  String get reportDetailImageSaveRestricted;
+
+  /// No description provided for @reportDetailImageSaveUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving to photos is unavailable on this device.'**
+  String get reportDetailImageSaveUnavailable;
+
+  /// No description provided for @reportShareSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get reportShareSend;
+
+  /// No description provided for @reportShareCopy.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get reportShareCopy;
+
+  /// No description provided for @reportShareSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get reportShareSave;
+
+  /// No description provided for @reportShareCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Image copied'**
+  String get reportShareCopied;
+
+  /// No description provided for @reportShareCopyFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not copy the image'**
+  String get reportShareCopyFailed;
+
+  /// No description provided for @reportShareUnsupportedLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Earthquake share images currently support Traditional Chinese (Taiwan) only.'**
+  String get reportShareUnsupportedLanguage;
+
+  /// No description provided for @reportShareUnsupportedReport.
+  ///
+  /// In en, this message translates to:
+  /// **'This report lacks the verified data required to create a share image.'**
+  String get reportShareUnsupportedReport;
+
+  /// No description provided for @reportShareRendererUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'The native image renderer is unavailable in this build.'**
+  String get reportShareRendererUnavailable;
+
+  /// No description provided for @reportShareRendererIncompatible.
+  ///
+  /// In en, this message translates to:
+  /// **'The native renderer does not support this format.'**
+  String get reportShareRendererIncompatible;
+
+  /// No description provided for @reportShareTimeout.
+  ///
+  /// In en, this message translates to:
+  /// **'Creating the image timed out. Try again.'**
+  String get reportShareTimeout;
+
+  /// No description provided for @reportShareRenderFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not create the earthquake share image. Try again.'**
+  String get reportShareRenderFailed;
+
+  /// No description provided for @reportShareExportFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open system sharing. Try again.'**
+  String get reportShareExportFailed;
+
   /// Section header over the CWA-rendered report image
   ///
   /// In en, this message translates to:

@@ -30,9 +30,25 @@ abstract interface class ImageSaver {
   /// Obtains the grant [saveToGallery] needs, prompting when the OS still can.
   ///
   /// Returned separately so a caller can check before fetching anything, and
-  /// so the UI can tell "the library refused" (Settings is the only way
-  /// forward) apart from a failed write.
+  /// so the UI can choose the appropriate recovery when the library refuses.
   Future<Result<void>> ensurePermission();
+}
+
+extension GuardedImageSave on ImageSaver {
+  /// Saves only while the caller still owns the image. A null result means
+  /// eligibility was lost before the write was dispatched.
+  Future<Result<void>?> saveToGalleryIfCurrent({
+    required Uint8List bytes,
+    required String fileName,
+    required bool Function() isCurrent,
+    String mimeType = 'image/png',
+  }) async {
+    if (!isCurrent()) return null;
+    if (this case final _MethodChannelImageSaver saver) {
+      return saver._saveToGallery(bytes, fileName, mimeType, isCurrent);
+    }
+    return saveToGallery(bytes: bytes, fileName: fileName, mimeType: mimeType);
+  }
 }
 
 /// The one MethodChannel protocol both platforms speak.
@@ -48,6 +64,7 @@ base class _MethodChannelImageSaver implements ImageSaver {
 
   final MethodChannel _channel;
   final bool _isSupportedPlatform;
+  bool _writing = false;
 
   /// The permission this save needs, asked **before** anything is written.
   ///
@@ -60,22 +77,33 @@ base class _MethodChannelImageSaver implements ImageSaver {
   Future<Result<void>> ensurePermission() async {
     if (!_isSupportedPlatform) return _unavailable();
 
-    final status = await _channelString('status');
-    switch (status) {
-      case 'granted':
-        return const Ok(null);
-      case 'denied':
-        // iOS never asks twice, so a refusal here is already final.
-        return _permissionDenied();
-      case 'notDetermined':
-        return await _channelString('request') == 'granted'
-            ? const Ok(null)
-            : _permissionDenied();
-      default:
-        // No answer — an engine that never registered the channel, or a future
-        // platform without a status method. `save` still reports unavailable.
-        return const Ok(null);
+    try {
+      final status = await _channel.invokeMethod<String>('status');
+      if (status == 'granted') return const Ok(null);
+      return await _checkPermission(status);
+    } on MissingPluginException {
+      return _unavailable();
+    } catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'Checking gallery access failed');
+      return Err(_failure(ImageSaveFailureReason.failed));
     }
+  }
+
+  Future<Result<void>> _checkPermission(String? status) async {
+    if (status == 'notDetermined') {
+      status = await _channel.invokeMethod<String>('request');
+    }
+    return switch (status) {
+      'granted' => const Ok(null),
+      'denied' => Err(
+        _failure(ImageSaveFailureReason.permissionSettingsRequired),
+      ),
+      'restricted' => Err(
+        _failure(ImageSaveFailureReason.permissionRestricted),
+      ),
+      'notDetermined' => Err(_failure(ImageSaveFailureReason.permissionDenied)),
+      _ => _unavailable(),
+    };
   }
 
   @override
@@ -83,39 +111,40 @@ base class _MethodChannelImageSaver implements ImageSaver {
     required Uint8List bytes,
     required String fileName,
     String mimeType = 'image/png',
-  }) async {
+  }) async => (await _saveToGallery(bytes, fileName, mimeType))!;
+
+  Future<Result<void>?> _saveToGallery(
+    Uint8List bytes,
+    String fileName,
+    String mimeType, [
+    bool Function()? isCurrent,
+  ]) async {
     if (!_isSupportedPlatform) return _unavailable();
+    if (_writing) return Err(_failure(ImageSaveFailureReason.failed));
 
     final permission = await ensurePermission();
+    // Permission prompts can outlive the dialog. Check immediately before
+    // the irreversible native call, without an async gap after this guard.
+    if (isCurrent?.call() == false) return null;
     if (permission case Err(:final failure)) return Err(failure);
+    if (_writing) return Err(_failure(ImageSaveFailureReason.failed));
 
-    return _invoke(bytes, fileName, mimeType);
-  }
-
-  Future<String?> _channelString(String method) async {
+    _writing = true;
     try {
-      return await _channel.invokeMethod<String>(method);
-    } on MissingPluginException {
-      return null;
-    } on PlatformException catch (error, stackTrace) {
-      Log.handle(error, stackTrace, 'image saver $method');
-      return null;
+      return await _invoke(bytes, fileName, mimeType);
+    } finally {
+      _writing = false;
     }
   }
 
-  static Result<void> _unavailable() => const Err(
-    ImageSaveFailure(
-      ImageSaveFailureReason.unavailable,
-      'Saving images is unavailable on this platform.',
-    ),
-  );
+  static Result<void> _unavailable() =>
+      Err(_failure(ImageSaveFailureReason.unavailable));
 
-  static Result<void> _permissionDenied() => const Err(
-    ImageSaveFailure(
-      ImageSaveFailureReason.permissionDenied,
-      'The photo library refused the image.',
-    ),
-  );
+  static ImageSaveFailure _failure(ImageSaveFailureReason reason) =>
+      ImageSaveFailure(reason, 'Gallery save failed: ${reason.name}');
+
+  ImageSaveFailureReason get _nativeDenial =>
+      ImageSaveFailureReason.permissionSettingsRequired;
 
   Future<Result<void>> _invoke(
     Uint8List bytes,
@@ -130,42 +159,20 @@ base class _MethodChannelImageSaver implements ImageSaver {
       });
       return const Ok(null);
     } on MissingPluginException {
-      return const Err(
-        ImageSaveFailure(
-          ImageSaveFailureReason.unavailable,
-          'Saving images is unavailable on this platform.',
-        ),
-      );
+      return _unavailable();
     } on PlatformException catch (error) {
-      final failure = _saveFailure(error);
-      Log.warning('Saving an image failed: ${failure.reason.name}');
-      return Err(failure);
-    } on Object {
-      Log.warning('Saving an image failed unexpectedly');
-      return const Err(
-        ImageSaveFailure(
-          ImageSaveFailureReason.failed,
-          'The image could not be saved.',
-        ),
-      );
+      final reason = switch (error.code) {
+        'permission_denied' => _nativeDenial,
+        'permission_restricted' => ImageSaveFailureReason.permissionRestricted,
+        'unsupported' => ImageSaveFailureReason.unavailable,
+        _ => ImageSaveFailureReason.failed,
+      };
+      Log.warning('Saving an image failed: ${reason.name} (${error.code})');
+      return Err(_failure(reason));
+    } catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'Saving an image failed unexpectedly');
+      return Err(_failure(ImageSaveFailureReason.failed));
     }
-  }
-
-  static ImageSaveFailure _saveFailure(PlatformException error) {
-    return switch (error.code) {
-      'permission_denied' => const ImageSaveFailure(
-        ImageSaveFailureReason.permissionDenied,
-        'The photo library refused the image.',
-      ),
-      'unsupported' => const ImageSaveFailure(
-        ImageSaveFailureReason.unavailable,
-        'Saving images is unavailable on this platform.',
-      ),
-      _ => const ImageSaveFailure(
-        ImageSaveFailureReason.failed,
-        'The image could not be saved.',
-      ),
-    };
   }
 }
 
@@ -195,21 +202,28 @@ final class AndroidImageSaver extends _MethodChannelImageSaver {
   /// `permission_handler` reports it permanently denied because the manifest
   /// caps the declaration at API 28.
   @override
-  Future<Result<void>> ensurePermission() async {
-    if (!_isSupportedPlatform) return super.ensurePermission();
-
-    if (await _channelString('status') == 'granted') return const Ok(null);
-
-    var status = await _storageStatus();
-    if (status.isGranted || status.isLimited) return const Ok(null);
-    if (status.isPermanentlyDenied) {
-      return _MethodChannelImageSaver._permissionDenied();
+  Future<Result<void>> _checkPermission(String? nativeStatus) async {
+    // Only the API 26–28 path returns denied. An absent or unknown reply
+    // cannot establish that the platform needs a storage permission.
+    if (nativeStatus != 'denied') {
+      return _MethodChannelImageSaver._unavailable();
     }
 
-    status = await _requestStorage();
+    var status = await _storageStatus();
+    if (status.isDenied) status = await _requestStorage();
     if (status.isGranted || status.isLimited) return const Ok(null);
-    return _MethodChannelImageSaver._permissionDenied();
+
+    final reason = status.isPermanentlyDenied
+        ? ImageSaveFailureReason.permissionSettingsRequired
+        : status.isRestricted
+        ? ImageSaveFailureReason.permissionRestricted
+        : ImageSaveFailureReason.permissionDenied;
+    return Err(_MethodChannelImageSaver._failure(reason));
   }
+
+  @override
+  ImageSaveFailureReason get _nativeDenial =>
+      ImageSaveFailureReason.permissionDenied;
 }
 
 /// iOS implementation — `PHPhotoLibrary` add-only access.

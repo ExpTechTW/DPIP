@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:dpip/features/earthquake/domain/earthquake_report_snapshot.dart';
 import 'package:dpip/features/earthquake/domain/earthquake_share_input.dart';
+import 'package:dpip/features/earthquake/domain/earthquake_share_input_v3.dart';
 import 'package:flutter/foundation.dart';
 
 final class ReportPictureFixtures {
@@ -53,6 +54,24 @@ final class ReportPictureFixtures {
       throw StateError('Unexpected Core v2 report or source evidence');
     }
     return ReportPictureFixtures._(snapshot, stationCount);
+  }
+
+  EarthquakeShareInputV3 inputV3() => adaptEarthquakeShareSnapshotV3(
+    CoreEarthquakeReportSnapshot.decode(
+      base64Decode(_modern),
+      requestedReportId: snapshot.report.id,
+    ),
+  );
+
+  static EarthquakeShareInputV3 historicalV3() {
+    final snapshot = CoreEarthquakeReportSnapshot.decode(
+      base64Decode(_historical),
+      requestedReportId: historicalId,
+    );
+    if (snapshot.bodySha256 != _historicalHash) {
+      throw StateError('Unexpected historical body');
+    }
+    return adaptEarthquakeShareSnapshotV3(snapshot);
   }
 
   EarthquakeShareInputV2 verifiedInput() {

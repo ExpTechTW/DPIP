@@ -3,7 +3,7 @@
 # every build, so two builds can be compared number for number.
 #
 #     tool/dev/build.sh android-profile --dart-define=DPIP_FRAME_BENCH=true
-#     adb install -r build/app/outputs/flutter-apk/app-profile.apk
+#     adb install -r build/app/outputs/flutter-apk/app-production-profile.apk
 #     tool/dev/bench_map.sh <label> [--surface map|home] [--out DIR]
 #
 # Needs a rooted adb (an emulator's `adb root`): the gestures are raw

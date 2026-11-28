@@ -927,6 +927,75 @@ class AppLocalizationsZh extends AppLocalizations {
   String get shelterCapacityLabel => '收容人數';
 
   @override
+  String get reportShareTitle => '地震分享圖';
+
+  @override
+  String get reportSharePreview => '地震分享圖預覽';
+
+  @override
+  String get reportShareFormat => '格式';
+
+  @override
+  String get reportShareMapMode => '地圖模式';
+
+  @override
+  String get reportShareTheme => '主題';
+
+  @override
+  String get reportShareCluster => '群集';
+
+  @override
+  String get reportShareStations => '測站';
+
+  @override
+  String get reportShareTowns => '鄉鎮';
+
+  @override
+  String get reportDetailImageSaveSettingsRequired => '請在設定中允許取用照片，再試一次儲存。';
+
+  @override
+  String get reportDetailImageSaveRestricted => '這部裝置限制了相簿取用權限。';
+
+  @override
+  String get reportDetailImageSaveUnavailable => '這部裝置不支援儲存到相簿。';
+
+  @override
+  String get reportShareSend => '分享';
+
+  @override
+  String get reportShareCopy => '複製';
+
+  @override
+  String get reportShareSave => '儲存';
+
+  @override
+  String get reportShareCopied => '已複製圖片';
+
+  @override
+  String get reportShareCopyFailed => '無法複製圖片';
+
+  @override
+  String get reportShareUnsupportedLanguage => '地震分享圖目前僅支援繁體中文（臺灣）。';
+
+  @override
+  String get reportShareUnsupportedReport => '這份地震報告缺少可驗證的資料，無法產生分享圖。';
+
+  @override
+  String get reportShareRendererUnavailable => '此版本無法載入地震分享圖的原生函式庫。';
+
+  @override
+  String get reportShareRendererIncompatible => '原生函式庫不支援此格式。';
+
+  @override
+  String get reportShareTimeout => '產生分享圖逾時，請重試。';
+
+  @override
+  String get reportShareRenderFailed => '無法產生地震分享圖，請重試。';
+
+  @override
+  String get reportShareExportFailed => '無法開啟系統分享，請重試。';
+
+  @override
   String get reportDetailImage => '地震報告圖';
 
   @override
@@ -4387,6 +4456,75 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get shelterCapacityLabel => '收容人数';
+
+  @override
+  String get reportShareTitle => '地震分享图片';
+
+  @override
+  String get reportSharePreview => '地震分享图预览';
+
+  @override
+  String get reportShareFormat => '格式';
+
+  @override
+  String get reportShareMapMode => '地图模式';
+
+  @override
+  String get reportShareTheme => '主题';
+
+  @override
+  String get reportShareCluster => '聚合';
+
+  @override
+  String get reportShareStations => '测站';
+
+  @override
+  String get reportShareTowns => '乡镇';
+
+  @override
+  String get reportDetailImageSaveSettingsRequired => '请在设置中允许访问照片，然后重新保存。';
+
+  @override
+  String get reportDetailImageSaveRestricted => '设备限制了照片访问权限。';
+
+  @override
+  String get reportDetailImageSaveUnavailable => '此设备不支持保存到相册。';
+
+  @override
+  String get reportShareSend => '分享';
+
+  @override
+  String get reportShareCopy => '复制';
+
+  @override
+  String get reportShareSave => '保存';
+
+  @override
+  String get reportShareCopied => '已复制图片';
+
+  @override
+  String get reportShareCopyFailed => '无法复制图片';
+
+  @override
+  String get reportShareUnsupportedLanguage => '地震分享图片目前仅支持繁体中文（台湾）。';
+
+  @override
+  String get reportShareUnsupportedReport => '这份地震报告缺少可验证的数据，无法生成分享图片。';
+
+  @override
+  String get reportShareRendererUnavailable => '此版本无法加载地震分享图片所需的原生库。';
+
+  @override
+  String get reportShareRendererIncompatible => '原生函数库不支持此格式。';
+
+  @override
+  String get reportShareTimeout => '生成分享图片超时，请重试。';
+
+  @override
+  String get reportShareRenderFailed => '无法生成地震分享图片，请重试。';
+
+  @override
+  String get reportShareExportFailed => '无法打开系统分享，请重试。';
 
   @override
   String get reportDetailImage => '地震报告图';
@@ -7850,6 +7988,75 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get shelterCapacityLabel => '收容人數';
 
   @override
+  String get reportShareTitle => '地震分享圖片';
+
+  @override
+  String get reportSharePreview => '地震分享圖預覽';
+
+  @override
+  String get reportShareFormat => '格式';
+
+  @override
+  String get reportShareMapMode => '地圖模式';
+
+  @override
+  String get reportShareTheme => '主題';
+
+  @override
+  String get reportShareCluster => '群組';
+
+  @override
+  String get reportShareStations => '測站';
+
+  @override
+  String get reportShareTowns => '鄉鎮';
+
+  @override
+  String get reportDetailImageSaveSettingsRequired => '請在設定中允許取用相片，再試儲存。';
+
+  @override
+  String get reportDetailImageSaveRestricted => '裝置限制了相片存取權限。';
+
+  @override
+  String get reportDetailImageSaveUnavailable => '此裝置不支援儲存至相簿。';
+
+  @override
+  String get reportShareSend => '分享';
+
+  @override
+  String get reportShareCopy => '複製';
+
+  @override
+  String get reportShareSave => '儲存';
+
+  @override
+  String get reportShareCopied => '已複製圖片';
+
+  @override
+  String get reportShareCopyFailed => '未能複製圖片';
+
+  @override
+  String get reportShareUnsupportedLanguage => '地震分享圖片目前只支援繁體中文（台灣）。';
+
+  @override
+  String get reportShareUnsupportedReport => '這份地震報告缺少可驗證的資料，無法製作分享圖片。';
+
+  @override
+  String get reportShareRendererUnavailable => '此版本無法載入地震分享圖片的原生程式庫。';
+
+  @override
+  String get reportShareRendererIncompatible => '原生函式庫不支援此格式。';
+
+  @override
+  String get reportShareTimeout => '製作分享圖片逾時，請重試。';
+
+  @override
+  String get reportShareRenderFailed => '無法製作地震分享圖片，請重試。';
+
+  @override
+  String get reportShareExportFailed => '無法開啟系統分享，請重試。';
+
+  @override
   String get reportDetailImage => '地震報告圖';
 
   @override
@@ -11310,6 +11517,75 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get shelterCapacityLabel => '收容人數';
+
+  @override
+  String get reportShareTitle => '地震分享圖';
+
+  @override
+  String get reportSharePreview => '地震分享圖預覽';
+
+  @override
+  String get reportShareFormat => '格式';
+
+  @override
+  String get reportShareMapMode => '地圖模式';
+
+  @override
+  String get reportShareTheme => '主題';
+
+  @override
+  String get reportShareCluster => '群集';
+
+  @override
+  String get reportShareStations => '測站';
+
+  @override
+  String get reportShareTowns => '鄉鎮';
+
+  @override
+  String get reportDetailImageSaveSettingsRequired => '請在設定中允許取用照片，再試一次儲存。';
+
+  @override
+  String get reportDetailImageSaveRestricted => '這部裝置限制了相簿取用權限。';
+
+  @override
+  String get reportDetailImageSaveUnavailable => '這部裝置不支援儲存到相簿。';
+
+  @override
+  String get reportShareSend => '分享';
+
+  @override
+  String get reportShareCopy => '複製';
+
+  @override
+  String get reportShareSave => '儲存';
+
+  @override
+  String get reportShareCopied => '已複製圖片';
+
+  @override
+  String get reportShareCopyFailed => '無法複製圖片';
+
+  @override
+  String get reportShareUnsupportedLanguage => '地震分享圖目前僅支援繁體中文（臺灣）。';
+
+  @override
+  String get reportShareUnsupportedReport => '這份地震報告缺少可驗證的資料，無法產生分享圖。';
+
+  @override
+  String get reportShareRendererUnavailable => '此版本無法載入地震分享圖的原生函式庫。';
+
+  @override
+  String get reportShareRendererIncompatible => '原生函式庫不支援此格式。';
+
+  @override
+  String get reportShareTimeout => '產生分享圖逾時，請重試。';
+
+  @override
+  String get reportShareRenderFailed => '無法產生地震分享圖，請重試。';
+
+  @override
+  String get reportShareExportFailed => '無法開啟系統分享，請重試。';
 
   @override
   String get reportDetailImage => '地震報告圖';

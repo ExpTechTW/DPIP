@@ -369,7 +369,7 @@ jobs:
           if [ "${{ matrix.platform }}" = "android" ]; then
             bash tool/dev/build.sh android $COMMON
             bash tool/dev/build.sh bundle $COMMON
-            mv build/app/outputs/flutter-apk/app-release.apk \
+            mv build/app/outputs/flutter-apk/app-production-release.apk \
                "DPIP-$DPIP_LABEL.apk"
           else
             # Two steps rather than `flutter build ipa`. Flutter passes
@@ -448,7 +448,7 @@ jobs:
         with:
           serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
           packageName: com.exptech.dpip
-          releaseFiles: build/app/outputs/bundle/release/app-release.aab
+          releaseFiles: build/app/outputs/bundle/productionRelease/app-production-release.aab
           # `track` is deprecated in favour of the plural, which takes a list.
           tracks: internal
           status: completed

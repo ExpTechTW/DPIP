@@ -12,6 +12,8 @@
 /// api, and [dispose] is safe to call exactly once.
 library;
 
+import 'dart:typed_data';
+
 import 'package:dio/dio.dart';
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/api_region.dart';
@@ -53,6 +55,8 @@ class _RecordingApiClient implements ApiClient {
     Map<String, dynamic>? query,
     CancelToken? cancelToken,
     bool validateJson = false,
+    void Function(Uint8List)? validateCacheBody,
+    bool requireOriginBody = false,
   }) => throw UnimplementedError();
 
   @override

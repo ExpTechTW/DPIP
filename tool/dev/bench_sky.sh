@@ -3,7 +3,7 @@
 # every scene, so a build can be compared number for number with another.
 #
 #     tool/dev/build.sh android-profile --dart-define=DPIP_FRAME_BENCH=true
-#     adb install -r build/app/outputs/flutter-apk/app-profile.apk
+#     adb install -r build/app/outputs/flutter-apk/app-production-profile.apk
 #     tool/dev/bench_sky.sh [--out DIR] [--runs N] [--scene weather:sky]
 #
 # One profile APK covers every scene. With DPIP_FRAME_BENCH the home backdrop

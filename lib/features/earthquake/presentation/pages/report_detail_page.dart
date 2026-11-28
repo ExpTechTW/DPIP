@@ -24,9 +24,12 @@ import 'package:dpip/core/settings/region_store.dart';
 import 'package:dpip/core/settings/setting_keys.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/features/earthquake/domain/earthquake_report.dart';
+import 'package:dpip/features/earthquake/domain/earthquake_report_snapshot.dart';
 import 'package:dpip/features/earthquake/replay_eew_probe.dart';
 import 'package:dpip/shared/seismic/intensity.dart';
 import 'package:dpip/features/earthquake/domain/report_repository.dart';
+import 'package:dpip/features/earthquake/presentation/widgets/earthquake_share_sheet.dart';
+import 'package:dpip/features/earthquake/presentation/widgets/report_image_save_feedback.dart';
 import 'package:dpip/shared/seismic/intensity_icon_renderer.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/map/base_map.dart';
@@ -44,6 +47,7 @@ import 'package:dpip/shared/seismic/report_colors.dart';
 import 'package:dpip/shared/widgets/async_view.dart';
 import 'package:dpip/shared/widgets/frosted_surface.dart';
 import 'package:dpip/shared/widgets/intensity_badge.dart';
+import 'package:dpip/shared/widgets/map_chip_button.dart';
 import 'package:dpip/shared/widgets/map_color_legend.dart';
 import 'package:dpip/shared/widgets/loading_view.dart';
 import 'package:dpip/shared/widgets/section_header.dart';
@@ -103,10 +107,11 @@ class _ReportDetailPageState extends State<ReportDetailPage> {
   void _leaveForList() {
     if (_leaving) return;
     _leaving = true;
+    final reportId = widget.reportId;
     // After the frame: this runs from inside a build, where navigating is not
     // allowed.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
+      if (!mounted || widget.reportId != reportId) return;
       final l10n = AppLocalizations.of(context);
       final messenger = ScaffoldMessenger.maybeOf(context);
       final router = GoRouter.of(context);
@@ -123,6 +128,14 @@ class _ReportDetailPageState extends State<ReportDetailPage> {
   }
 
   @override
+  void didUpdateWidget(covariant ReportDetailPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.reportId == oldWidget.reportId) return;
+    _leaving = false;
+    _sheetExpanded.value = false;
+  }
+
+  @override
   void dispose() {
     _sheetExpanded.dispose();
     super.dispose();
@@ -130,15 +143,17 @@ class _ReportDetailPageState extends State<ReportDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    final repository = context.read<ReportRepository>();
+    final source = context.read<EarthquakeShareSource>();
     return Scaffold(
       body: Stack(
         children: [
           Positioned.fill(
-            child: AsyncView<EarthquakeReport>(
-              future: () => repository.get(widget.reportId),
-              builder: (context, report) => _ReportMapDetail(
-                report: report,
+            child: AsyncView<SourcedEarthquakeReport>(
+              key: ValueKey(widget.reportId),
+              future: () => source.getDetailWithSource(widget.reportId),
+              builder: (context, detail) => _ReportMapDetail(
+                report: detail.report,
+                source: detail.source,
                 sheetExpanded: _sheetExpanded,
                 imageSaver: _imageSaver,
               ),
@@ -266,11 +281,13 @@ List<_IntensityGroup> _buildIntensityGroups(EarthquakeReport report) {
 class _ReportMapDetail extends StatefulWidget {
   const _ReportMapDetail({
     required this.report,
+    required this.source,
     required this.sheetExpanded,
     required this.imageSaver,
   });
 
   final EarthquakeReport report;
+  final Result<CoreEarthquakeReportSnapshot> source;
 
   /// Hands [ReportDetailPage.imageSaver] down to the sheet's report-image card
   /// — the widget that owns the save button.
@@ -557,6 +574,35 @@ class _ReportMapDetailState extends State<_ReportMapDetail> {
     return {'type': 'FeatureCollection', 'features': features};
   }
 
+  void _openShare() {
+    final report = widget.report;
+    final source = widget.source;
+    unawaited(
+      showModalBottomSheet<void>(
+        context: context,
+        useRootNavigator: true,
+        isScrollControlled: true,
+        useSafeArea: true,
+        showDragHandle: false,
+        constraints: const BoxConstraints(maxWidth: 720),
+        shape: const RoundedRectangleBorder(borderRadius: AppRadius.topSheet),
+        clipBehavior: Clip.antiAlias,
+        builder: (_) => FractionallySizedBox(
+          heightFactor: 0.96,
+          child: EarthquakeShareSheet(
+            report: report,
+            source: source,
+            saver: widget.imageSaver,
+            isReportCurrent: () =>
+                mounted &&
+                widget.report == report &&
+                identical(widget.source, source),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return GsiOverlayScope(
@@ -579,6 +625,7 @@ class _ReportMapDetailState extends State<_ReportMapDetail> {
               expandedNotifier: widget.sheetExpanded,
               saver: widget.imageSaver,
               replayAvailable: _replayAvailable,
+              onShare: _openShare,
             ),
           ),
           // Base-map options (OSM detailed map / terrain relief / township
@@ -601,11 +648,18 @@ class _ReportMapDetailState extends State<_ReportMapDetail> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      MapBasemapMenu(
-                        showTownLabels: _showTownLabels,
-                        onShowTownLabelsChanged: _setShowTownLabels,
-                        showTerrain: _showTerrain,
-                        onShowTerrainChanged: _setShowTerrain,
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          _ReportShareButton(onTap: _openShare),
+                          const SizedBox(width: AppSpacing.sm),
+                          MapBasemapMenu(
+                            showTownLabels: _showTownLabels,
+                            onShowTownLabelsChanged: _setShowTownLabels,
+                            showTerrain: _showTerrain,
+                            onShowTerrainChanged: _setShowTerrain,
+                          ),
+                        ],
                       ),
                       const SizedBox(height: AppSpacing.sm),
                       MapCompass(bearing: _bearing, onPressed: _resetNorth),
@@ -616,6 +670,29 @@ class _ReportMapDetailState extends State<_ReportMapDetail> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _ReportShareButton extends StatelessWidget {
+  const _ReportShareButton({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final label = AppLocalizations.of(context).reportShareTitle;
+    return Semantics(
+      button: true,
+      label: label,
+      onTap: onTap,
+      excludeSemantics: true,
+      child: MapChipButton(
+        icon: Icons.share_outlined,
+        tooltip: label,
+        active: false,
+        onTap: onTap,
       ),
     );
   }
@@ -632,9 +709,11 @@ class _ReportSheet extends StatefulWidget {
     required this.expandedNotifier,
     required this.saver,
     required this.replayAvailable,
+    required this.onShare,
   });
 
   final EarthquakeReport report;
+  final VoidCallback onShare;
 
   /// Whether the archive probe found this report still replayable.
   final bool replayAvailable;
@@ -755,6 +834,7 @@ class _ReportSheetState extends State<_ReportSheet> {
                             child: _ExpandedHeader(
                               atTop: atTop,
                               onBack: _collapse,
+                              onShare: widget.onShare,
                             ),
                           ),
                         Expanded(
@@ -842,7 +922,13 @@ class _ReportSheetState extends State<_ReportSheet> {
 /// pops the page — the floating button is what leaves (and only it is visible
 /// in the collapsed state), so each state has exactly one sensible action.
 class _ExpandedHeader extends StatelessWidget {
-  const _ExpandedHeader({required this.atTop, required this.onBack});
+  const _ExpandedHeader({
+    required this.atTop,
+    required this.onBack,
+    required this.onShare,
+  });
+
+  final VoidCallback onShare;
 
   /// Whether the sheet is flush with the screen top — adds the status-bar
   /// inset back as padding so the row doesn't render underneath it.
@@ -878,7 +964,10 @@ class _ExpandedHeader extends StatelessWidget {
             ),
           ),
           // Balances the leading back button so the title stays centred.
-          const SizedBox(width: 48),
+          SizedBox(
+            width: 48,
+            child: Center(child: _ReportShareButton(onTap: onShare)),
+          ),
         ],
       ),
     );
@@ -1782,24 +1871,16 @@ class _ReportImageCardState extends State<_ReportImageCard> {
     setState(() => _saving = false);
 
     final l10n = AppLocalizations.of(context);
-    final refused =
-        result.failureOrNull is ImageSaveFailure &&
-        (result.failureOrNull! as ImageSaveFailure).reason ==
-            ImageSaveFailureReason.permissionDenied;
-    final message = result.when(
-      ok: (_) => l10n.reportDetailImageSaved,
-      // A refusal is not "try again": the only way forward is Settings, so the
-      // two failures must not share a sentence — nor the same snackbar.
-      err: (_) => refused
-          ? l10n.reportDetailImageSavePermissionDenied
-          : l10n.reportDetailImageSaveFailed,
-    );
+    final reason = result.failureOrNull == null
+        ? null
+        : imageSaveFailureReason(result.failureOrNull!);
+    final message = reason?.message(l10n) ?? l10n.reportDetailImageSaved;
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
         SnackBar(
           content: Text(message),
-          action: refused
+          action: reason == ImageSaveFailureReason.permissionSettingsRequired
               ? SnackBarAction(
                   label: l10n.permissionOpenSettings,
                   onPressed: openAppSettingsPage,

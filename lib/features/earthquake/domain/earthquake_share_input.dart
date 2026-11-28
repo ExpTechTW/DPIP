@@ -4,6 +4,7 @@ library;
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:crypto/crypto.dart';
 import 'package:dpip/features/earthquake/domain/earthquake_report.dart';
 import 'package:dpip/features/earthquake/domain/earthquake_report_snapshot.dart';
 
@@ -82,10 +83,23 @@ sealed class EarthquakeShareInput {
 
 final class EarthquakeShareInputV2 extends EarthquakeShareInput {
   EarthquakeShareInputV2._(List<int> bytes)
-    : bytes = Uint8List.fromList(bytes).asUnmodifiableView();
+    : bytes = Uint8List.fromList(bytes).asUnmodifiableView(),
+      verifiedSnapshot = null;
+
+  EarthquakeShareInputV2._verified(
+    EarthquakeShareInputV2 input,
+    this.verifiedSnapshot,
+  ) : bytes = input.bytes;
 
   /// Complete, deterministic UTF-8 envelope for the v2 renderer.
   final Uint8List bytes;
+
+  /// Present only when the source body matched its independently verified
+  /// hash and requested report ID.
+  final ({String reportId, String bodySha256})? verifiedSnapshot;
+
+  /// Also covers render-input changes from the adapter and identity evidence.
+  late final renderSha256 = sha256.convert(bytes).toString();
 }
 
 enum EarthquakeShareInputError {
@@ -141,7 +155,7 @@ EarthquakeShareInput adaptEarthquakeShareSnapshot(
       'The verified identities belong to a different Core v2 response body.',
     );
   }
-  return adaptEarthquakeShareInput(
+  final input = adaptEarthquakeShareInput(
     snapshot.report,
     evidence: ExpTechReportEvidence(
       snapshot: snapshot.report,
@@ -153,6 +167,13 @@ EarthquakeShareInput adaptEarthquakeShareSnapshot(
       magnitudeIsMl: identities.magnitudeIsMl,
     ),
   );
+  return switch (input) {
+    EarthquakeShareInputV2() => EarthquakeShareInputV2._verified(input, (
+      reportId: snapshot.requestedReportId,
+      bodySha256: snapshot.bodySha256,
+    )),
+    UnsupportedEarthquakeShareInput() => input,
+  };
 }
 
 /// Validation precedes byte emission. Ordinary detail models without matching

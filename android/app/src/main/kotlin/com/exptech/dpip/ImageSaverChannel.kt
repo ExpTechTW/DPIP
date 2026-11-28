@@ -46,9 +46,24 @@ class ImageSaverChannel(private val context: Context) :
         private const val ALBUM = "DPIP"
     }
 
+    private val clipboard = ClipboardImageStore(context)
+
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
             "save" -> save(call, result)
+            "copyPng" -> {
+                val bytes = call.arguments as? ByteArray
+                if (bytes == null || bytes.isEmpty()) {
+                    result.error("invalid_args", "PNG bytes are required", null)
+                    return
+                }
+                try {
+                    clipboard.copyPng(bytes)
+                    result.success(Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU)
+                } catch (error: Exception) {
+                    result.error("copy_failed", error.message, null)
+                }
+            }
             "status" -> result.success(status())
             else -> result.notImplemented()
         }
@@ -85,14 +100,13 @@ class ImageSaverChannel(private val context: Context) :
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 saveToMediaStore(bytes, fileName, mimeType)
+                result.success(null)
             } else {
-                saveToPicturesDirectory(bytes, fileName, mimeType)
+                saveToPicturesDirectory(bytes, fileName, mimeType, result)
             }
-            result.success(null)
         } catch (error: SecurityException) {
-            // The legacy grant, and only that: API 29+ needs no permission, so
-            // reaching this there means something else refused the write.
-            result.error("permission_denied", error.message, null)
+            val code = if (status() == "denied") "permission_denied" else "save_failed"
+            result.error(code, error.message, null)
         } catch (error: Exception) {
             result.error("save_failed", error.message, null)
         }
@@ -118,23 +132,28 @@ class ImageSaverChannel(private val context: Context) :
             val stream = resolver.openOutputStream(uri)
                 ?: throw IOException("MediaStore could not open the image for writing")
             stream.use { it.write(bytes) }
+            val published = resolver.update(
+                uri,
+                ContentValues().apply { put(MediaStore.Images.Media.IS_PENDING, 0) },
+                null,
+                null,
+            )
+            if (published != 1) throw IOException("MediaStore could not publish the image")
         } catch (error: Exception) {
             // A failed write must not leave a pending row behind: it would be
             // invisible to the gallery and never cleaned up by it.
-            resolver.delete(uri, null, null)
+            runCatching { resolver.delete(uri, null, null) }
             throw error
         }
-
-        resolver.update(
-            uri,
-            ContentValues().apply { put(MediaStore.Images.Media.IS_PENDING, 0) },
-            null,
-            null,
-        )
     }
 
     /** API 26–28: the public Pictures directory, then tell the gallery about it. */
-    private fun saveToPicturesDirectory(bytes: ByteArray, fileName: String, mimeType: String) {
+    private fun saveToPicturesDirectory(
+        bytes: ByteArray,
+        fileName: String,
+        mimeType: String,
+        result: MethodChannel.Result,
+    ) {
         if (context.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) !=
             PackageManager.PERMISSION_GRANTED
         ) {
@@ -153,11 +172,22 @@ class ImageSaverChannel(private val context: Context) :
         }
 
         val file = uniqueFile(album, fileName)
-        file.writeBytes(bytes)
-        // Writes outside MediaStore are invisible until something tells the
-        // gallery to index them; without this the picture exists but no Photos
-        // app lists it.
-        MediaScannerConnection.scanFile(context, arrayOf(file.absolutePath), arrayOf(mimeType), null)
+        try {
+            file.writeBytes(bytes)
+            MediaScannerConnection.scanFile(
+                context, arrayOf(file.absolutePath), arrayOf(mimeType),
+            ) { _, uri ->
+                if (uri != null) {
+                    result.success(null)
+                } else {
+                    runCatching { file.delete() }
+                    result.error("save_failed", "The gallery could not index the image", null)
+                }
+            }
+        } catch (error: Exception) {
+            runCatching { file.delete() }
+            throw error
+        }
     }
 
     /** [fileName] in [directory], or the first `name (n).ext` that is free. */

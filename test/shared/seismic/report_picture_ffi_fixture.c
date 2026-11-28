@@ -90,3 +90,52 @@ unsigned int fixture_live_renderers(void) { return live_renderers; }
 unsigned int fixture_outstanding_buffers(void) { return outstanding_bytes != NULL; }
 unsigned int fixture_buffer_frees(void) { return frees; }
 unsigned int fixture_invalid_buffer_frees(void) { return invalid_frees; }
+
+#ifdef WITH_OPTIONS
+typedef struct {
+  uint32_t size;
+  uint32_t format;
+  uint32_t theme;
+  uint32_t mode;
+} EqrShareRenderOptions;
+
+int32_t eqr_render_share_png_with_options(
+    const void *renderer, const uint8_t *json, size_t len,
+    const EqrShareRenderOptions *options, uint8_t **out_ptr, size_t *out_len) {
+  if (options->size != sizeof(*options) || options->format != 2) return -1;
+  return eqr_render_share_png_v2(renderer, json, len, options->mode,
+                                 options->theme, out_ptr, out_len);
+}
+#endif
+
+#ifdef WITH_STORY
+int32_t eqr_qa_render_story_png_v1(
+    const void *renderer, const uint8_t *json, size_t len,
+    const EqrShareRenderOptions *options, uint8_t **out_ptr, size_t *out_len) {
+  if (options->size != sizeof(*options) || options->format != 3) return -1;
+  return eqr_render_share_png_v2(renderer, json, len, options->mode,
+                                 options->theme, out_ptr, out_len);
+}
+#endif
+
+#ifdef WITH_V3
+int32_t eqr_render_share_png_v3(
+    const void *renderer, const uint8_t *json, size_t len,
+    const EqrShareRenderOptions *options, uint8_t **out_ptr, size_t *out_len) {
+  if (options->size != 16) return -2;
+  if (options->format == 3) return -3;
+  if (options->format != 1 && options->format != 2) return -1;
+  if (len && json[0] == 2) return -2;
+  return eqr_render_share_png_v2(renderer, json, len, options->mode,
+                                 options->theme, out_ptr, out_len);
+}
+#endif
+
+#ifdef WITH_STORY_V3
+int32_t eqr_qa_render_story_png_v2(
+    const void *renderer, const uint8_t *json, size_t len,
+    const EqrShareRenderOptions *options, uint8_t **out_ptr, size_t *out_len) {
+  if (len && json[0] == 2) return -2;
+  return eqr_qa_render_story_png_v1(renderer, json, len, options, out_ptr, out_len);
+}
+#endif

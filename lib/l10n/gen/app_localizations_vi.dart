@@ -949,6 +949,85 @@ class AppLocalizationsVi extends AppLocalizations {
   String get shelterCapacityLabel => 'Sức chứa';
 
   @override
+  String get reportShareTitle => 'Ảnh chia sẻ động đất';
+
+  @override
+  String get reportSharePreview => 'Xem trước ảnh động đất';
+
+  @override
+  String get reportShareFormat => 'Định dạng';
+
+  @override
+  String get reportShareMapMode => 'Kiểu bản đồ';
+
+  @override
+  String get reportShareTheme => 'Chủ đề';
+
+  @override
+  String get reportShareCluster => 'Cụm';
+
+  @override
+  String get reportShareStations => 'Trạm đo';
+
+  @override
+  String get reportShareTowns => 'Địa phương';
+
+  @override
+  String get reportDetailImageSaveSettingsRequired =>
+      'Cho phép truy cập ảnh trong Cài đặt rồi thử lưu lại.';
+
+  @override
+  String get reportDetailImageSaveRestricted =>
+      'Thiết bị của bạn hạn chế quyền truy cập ảnh.';
+
+  @override
+  String get reportDetailImageSaveUnavailable =>
+      'Thiết bị này không hỗ trợ lưu vào thư viện ảnh.';
+
+  @override
+  String get reportShareSend => 'Chia sẻ';
+
+  @override
+  String get reportShareCopy => 'Sao chép';
+
+  @override
+  String get reportShareSave => 'Lưu';
+
+  @override
+  String get reportShareCopied => 'Đã sao chép hình ảnh';
+
+  @override
+  String get reportShareCopyFailed => 'Không thể sao chép hình ảnh';
+
+  @override
+  String get reportShareUnsupportedLanguage =>
+      'Ảnh chia sẻ động đất hiện chỉ hỗ trợ tiếng Trung phồn thể (Đài Loan).';
+
+  @override
+  String get reportShareUnsupportedReport =>
+      'Báo cáo này thiếu dữ liệu đã xác minh để tạo ảnh chia sẻ.';
+
+  @override
+  String get reportShareRendererUnavailable =>
+      'Thư viện tạo ảnh gốc không khả dụng trong phiên bản này.';
+
+  @override
+  String get reportShareRendererIncompatible =>
+      'Trình kết xuất không hỗ trợ định dạng này.';
+
+  @override
+  String get reportShareTimeout =>
+      'Đã hết thời gian tạo ảnh. Vui lòng thử lại.';
+
+  @override
+  String get reportShareRenderFailed =>
+      'Không thể tạo ảnh chia sẻ động đất. Vui lòng thử lại.';
+
+  @override
+  String get reportShareExportFailed =>
+      'Không thể mở trình chia sẻ của hệ thống. Vui lòng thử lại.';
+
+  @override
   String get reportDetailImage => 'Hình ảnh báo cáo';
 
   @override

@@ -49,7 +49,8 @@ void main() {
       final recoveredOutput = Completer<Uint8List>();
       final requests = <(int, EqMapMode, EqTheme)>[];
       var releases = 0;
-      final picture = ReportPicture.forTesting((input, mode, theme) {
+      final picture = ReportPicture.forTesting((input, mode, theme, format) {
+        expect(format, EqShareFormat.landscape16By9);
         requests.add((input.single, mode, theme));
         switch (input.single) {
           case 1:
@@ -117,7 +118,7 @@ void main() {
     'normalizes a failed render Future and allows a later request',
     () async {
       var renders = 0;
-      final picture = ReportPicture.forTesting((input, _, _) async {
+      final picture = ReportPicture.forTesting((input, _, _, _) async {
         if (++renders == 1) throw StateError('background render failed');
         return input;
       }, () {});

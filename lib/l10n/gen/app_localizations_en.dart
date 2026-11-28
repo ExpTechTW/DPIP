@@ -951,6 +951,84 @@ class AppLocalizationsEn extends AppLocalizations {
   String get shelterCapacityLabel => 'Capacity';
 
   @override
+  String get reportShareTitle => 'Earthquake share image';
+
+  @override
+  String get reportSharePreview => 'Image preview';
+
+  @override
+  String get reportShareFormat => 'Format';
+
+  @override
+  String get reportShareMapMode => 'Map style';
+
+  @override
+  String get reportShareTheme => 'Theme';
+
+  @override
+  String get reportShareCluster => 'Clusters';
+
+  @override
+  String get reportShareStations => 'Stations';
+
+  @override
+  String get reportShareTowns => 'Townships';
+
+  @override
+  String get reportDetailImageSaveSettingsRequired =>
+      'Allow photo access in Settings, then try saving again.';
+
+  @override
+  String get reportDetailImageSaveRestricted =>
+      'Your device restricts access to photos.';
+
+  @override
+  String get reportDetailImageSaveUnavailable =>
+      'Saving to photos is unavailable on this device.';
+
+  @override
+  String get reportShareSend => 'Share';
+
+  @override
+  String get reportShareCopy => 'Copy';
+
+  @override
+  String get reportShareSave => 'Save';
+
+  @override
+  String get reportShareCopied => 'Image copied';
+
+  @override
+  String get reportShareCopyFailed => 'Could not copy the image';
+
+  @override
+  String get reportShareUnsupportedLanguage =>
+      'Earthquake share images currently support Traditional Chinese (Taiwan) only.';
+
+  @override
+  String get reportShareUnsupportedReport =>
+      'This report lacks the verified data required to create a share image.';
+
+  @override
+  String get reportShareRendererUnavailable =>
+      'The native image renderer is unavailable in this build.';
+
+  @override
+  String get reportShareRendererIncompatible =>
+      'The native renderer does not support this format.';
+
+  @override
+  String get reportShareTimeout => 'Creating the image timed out. Try again.';
+
+  @override
+  String get reportShareRenderFailed =>
+      'Could not create the earthquake share image. Try again.';
+
+  @override
+  String get reportShareExportFailed =>
+      'Could not open system sharing. Try again.';
+
+  @override
   String get reportDetailImage => 'Report image';
 
   @override

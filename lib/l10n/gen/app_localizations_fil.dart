@@ -959,6 +959,85 @@ class AppLocalizationsFil extends AppLocalizations {
   String get shelterCapacityLabel => 'Kapasidad';
 
   @override
+  String get reportShareTitle => 'Larawan ng lindol para sa pagbabahagi';
+
+  @override
+  String get reportSharePreview => 'Preview ng larawan ng lindol';
+
+  @override
+  String get reportShareFormat => 'Format';
+
+  @override
+  String get reportShareMapMode => 'Estilo ng mapa';
+
+  @override
+  String get reportShareTheme => 'Tema';
+
+  @override
+  String get reportShareCluster => 'Mga grupo';
+
+  @override
+  String get reportShareStations => 'Mga istasyon';
+
+  @override
+  String get reportShareTowns => 'Mga bayan';
+
+  @override
+  String get reportDetailImageSaveSettingsRequired =>
+      'Payagan ang access sa mga larawan sa Mga Setting, saka subukang mag-save muli.';
+
+  @override
+  String get reportDetailImageSaveRestricted =>
+      'Nililimitahan ng device mo ang access sa mga larawan.';
+
+  @override
+  String get reportDetailImageSaveUnavailable =>
+      'Hindi puwedeng mag-save sa mga larawan sa device na ito.';
+
+  @override
+  String get reportShareSend => 'Ibahagi';
+
+  @override
+  String get reportShareCopy => 'Kopyahin';
+
+  @override
+  String get reportShareSave => 'I-save';
+
+  @override
+  String get reportShareCopied => 'Nakopya na ang larawan';
+
+  @override
+  String get reportShareCopyFailed => 'Hindi makopya ang larawan';
+
+  @override
+  String get reportShareUnsupportedLanguage =>
+      'Traditional Chinese (Taiwan) pa lang ang sinusuportahan ng mga larawang ito.';
+
+  @override
+  String get reportShareUnsupportedReport =>
+      'Kulang ang beripikadong datos ng ulat para makagawa ng larawan.';
+
+  @override
+  String get reportShareRendererUnavailable =>
+      'Hindi available ang native na tagagawa ng larawan sa bersyong ito.';
+
+  @override
+  String get reportShareRendererIncompatible =>
+      'Hindi suportado ng native renderer ang format na ito.';
+
+  @override
+  String get reportShareTimeout =>
+      'Naubos ang oras sa paggawa ng larawan. Subukan ulit.';
+
+  @override
+  String get reportShareRenderFailed =>
+      'Hindi nagawa ang larawan ng lindol. Subukan ulit.';
+
+  @override
+  String get reportShareExportFailed =>
+      'Hindi mabuksan ang menu ng pagbabahagi. Subukan ulit.';
+
+  @override
   String get reportDetailImage => 'Larawan ng Ulat';
 
   @override

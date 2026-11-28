@@ -1,8 +1,40 @@
+import Flutter
 import Foundation
+import UIKit
+import UniformTypeIdentifiers
 import XCTest
 @testable import Runner
 
 final class RunnerTests: XCTestCase {
+  @MainActor
+  func testCopyPngPreservesPasteboardBytesAndDimensions() throws {
+    let pasteboard = UIPasteboard.general
+    let previous = pasteboard.items
+    defer { pasteboard.items = previous }
+    let format = UIGraphicsImageRendererFormat()
+    format.scale = 1
+    let png = UIGraphicsImageRenderer(size: CGSize(width: 3, height: 2), format: format)
+      .pngData { context in
+        UIColor.red.setFill()
+        context.fill(CGRect(x: 0, y: 0, width: 3, height: 2))
+      }
+    let plugin = ImageSaverPlugin()
+    var reply: Any?
+    plugin.handle(
+      FlutterMethodCall(methodName: "copyPng", arguments: FlutterStandardTypedData(bytes: png))
+    ) { reply = $0 }
+
+    XCTAssertEqual(reply as? Bool, true)
+    let copied = try XCTUnwrap(pasteboard.data(forPasteboardType: UTType.png.identifier))
+    XCTAssertEqual(copied, png)
+    let image = try XCTUnwrap(UIImage(data: copied)?.cgImage)
+    XCTAssertEqual(image.width, 3)
+    XCTAssertEqual(image.height, 2)
+    plugin.handle(FlutterMethodCall(methodName: "copyPng", arguments: nil)) { reply = $0 }
+    XCTAssertEqual((reply as? FlutterError)?.code, "invalid_args")
+    XCTAssertEqual(pasteboard.data(forPasteboardType: UTType.png.identifier), png)
+  }
+
   func testSnapshotKindAllowlist() throws {
     let kind = try WidgetSnapshotFile.kind("weatherForecast")
     XCTAssertEqual(kind.filename, "weather-forecast.json")

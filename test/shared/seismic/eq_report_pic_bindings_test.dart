@@ -64,6 +64,7 @@ void main() {
           final result = probeReportPictureBindings(
             Ok(_library(variant)),
             fromProcess: false,
+            legacyV2: true,
           );
           expect(
             result.failureOrNull,
@@ -79,6 +80,200 @@ void main() {
                   contains(diagnostic),
                 ),
           );
+        });
+      }
+
+      for (final (variant, qa, format, diagnostic) in [
+        ('v3-old-minor', false, EqShareFormat.landscape16By9, 'ABI 1.3'),
+        ('v3-wrong-major', false, EqShareFormat.landscape16By9, 'ABI 2.4'),
+        (
+          'v3-missing-capability',
+          false,
+          EqShareFormat.landscape16By9,
+          'EQR_CAP_SHARE_INPUT_V3',
+        ),
+        (
+          'v3-missing-format',
+          false,
+          EqShareFormat.information4By5,
+          'EQR_CAP_PRODUCTION_4_5',
+        ),
+        (
+          'v3-missing-symbol',
+          false,
+          EqShareFormat.landscape16By9,
+          'eqr_render_share_png_v3',
+        ),
+        ('v3-production', true, EqShareFormat.story9By16, 'profile'),
+        ('v3-production', false, EqShareFormat.story9By16, 'QA'),
+        ('v3-qa', false, EqShareFormat.landscape16By9, 'profile'),
+        (
+          'v3-missing-qa-symbol',
+          true,
+          EqShareFormat.story9By16,
+          'eqr_qa_render_story_png_v2',
+        ),
+        ('v3-reserved-story', false, EqShareFormat.landscape16By9, 'bit 10'),
+      ]) {
+        test('v3 rejects $variant for ${format.name} (qa: $qa)', () {
+          final renderer = EqReportPic.create(
+            EqReportPicBindings(_library(variant), storyQa: qa),
+            [
+              Uint8List.fromList([7]),
+            ],
+          );
+          addTearDown(renderer.dispose);
+          expect(
+            () => renderer.renderSharePngV3(
+              Uint8List.fromList([4]),
+              format: format,
+              mode: EqMapMode.towns,
+              theme: EqTheme.dark,
+            ),
+            throwsA(
+              isA<EqShareRenderException>()
+                  .having(
+                    (error) => error.reason,
+                    'reason',
+                    EqShareRenderError.unsupportedFeature,
+                  )
+                  .having((error) => error.nativeStatus, 'status', isNull)
+                  .having(
+                    (error) => error.message,
+                    'diagnostic',
+                    contains(diagnostic),
+                  ),
+            ),
+          );
+        });
+      }
+
+      for (final (variant, qa, format) in [
+        ('v3-production', false, EqShareFormat.landscape16By9),
+        ('v3-production', false, EqShareFormat.information4By5),
+        ('v3-qa', true, EqShareFormat.story9By16),
+      ]) {
+        test(
+          '${format.name} uses its versioned options ABI without fallback',
+          () {
+            final library = _library(variant);
+            final renderer = EqReportPic.create(
+              EqReportPicBindings(library, storyQa: qa),
+              [
+                Uint8List.fromList([7]),
+              ],
+            );
+            final live = library
+                .lookupFunction<Uint32 Function(), int Function()>(
+                  'fixture_live_renderers',
+                );
+            final outstanding = library
+                .lookupFunction<Uint32 Function(), int Function()>(
+                  'fixture_outstanding_buffers',
+                );
+            Uint8List render(int byte) => renderer.renderSharePngV3(
+              Uint8List.fromList([byte]),
+              format: format,
+              mode: EqMapMode.towns,
+              theme: EqTheme.dark,
+            );
+            final png = render(4);
+            expect(outstanding(), 0);
+            expect(
+              () => render(2),
+              throwsA(
+                isA<EqShareRenderException>()
+                    .having(
+                      (error) => error.reason,
+                      'reason',
+                      EqShareRenderError.unsupportedVersion,
+                    )
+                    .having((error) => error.nativeStatus, 'status', -2)
+                    .having(
+                      (error) => error.message,
+                      'diagnostic',
+                      'fixture render error',
+                    ),
+              ),
+            );
+            renderer.dispose();
+            expect(live(), 0);
+            expect(png, [4, 2, 1]);
+          },
+        );
+      }
+
+      test('Story QA uses format 3 and frees the native PNG', () {
+        final library = _library('story-qa');
+        final bindings = EqReportPicBindings(library);
+        final renderer = EqReportPic.create(bindings, [
+          Uint8List.fromList([7]),
+        ]);
+        addTearDown(renderer.dispose);
+        expect(bindings.supportsStoryQa, isTrue);
+        expect(
+          renderer.renderSharePngV2(
+            Uint8List.fromList([4]),
+            format: EqShareFormat.story9By16,
+            mode: EqMapMode.towns,
+            theme: EqTheme.dark,
+          ),
+          [4, 2, 1],
+        );
+        final live = library.lookupFunction<Uint32 Function(), int Function()>(
+          'fixture_outstanding_buffers',
+        );
+        expect(live(), 0);
+        expect(
+          EqReportPicBindings(_library('abi-1-3')).supportsStoryQa,
+          isFalse,
+        );
+      });
+
+      for (final variant in [
+        'supported',
+        'missing-4-5-symbol',
+        'missing-4-5-capability',
+        'abi-1-3',
+      ]) {
+        test('negotiates 4:5 support with $variant', () {
+          final lib = _library(variant);
+          final bindings = EqReportPicBindings(lib);
+          final invalidFrees = lib
+              .lookupFunction<Uint32 Function(), int Function()>(
+                'fixture_invalid_buffer_frees',
+              );
+          final owner = EqReportPic.create(bindings, [
+            Uint8List.fromList([7]),
+          ]);
+          addTearDown(owner.dispose);
+          expect(_render(owner, [3]), [3, 1, 1]);
+          Uint8List portrait() => owner.renderSharePngV2(
+            Uint8List.fromList([4]),
+            mode: EqMapMode.towns,
+            theme: EqTheme.light,
+            format: EqShareFormat.information4By5,
+          );
+          final supported = variant == 'abi-1-3';
+          expect(bindings.supportsInformation4By5, supported);
+          if (supported) {
+            expect(portrait(), [4, 2, 0]);
+          } else {
+            expect(
+              portrait,
+              throwsA(
+                isA<EqShareRenderException>()
+                    .having(
+                      (e) => e.reason,
+                      'reason',
+                      EqShareRenderError.unsupportedFeature,
+                    )
+                    .having((e) => e.nativeStatus, 'native status', isNull),
+              ),
+            );
+          }
+          expect(_render(owner, [5]), [5, 1, 1]);
+          expect(invalidFrees(), 0);
         });
       }
 
@@ -109,6 +304,7 @@ void main() {
         final bindings = probeReportPictureBindings(
           Ok(lib),
           fromProcess: false,
+          legacyV2: true,
         ).valueOrNull!;
         final frees = lib.lookupFunction<Uint32 Function(), int Function()>(
           'fixture_buffer_frees',

@@ -102,10 +102,13 @@ what it happens to do. They live here so there is one copy: `CLAUDE.md` and
 
 ## Native report-image renderer
 
-`ReportPicture` in `lib/shared/seismic/report_picture/` accepts the original
-UTF-8 Share Render Input v2 bytes. It checks the ABI (major 1, minor 2 or later)
-and the v2 and production 16:9 capability bits before loading fonts. Rust
-validates the input and returns a 1920×1080 PNG. The service returns a
+`ReportPicture` in `lib/shared/seismic/report_picture/` accepts UTF-8 Share
+Render Input v3. It checks the ABI (major 1, minor 4 or later), the v3
+capability and the profile's symbols before loading fonts. Each render checks
+the selected format capability. The 16:9 map and 4:5 information card return
+1920×1080 and 1080×1350 PNGs through `eqr_render_share_png_v3`. The 9:16 QA
+Story returns a 1080×1920 PNG through `eqr_qa_render_story_png_v2`. Legacy
+verification tools can explicitly open the v2 renderer. The service returns a
 `Result<Uint8List>` with an app-owned copy or a structured
 `ReportPictureFailure`. The upstream Dart bindings copy native bytes and
 release the original buffer in the same isolate. Native initialization and
@@ -115,114 +118,61 @@ handle. Ignoring a request Future does not cancel native work.
 
 ### Earthquake report source evidence
 
-The Core v2 detail endpoint is fetched as bytes. The cache revalidates only
-against a row of the requested representation and restores the body with its
-matching ETag. `EarthquakeReportSnapshot` keeps the existing display model,
-the requested report ID, the optional ETag, the body SHA-256 and the exact
-JSON number tokens. It validates the source before the ordinary model
-decoder can discard duplicate keys or coerce integers. The detail screen
-still decodes the plain model: this stricter evidence belongs to the share
-path and must never turn a report the app could show into an error page.
+The region-pinned Core v2 detail endpoint is fetched as bytes. A complete 200
+or a 304 confirming the pinned binary cache entry supplies the body. A
+`CoreEarthquakeReportSnapshot` retains immutable content-decoded bytes, the
+full report ID, SHA-256, the exact JSON number tokens and HTTP provenance.
+The detail page and share sheet use the same response. A displayable report
+may still open when the stricter evidence check rejects sharing.
 
-`adaptEarthquakeShareSnapshot` accepts verified county and station codes,
-the intensity scale and the magnitude kind, all bound to that body SHA-256.
-The adapter uses the snapshot's original number tokens and emits
-deterministic Share Render Input v2 UTF-8 bytes for `ReportPicture`. A
-different body needs its own verified evidence even when the report ID and
-decoded model are equal. The Core v2 detail omits station identifiers, a
-per-report scale identifier and the original publication's revision
-metadata.
+`adaptEarthquakeShareSnapshotV3` checks the modern Core profile, the report
+time and identity, and the measurement and observation fields. It uses JSON
+Pointers as observation identities within that source body and uses the exact
+number tokens to emit deterministic v3 bytes. The share-sheet cache includes
+the source body and input hashes as well as renderer, format, mode, theme and
+locale. History with an unverified intensity scale stays available in the
+ordinary detail flow and is ineligible for v3 sharing.
 
 ### Native build inputs
 
-The mobile runtime is opt-in. With a local checkout containing eq-report-pic
-merge commit `b135d02bd1ba5103cd3d116a951b1b63a710a312` (PR #12), run these
-commands from the DPIP repository root.
+The native runtime is opt-in. DPIP pins the merged eq-report-pic commit
+`6c2ca6e21c9a50cd386d5c83064a261227a49326`
+([eq-report-pic #19](https://github.com/ExpTechTW/eq-report-pic/pull/19)).
+The build driver archives that commit and builds from the frozen Cargo lock
+and vendored sources. See the [QA guide](tool/qa/README.md) for launch commands.
 
-```sh
-tool/dev/build_report_picture.sh ios ../eq-report-pic
-tool/dev/build_report_picture.sh android ../eq-report-pic
-shasum -a 256 -c native/eq_report_pic/ios/SHA256SUMS
-shasum -a 256 -c native/eq_report_pic/android/SHA256SUMS
-```
+- iOS Runner selects one verified static archive for the active SDK.
+  `Debug-storyqa` selects the QA archive. Production configurations select
+  the production archive. Force-load, linker roots and export-dynamic keep
+  the selected C ABI visible to `DynamicLibrary.process()`.
+- Android Gradle flavors select their own JNI source sets. Story QA is
+  debug-only, with a distinct application ID and library SONAME; the
+  production flavor uses the original application ID. The NDK pin is
+  `28.2.13676358` and the supported ABIs are arm64-v8a and x86_64.
+- Each invocation stages from a candidate package and a separately trusted
+  manifest into a fresh directory. If staging fails, the app build cannot
+  begin. An ordinary build without a stage has no report renderer.
+- Both profiles expose ABI 1.4. Production reports mask `0xb1f` and rejects
+  format 3. QA reports `0x1b1f` and uses the extra Story symbol and bit 12.
+  Bit 10 is disabled in both profiles.
+- Both profiles pass the same verified fonts to the renderer in order:
+  M PLUS 2p Bold, Gen Shin Gothic Bold, then Noto Sans TC Black.
+  The final-app verifier checks the actual bundled font hashes, the iOS link
+  map and signed export trie, or the packaged Android ELF bytes and APK
+  page alignment.
 
-The script archives that commit, checks `Cargo.lock`, and builds offline with
-the committed Cargo vendor snapshot and Rust 1.99.1. Install the Rust targets
-for the platform you build.
+Distribution of the native runtime requires clearance for its fonts and
+embedded basemap. Story's rendered diagnostic footer records the outstanding
+geographic validation.
 
-- **iOS** uses Xcode and `aarch64-apple-ios`, `aarch64-apple-ios-sim`, and
-  `x86_64-apple-ios`. Runner picks the static XCFramework slice for the SDK.
-  Linker roots keep all nine ABI symbols through dead stripping for Dart
-  `DynamicLibrary.process()` lookup. The extensions use their own link settings.
-- **Android** uses NDK `28.2.13676358`, API 26, and
-  `aarch64-linux-android` / `x86_64-linux-android`. Set `ANDROID_HOME` or
-  `ANDROID_SDK_ROOT` if needed. Gradle includes the ELF files as `jniLibs`
-  for `arm64-v8a` and `x86_64`. The script checks all nine exports and 16 KiB
-  ELF segment alignment. DPIP excludes `armeabi-v7a` from its supported set.
-  Dart opens `libeq_report_pic.so`.
+### Installed and offline QA
 
-The generated native libraries, fonts, and notices are local build inputs.
-Each platform's `source-revision.txt`, `toolchain.txt`, and `SHA256SUMS` record
-what was built and staged. Flutter packages a single set of the original TTFs
-with their notices. Standard CI builds omit the optional native inputs.
-A missing library or unsupported ABI becomes an ordinary `Failure`.
-Distribution of the native runtime also requires clearance for the embedded
-basemap and assets.
-
-### Interactive QA
-
-See the [地震分享圖 QA guide](tool/qa/README.md) for the development-only
-preview, one-command launch, and manual checks with the verified offline report.
-
-### Offline smoke test
-
-Use the alternate entry point with the original synthetic fixture from
-eq-report-pic's `testdata/share-input-v2/synthetic-zero-missing.json`, checked
-in here for QA. The `.jcs.json` companion is the canonical comparison payload
-and omits fields expected by the renderer.
-
-```sh
-tool/run.sh -d <simulator-or-emulator-id> --target tool/qa/report_picture_smoke.dart \
-  --dart-define="DPIP_REPORT_PICTURE_FIXTURE=$(base64 < tool/qa/fixtures/report_picture_v2.json | tr -d '\n')"
-```
-
-Check for `REPORT_PICTURE_SMOKE PASS`, the ABI and capabilities, and the
-fixture SHA-256. The smoke test checks queuing, invalid input and version,
-recovery, and disposal. Each `REPORT_PICTURE_PNG` line gives the theme,
-decoded dimensions, SHA-256 and app-sandbox path for one generated PNG.
-Copy `report-picture-light.png` and `report-picture-dark.png` out of the
-debug app to inspect the rendered maps:
-
-```sh
-xcrun simctl get_app_container booted com.exptech.dpip.dpip data
-adb exec-out run-as com.exptech.dpip cat app_flutter/report-picture-light.png > report-picture-light.png
-adb exec-out run-as com.exptech.dpip cat app_flutter/report-picture-dark.png > report-picture-dark.png
-```
-
-On iOS, the PNGs are under `Documents` in the returned data container.
-
-To render the verified Taitung offshore report through the snapshot and
-adapter, supply the original Core v2 bytes and the independent v2 envelope
-from the [source fixtures](test/features/earthquake/domain/fixtures/share_input/README.md).
-
-```sh
-fixture_dir=test/features/earthquake/domain/fixtures/share_input
-tool/run.sh -d <simulator-or-emulator-id> --no-pub --target tool/qa/report_picture_smoke.dart \
-  --dart-define="DPIP_REPORT_PICTURE_CORE_V2=$(base64 < "$fixture_dir/exptech-modern.json" | tr -d '\n')" \
-  --dart-define="DPIP_REPORT_PICTURE_HISTORICAL=$(base64 < "$fixture_dir/exptech-historical.json" | tr -d '\n')" \
-  --dart-define="DPIP_REPORT_PICTURE_FIXTURE=$(base64 < "$fixture_dir/exptech-modern.v2.json" | tr -d '\n')"
-```
-
-This mode checks the source fingerprint, the original report ID, the two
-regional intensities, five verified stations and byte equality with the v2
-envelope. It rejects missing identity evidence and checks that the historical
-Meinong fixture cannot render without verified regional and station codes.
-Both themes must return identical bytes on repeated renders of their
-respective inputs.
-
-For a negative smoke test, pass `--dart-define=DPIP_REPORT_PICTURE_EXPECT=unavailable`
-or `--dart-define=DPIP_REPORT_PICTURE_EXPECT=unsupportedAbi` with a build
-prepared without the library or with an incompatible ABI.
+The ordinary report detail page loads the original Core v2 report response.
+The supported report ID, original bytes, source identity, intensity scale
+and magnitude evidence are checked before rendering; a revised body requires
+new verification. The alternate smoke targets under `tool/qa/` exercise the
+same snapshot adapter and worker with the verified offline fixtures.
+The production app entry point does not import them.
 
 Run `tool/dev/test_report_picture.sh` on macOS or Linux for host-side ABI
 and lifecycle tests. It compiles small C test doubles with `cc` and uses

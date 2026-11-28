@@ -14,6 +14,8 @@ const reportPictureAbiSymbols = [
   'eqr_render_share_png_v2',
 ];
 
+const reportPictureOptionsSymbol = 'eqr_render_share_png_with_options';
+
 (int, int) readReportPictureAbi(DynamicLibrary library) {
   final info = library
       .lookupFunction<

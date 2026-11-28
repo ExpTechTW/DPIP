@@ -10,6 +10,9 @@ import 'package:dpip/core/network/stale_if_error.dart';
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:flutter/foundation.dart' show visibleForTesting;
 
+/// Throws a FormatException if the original body is unsuitable for caching.
+typedef ByteCacheValidator = void Function(Uint8List);
+
 /// Dio interceptor implementing HTTP ETag revalidation against an
 /// [EtagCacheStore].
 ///
@@ -51,6 +54,30 @@ class EtagInterceptor extends Interceptor {
 
   /// Request opt-in for JSON that must be returned and cached as source bytes.
   static const String validateJsonBytesKey = 'dpip.validateJsonBytes';
+
+  static const String validateCacheBodyKey = 'dpip.validateCacheBody';
+  static const String revalidatedBytesKey = 'dpip.revalidatedBytes';
+  static const String _conditionalBytesKey = 'dpip.conditionalBytes';
+
+  static final _entityTag = RegExp(r'(?:W/)?"[\x21\x23-\x7e\x80-\xff]*"');
+
+  /// Require one HTTP entity-tag before treating it as a validator. In
+  /// particular, a wildcard could revalidate an unrelated cached body.
+  static bool isEntityTag(String value) =>
+      _entityTag.matchAsPrefix(value)?.end == value.length;
+
+  static bool _acceptBytes(ByteCacheValidator validate, Uint8List bytes) {
+    try {
+      validate(bytes);
+      return true;
+    } on FormatException {
+      return false;
+    }
+  }
+
+  // GET/If-None-Match uses weak comparison: W/"tag" and "tag" match.
+  static String _weakTag(String etag) =>
+      etag.startsWith('W/') ? etag.substring(2) : etag;
 
   /// Whether a request may enter the store.
   ///
@@ -287,6 +314,26 @@ class EtagInterceptor extends Interceptor {
       return;
     }
 
+    final validator =
+        options.extra[validateCacheBodyKey] as ByteCacheValidator?;
+    if (_isBytes(options) && validator != null) {
+      final cached = await store.readBytes(
+        url,
+        touch: false,
+        recordHit: false,
+        accept: (_, etag) => isEntityTag(etag) && !_isUrlHashEtag(etag),
+      );
+      // Pin the validated bytes that supplied the conditional ETag. A
+      // concurrent writer can replace the row even with the same ETag.
+      options.headers.remove(HttpHeadersEtag.ifNoneMatch);
+      if (cached != null && _acceptBytes(validator, cached.bytes)) {
+        options.extra[_conditionalBytesKey] = cached;
+        options.headers[HttpHeadersEtag.ifNoneMatch] = cached.etag;
+      }
+      handler.next(options);
+      return;
+    }
+
     // An older client may have cached this URL after decoding JSON. Only
     // revalidate if the row can supply the requested representation on 304.
     final etag = await store.readEtag(url, binary: _isBytes(options));
@@ -304,6 +351,8 @@ class EtagInterceptor extends Interceptor {
   ) async {
     final options = response.requestOptions;
     final validateJson = options.extra[validateJsonBytesKey] == true;
+    final validator =
+        options.extra[validateCacheBodyKey] as ByteCacheValidator?;
     // Validate before a fresh response can replace a cache row or reach the
     // region client. A 304 has no body until the matching row is restored.
     if (validateJson &&
@@ -320,19 +369,45 @@ class EtagInterceptor extends Interceptor {
       if (response.statusCode == 304) {
         final validated = options.headers[HttpHeadersEtag.ifNoneMatch];
         if (binary) {
-          final cached = await store.readBytes(
-            url,
-            accept: (_, etag) => etag == validated,
-          );
+          final sent = options.extra[_conditionalBytesKey] as CachedBytes?;
+          final CachedBytes? cached;
+          if (validator == null) {
+            cached = await store.readBytes(
+              url,
+              accept: (_, etag) => etag == validated,
+            );
+          } else {
+            // An unsolicited 304 or a response for another validator cannot
+            // establish the body. Retain the existing failover on eviction or
+            // replacement by a different validator while the request was out.
+            final returnedTags = response.headers['etag'];
+            final returnedTag = returnedTags?.singleOrNull;
+            cached =
+                sent != null &&
+                    sent.etag == validated &&
+                    (returnedTags == null ||
+                        (returnedTag != null &&
+                            _weakTag(returnedTag) == _weakTag(sent.etag))) &&
+                    await store.readEtag(url, binary: true) == validated
+                ? sent
+                : null;
+          }
           if (cached != null) {
             if (validateJson &&
+                validator == null &&
                 !_validateJsonBytes(cached.bytes, response, handler)) {
               return;
             }
             response.statusCode = 200;
             response.data = cached.bytes;
             response.headers.set('etag', cached.etag);
-            // Hit metering lives in [EtagCacheStore.readBytes].
+            response.extra[revalidatedBytesKey] = true;
+            // For pinned bytes the read was speculative, so meter the actual
+            // 304 hit here. Other binary hits are metered in readBytes.
+            final usage = _usage;
+            if (sent != null && usage != null) {
+              unawaited(usage.record(down: 0, hit: true, saved: cached.size));
+            }
             handler.next(response);
             return;
           }
@@ -388,7 +463,7 @@ class EtagInterceptor extends Interceptor {
             : _downBytes(response);
         final immutable =
             post || (binary && response.data != null && isImmutableTile(uri));
-        var etag = response.headers.value('etag');
+        var etag = response.headers['etag']?.singleOrNull;
         if (immutable) {
           // POST (a dashboard query whose body is a constant) and URL-pinned
           // tiles both carry their content in the URL — ignore any server ETag
@@ -402,15 +477,20 @@ class EtagInterceptor extends Interceptor {
         if (etag != null && response.data != null) {
           if (binary) {
             final bytes = _asBytes(response.data);
-            unawaited(
-              store.writeBytes(
-                url,
-                etag: etag,
-                bytes: bytes,
-                contentType: response.headers.value(Headers.contentTypeHeader),
-                size: down,
-              ),
-            );
+            if (validator == null ||
+                (isEntityTag(etag) && _acceptBytes(validator, bytes))) {
+              unawaited(
+                store.writeBytes(
+                  url,
+                  etag: etag,
+                  bytes: bytes,
+                  contentType: response.headers.value(
+                    Headers.contentTypeHeader,
+                  ),
+                  size: down,
+                ),
+              );
+            }
           } else {
             unawaited(
               store.write(

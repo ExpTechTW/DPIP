@@ -172,7 +172,7 @@ class _MapPlatform extends MapLibrePlatform {
   }
 }
 
-class _Reports implements ReportRepository {
+class _Reports implements ReportRepository, EarthquakeShareSource {
   Result<EarthquakeReport>? next;
   Completer<Result<EarthquakeReport>>? pending;
   int gets = 0;
@@ -180,6 +180,16 @@ class _Reports implements ReportRepository {
   /// What the archive probe answers; tests flip it between visits.
   Result<bool> replay = const Ok(true);
   final List<int> replayProbes = [];
+
+  @override
+  Future<Result<SourcedEarthquakeReport>> getDetailWithSource(
+    String id,
+  ) async => (await get(id)).map(
+    (report) => (
+      report: report,
+      source: const Err(DecodeFailure('Invalid source evidence')),
+    ),
+  );
 
   @override
   Future<Result<EarthquakeReport>> get(String id) async {
@@ -366,12 +376,14 @@ void main() {
     required TownDirectory towns,
     required GoRouter router,
     ThemeData? theme,
+    Locale locale = const Locale('en'),
   }) async {
     useSurface(tester);
     await tester.pumpWidget(
       MultiProvider(
         providers: [
           Provider<ReportRepository>.value(value: reports),
+          Provider<EarthquakeShareSource>.value(value: reports),
           Provider<ApiClient>.value(value: client),
           Provider<SettingsStore>.value(value: settings),
           ChangeNotifierProvider<RegionStore>.value(value: regions),
@@ -379,7 +391,7 @@ void main() {
         ],
         child: MaterialApp.router(
           theme: theme,
-          locale: const Locale('en'),
+          locale: locale,
           localizationsDelegates: appLocalizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           routerConfig: router,
@@ -415,6 +427,100 @@ void main() {
         ],
       ),
     ],
+  );
+
+  testWidgets('sharing opens above the collapsed and expanded detail', (
+    tester,
+  ) async {
+    final reports = _Reports()..next = Ok(_report());
+    final settings = SettingsStore.inMemory();
+    final router = nestedRouter(reports);
+    await pumpPage(
+      tester,
+      reports: reports,
+      client: _BytesClient(RegionSelection(settings)),
+      settings: settings,
+      regions: RegionStore(settings),
+      towns: const TownDirectory({}),
+      router: router,
+    );
+    await tester.pump();
+
+    final share = find.byTooltip('Earthquake share image');
+    final semantics = tester.ensureSemantics();
+    try {
+      expect(
+        tester
+            .getSemantics(find.bySemanticsLabel('Earthquake share image'))
+            .flagsCollection
+            .isButton,
+        isTrue,
+      );
+    } finally {
+      semantics.dispose();
+    }
+    final settingsButton = find.byTooltip('Map settings panel');
+    final modal = find.byType(BottomSheet);
+    expect(tester.getSize(share), tester.getSize(settingsButton));
+    expect(tester.getCenter(share).dy, tester.getCenter(settingsButton).dy);
+    expect(
+      tester.getCenter(share).dx,
+      lessThan(tester.getCenter(settingsButton).dx),
+    );
+
+    await tester.tap(share);
+    await tester.pumpAndSettle();
+    expect(modal, findsOneWidget);
+    await tester.tap(find.byTooltip('Close'));
+    await tester.pumpAndSettle();
+    expect(modal, findsNothing);
+    expect(settingsButton.hitTestable(), findsOneWidget);
+
+    await _expandSheet(tester);
+    expect(settingsButton, findsNothing);
+    expect(share.hitTestable(), findsOneWidget);
+    await tester.tap(share);
+    await tester.pumpAndSettle();
+    expect(modal, findsOneWidget);
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(modal, findsNothing);
+    expect(find.text('Report page').hitTestable(), findsOneWidget);
+    expect(share.hitTestable(), findsOneWidget);
+    expect(reports.gets, 1);
+  });
+
+  testWidgets(
+    'untrusted share evidence leaves ordinary report detail available',
+    (tester) async {
+      final reports = _Reports()..next = Ok(_report());
+      final settings = SettingsStore.inMemory();
+      final router = nestedRouter(reports);
+      final l10n = lookupAppLocalizations(kHomeLocale);
+      await pumpPage(
+        tester,
+        reports: reports,
+        client: _BytesClient(RegionSelection(settings)),
+        settings: settings,
+        regions: RegionStore(settings),
+        towns: const TownDirectory({}),
+        router: router,
+        locale: kHomeLocale,
+      );
+      await tester.pumpAndSettle();
+      expect(find.byType(ReportDetailPage), findsOneWidget);
+      await tester.tap(find.byTooltip(l10n.reportShareTitle));
+      await tester.pumpAndSettle();
+      expect(find.text(l10n.reportShareUnsupportedReport), findsOneWidget);
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+      expect(find.byType(ReportDetailPage), findsOneWidget);
+      expect(
+        find.byTooltip(l10n.reportShareTitle).hitTestable(),
+        findsOneWidget,
+      );
+      expect(reports.gets, 1);
+    },
   );
 
   testWidgets('a 404 from the archive probe hides replay', (tester) async {
@@ -508,6 +614,43 @@ void main() {
     );
     expect(find.byType(LoadingView), findsOneWidget);
     expect(reports.gets, 1);
+  });
+
+  testWidgets('changing the route report ID replaces the loaded report', (
+    tester,
+  ) async {
+    final first = _report();
+    final second = _report(id: '115054-2026-0310-150000', location: '臺東縣近海');
+    final reports = _Reports()..next = Ok(first);
+    final settings = SettingsStore.inMemory();
+    final router = nestedRouter(reports);
+    await pumpPage(
+      tester,
+      reports: reports,
+      client: _BytesClient(RegionSelection(settings)),
+      settings: settings,
+      regions: RegionStore(settings),
+      towns: const TownDirectory({}),
+      router: router,
+    );
+    await tester.pumpAndSettle();
+    expect(reports.gets, 1);
+    expect(find.text(first.shortLocation), findsWidgets);
+
+    final pending = Completer<Result<EarthquakeReport>>();
+    reports.pending = pending;
+    router.goNamed(
+      AppRoutes.earthquakeReport,
+      pathParameters: {'id': second.id},
+    );
+    await tester.pump();
+    await tester.pump();
+    expect(reports.gets, 2);
+    expect(find.text(first.shortLocation), findsNothing);
+
+    pending.complete(Ok(second));
+    await tester.pumpAndSettle();
+    expect(find.text(second.shortLocation), findsWidgets);
   });
 
   testWidgets('a network failure retries into the loaded report', (
@@ -963,12 +1106,18 @@ void main() {
     // A refusal must say so in its own words, and offer the only way out:
     // Settings, not another tap.
     saver.result = const Err(
-      ImageSaveFailure(ImageSaveFailureReason.permissionDenied, 'refused'),
+      ImageSaveFailure(
+        ImageSaveFailureReason.permissionSettingsRequired,
+        'refused',
+      ),
     );
     await tester.tap(find.byTooltip('Save image'));
     await tester.pump();
 
-    expect(find.text('Allow photo access to save the image'), findsOneWidget);
+    expect(
+      find.text('Allow photo access in Settings, then try saving again.'),
+      findsOneWidget,
+    );
     expect(find.text('Open Settings'), findsOneWidget);
   });
 }

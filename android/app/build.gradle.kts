@@ -48,8 +48,32 @@ android {
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
-    // Optional artifacts built by tool/dev/build_report_picture.sh.
-    sourceSets.getByName("main").jniLibs.srcDir("../../native/eq_report_pic/android")
+    flavorDimensions += "reportRenderer"
+    productFlavors {
+        create("production") {
+            dimension = "reportRenderer"
+        }
+        create("storyqa") {
+            dimension = "reportRenderer"
+            applicationIdSuffix = ".storyqa"
+        }
+    }
+
+    // Never read the old unscoped native directory or attach libraries to main.
+    val reportStage = providers.environmentVariable("DPIP_EQR_STAGE").orNull?.let { file(it) }
+    if (reportStage != null) {
+        val profile = reportStage.name
+        require(profile == "production" || profile == "qa") { "Invalid report renderer profile: $profile" }
+        val flavor = if (profile == "qa") "storyqa" else "production"
+        val stem = if (profile == "qa") "libeq_report_pic_story_qa" else "libeq_report_pic"
+        val jni = reportStage.resolve("android")
+        val expected = setOf("arm64-v8a/$stem.so", "x86_64/$stem.so")
+        check(jni.walkTopDown().filter { it.isFile }.map { it.relativeTo(jni).invariantSeparatorsPath }.toSet() == expected) {
+            "Missing or unexpected report renderer libraries in $jni"
+        }
+        sourceSets.getByName(flavor).jniLibs.srcDir(jni)
+    }
+    packaging.jniLibs.keepDebugSymbols += setOf("**/libeq_report_pic.so", "**/libeq_report_pic_story_qa.so")
 
     // Robolectric inflates the Widget's real layouts and resolves its real
     // resources, so the unit-test run needs the merged resource table — which
@@ -126,6 +150,24 @@ android {
     }
 }
 
+androidComponents {
+    beforeVariants(selector().withFlavor("reportRenderer" to "storyqa")) { variant ->
+        variant.enable = variant.buildType == "debug"
+    }
+}
+
+// QA uses the explicit Dart Firebase options and has its own application ID.
+tasks.matching { it.name == "processStoryqaDebugGoogleServices" }.configureEach {
+    enabled = false
+}
+tasks.matching { it.name == "mergeStoryqaDebugNativeLibs" }.configureEach {
+    doFirst {
+        check(providers.environmentVariable("DPIP_EQR_STAGE").orNull?.let { file(it).name } == "qa") {
+            "Story QA requires a verified QA native stage. Use tool/dev/run_report_sharing.sh."
+        }
+    }
+}
+
 kotlin {
     compilerOptions {
         jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
@@ -142,11 +184,11 @@ kotlin {
 // itself proposes; the alternative is dropping `isIncludeAndroidResources`,
 // which is what makes `RemoteViews.apply` and the SQLite/resources tests
 // possible at all.
-tasks.matching { it.name == "packageDebugUnitTestForUnitTest" }.configureEach {
-    dependsOn("copyFlutterAssetsDebug")
+tasks.matching { it.name == "packageProductionDebugUnitTestForUnitTest" }.configureEach {
+    dependsOn("copyFlutterAssetsProductionDebug")
 }
-tasks.matching { it.name == "packageReleaseUnitTestForUnitTest" }.configureEach {
-    dependsOn("copyFlutterAssetsRelease")
+tasks.matching { it.name == "packageProductionReleaseUnitTestForUnitTest" }.configureEach {
+    dependsOn("copyFlutterAssetsProductionRelease")
 }
 
 flutter {

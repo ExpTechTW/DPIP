@@ -15,7 +15,7 @@
 # separate script and not part of `tool/dev/test_android.sh`: a JVM run must stay
 # runnable everywhere. CI runs it from android.yml on an emulator.
 #
-# Arguments are passed straight to Gradle's `:app:connectedDebugAndroidTest`.
+# Arguments are passed straight to Gradle's `:app:connectedProductionDebugAndroidTest`.
 source "$(dirname "${BASH_SOURCE[0]}")/_lib.sh"
 cd "$(repo_root)"
 
@@ -48,7 +48,10 @@ fi
 # The wrapper and android/local.properties the Gradle call below needs, written
 # the way tool/dev/test_android.sh writes them. After the device checks, so a
 # run with nothing attached still fails without doing this first.
+# Tests that launch MainActivity need the same bootstrap flag as tool/run.sh.
 step "Configuring the Android project for Gradle"
 pinned flutter build apk --config-only
 
-exec android/gradlew -p android :app:connectedDebugAndroidTest "$@"
+dart_defines="$(printf %s 'DPIP_RUN_SH=true' | base64 | tr -d '\n')"
+exec android/gradlew -p android :app:connectedProductionDebugAndroidTest \
+  "-Pdart-defines=$dart_defines" "$@"

@@ -931,6 +931,79 @@ class AppLocalizationsKo extends AppLocalizations {
   String get shelterCapacityLabel => '수용 인원';
 
   @override
+  String get reportShareTitle => '지진 공유 이미지';
+
+  @override
+  String get reportSharePreview => '지진 이미지 미리보기';
+
+  @override
+  String get reportShareFormat => '형식';
+
+  @override
+  String get reportShareMapMode => '지도 유형';
+
+  @override
+  String get reportShareTheme => '테마';
+
+  @override
+  String get reportShareCluster => '군집';
+
+  @override
+  String get reportShareStations => '관측소';
+
+  @override
+  String get reportShareTowns => '읍면';
+
+  @override
+  String get reportDetailImageSaveSettingsRequired =>
+      '설정에서 사진 접근을 허용한 뒤 다시 저장해 주세요.';
+
+  @override
+  String get reportDetailImageSaveRestricted => '이 기기에서는 사진 접근이 제한되어 있습니다.';
+
+  @override
+  String get reportDetailImageSaveUnavailable => '이 기기에서는 사진에 저장할 수 없습니다.';
+
+  @override
+  String get reportShareSend => '공유';
+
+  @override
+  String get reportShareCopy => '복사';
+
+  @override
+  String get reportShareSave => '저장';
+
+  @override
+  String get reportShareCopied => '이미지를 복사했습니다';
+
+  @override
+  String get reportShareCopyFailed => '이미지를 복사할 수 없습니다';
+
+  @override
+  String get reportShareUnsupportedLanguage =>
+      '지진 공유 이미지는 현재 중국어 번체(대만)만 지원합니다.';
+
+  @override
+  String get reportShareUnsupportedReport =>
+      '확인된 데이터가 부족하여 이 지진 보고서의 공유 이미지를 만들 수 없습니다.';
+
+  @override
+  String get reportShareRendererUnavailable =>
+      '이 버전에서는 네이티브 이미지 라이브러리를 불러올 수 없습니다.';
+
+  @override
+  String get reportShareRendererIncompatible => '네이티브 렌더러에서 이 형식을 지원하지 않습니다.';
+
+  @override
+  String get reportShareTimeout => '이미지를 만드는 시간이 초과되었습니다. 다시 시도해 주세요.';
+
+  @override
+  String get reportShareRenderFailed => '지진 공유 이미지를 만들 수 없습니다. 다시 시도해 주세요.';
+
+  @override
+  String get reportShareExportFailed => '시스템 공유 화면을 열 수 없습니다. 다시 시도해 주세요.';
+
+  @override
   String get reportDetailImage => '지진 보고서 이미지';
 
   @override

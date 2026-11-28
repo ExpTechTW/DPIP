@@ -34,13 +34,13 @@ void main() {
     tester,
   ) async {
     final first = Completer<PreviewImage>();
-    final requests = <EqTheme>[];
+    final requests = <(EqTheme, EqShareFormat)>[];
     await tester.pumpWidget(
       MaterialApp(
         home: ReportPicturePreview(
-          generate: (scenario, theme) async {
+          generate: (scenario, theme, format) async {
             expect(scenario, PreviewScenario.verified);
-            requests.add(theme);
+            requests.add((theme, format));
             return requests.length == 1 ? first.future : image(theme);
           },
         ),
@@ -53,7 +53,7 @@ void main() {
     // Even stale callbacks before a rebuild cannot start another request.
     await tester.tap(find.text('產生 PNG'));
     await tester.pump();
-    expect(requests, [EqTheme.light]);
+    expect(requests, [(EqTheme.light, EqShareFormat.landscape16By9)]);
     expect(find.byType(LinearProgressIndicator), findsOneWidget);
     expect(
       tester.widget<FilledButton>(find.byType(FilledButton)).onPressed,
@@ -77,7 +77,7 @@ void main() {
 
     await tester.tap(find.text('重新產生 PNG'));
     await tester.pumpAndSettle();
-    expect(find.textContaining('與上一次同主題的 SHA-256 相同'), findsOneWidget);
+    expect(find.textContaining('與上一次同格式與主題的 SHA-256 相同'), findsOneWidget);
 
     await tester.tap(find.text('深色'));
     await tester.pumpAndSettle();
@@ -85,8 +85,19 @@ void main() {
     await tester.tap(find.text('產生 PNG'));
     await tester.pumpAndSettle();
     expect(find.textContaining('test-dark'), findsOneWidget);
-    expect(find.textContaining('此主題首次產圖'), findsOneWidget);
-    expect(requests, [EqTheme.light, EqTheme.light, EqTheme.dark]);
+    expect(find.textContaining('此格式與主題首次產圖'), findsOneWidget);
+    await tester.tap(find.text('4:5'));
+    await tester.pumpAndSettle();
+    expect(find.byType(Image), findsNothing);
+    await tester.tap(find.text('產生 PNG'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('此格式與主題首次產圖'), findsOneWidget);
+    expect(requests, [
+      (EqTheme.light, EqShareFormat.landscape16By9),
+      (EqTheme.light, EqShareFormat.landscape16By9),
+      (EqTheme.dark, EqShareFormat.landscape16By9),
+      (EqTheme.dark, EqShareFormat.information4By5),
+    ]);
   });
 
   testWidgets('shows structured failure and retries the same request', (
@@ -96,7 +107,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         home: ReportPicturePreview(
-          generate: (scenario, theme) async {
+          generate: (scenario, theme, format) async {
             expect(scenario, PreviewScenario.verified);
             expect(theme, EqTheme.light);
             if (++calls == 1) throw unavailable;
@@ -123,14 +134,19 @@ void main() {
     final pending = Completer<Uint8List>();
     var released = 0;
     final renderer = ReportPicture.forTesting(
-      (_, _, _) => pending.future,
+      (_, _, _, _) => pending.future,
       () => released++,
     );
     await tester.pumpWidget(
       MaterialApp(
         home: ReportPicturePreview(
-          generate: (_, theme) async {
-            await renderPreviewPng(png, theme, open: () async => Ok(renderer));
+          generate: (_, theme, format) async {
+            await renderPreviewPng(
+              png,
+              theme,
+              format: format,
+              open: () async => Ok(renderer),
+            );
             return image(theme);
           },
         ),
@@ -149,7 +165,7 @@ void main() {
   test('releases the renderer after a render failure', () async {
     var released = 0;
     final renderer = ReportPicture.forTesting(
-      (_, _, _) async => throw unavailable,
+      (_, _, _, _) async => throw unavailable,
       () => released++,
     );
     await expectLater(

@@ -947,6 +947,83 @@ class AppLocalizationsTh extends AppLocalizations {
   String get shelterCapacityLabel => 'ความจุ';
 
   @override
+  String get reportShareTitle => 'ภาพแผ่นดินไหวสำหรับแชร์';
+
+  @override
+  String get reportSharePreview => 'ตัวอย่างภาพแผ่นดินไหว';
+
+  @override
+  String get reportShareFormat => 'รูปแบบ';
+
+  @override
+  String get reportShareMapMode => 'รูปแบบแผนที่';
+
+  @override
+  String get reportShareTheme => 'ธีม';
+
+  @override
+  String get reportShareCluster => 'กลุ่ม';
+
+  @override
+  String get reportShareStations => 'สถานี';
+
+  @override
+  String get reportShareTowns => 'เขตการปกครอง';
+
+  @override
+  String get reportDetailImageSaveSettingsRequired =>
+      'อนุญาตให้เข้าถึงรูปภาพในการตั้งค่า แล้วลองบันทึกอีกครั้ง';
+
+  @override
+  String get reportDetailImageSaveRestricted =>
+      'อุปกรณ์ของคุณจำกัดการเข้าถึงรูปภาพ';
+
+  @override
+  String get reportDetailImageSaveUnavailable =>
+      'อุปกรณ์นี้ไม่รองรับการบันทึกลงในคลังรูปภาพ';
+
+  @override
+  String get reportShareSend => 'แชร์';
+
+  @override
+  String get reportShareCopy => 'คัดลอก';
+
+  @override
+  String get reportShareSave => 'บันทึก';
+
+  @override
+  String get reportShareCopied => 'คัดลอกรูปภาพแล้ว';
+
+  @override
+  String get reportShareCopyFailed => 'ไม่สามารถคัดลอกรูปภาพได้';
+
+  @override
+  String get reportShareUnsupportedLanguage =>
+      'ขณะนี้ภาพสำหรับแชร์รองรับเฉพาะภาษาจีนตัวเต็ม (ไต้หวัน)';
+
+  @override
+  String get reportShareUnsupportedReport =>
+      'รายงานนี้มีข้อมูลที่ผ่านการตรวจสอบไม่เพียงพอสำหรับสร้างภาพ';
+
+  @override
+  String get reportShareRendererUnavailable =>
+      'เวอร์ชันนี้ไม่สามารถโหลดไลบรารีสร้างภาพได้';
+
+  @override
+  String get reportShareRendererIncompatible => 'ตัวเรนเดอร์ไม่รองรับรูปแบบนี้';
+
+  @override
+  String get reportShareTimeout => 'หมดเวลาสร้างภาพ โปรดลองอีกครั้ง';
+
+  @override
+  String get reportShareRenderFailed =>
+      'ไม่สามารถสร้างภาพแผ่นดินไหวได้ โปรดลองอีกครั้ง';
+
+  @override
+  String get reportShareExportFailed =>
+      'ไม่สามารถเปิดเมนูแชร์ของระบบได้ โปรดลองอีกครั้ง';
+
+  @override
   String get reportDetailImage => 'ภาพรายงานแผ่นดินไหว';
 
   @override

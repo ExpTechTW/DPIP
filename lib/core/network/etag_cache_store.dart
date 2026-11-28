@@ -382,10 +382,12 @@ class EtagCacheStore {
   /// Reads SQLite (inflate when [kindBinaryGzip]). Every successful serve is
   /// metered once via [_usage] when wired. [touch] schedules an async last-used
   /// bump. A row [accept] turns down reads as a miss, before it is inflated,
-  /// touched or metered.
+  /// touched or metered. [recordHit] can be disabled when reading ahead of
+  /// revalidation, when the entry may never be served.
   Future<CachedBytes?> readBytes(
     String url, {
     bool touch = true,
+    bool recordHit = true,
     EntryFilter? accept,
   }) async {
     try {
@@ -407,7 +409,7 @@ class EtagCacheStore {
         contentType: row['content_type'] as String?,
         size: (row['size'] as num).toInt(),
       );
-      _recordBinaryHit(entry);
+      if (recordHit) _recordBinaryHit(entry);
       return entry;
     } catch (_) {
       return null;

@@ -952,6 +952,84 @@ class AppLocalizationsId extends AppLocalizations {
   String get shelterCapacityLabel => 'Kapasitas';
 
   @override
+  String get reportShareTitle => 'Gambar berbagi gempa';
+
+  @override
+  String get reportSharePreview => 'Pratinjau gambar gempa';
+
+  @override
+  String get reportShareFormat => 'Format';
+
+  @override
+  String get reportShareMapMode => 'Gaya peta';
+
+  @override
+  String get reportShareTheme => 'Tema';
+
+  @override
+  String get reportShareCluster => 'Klaster';
+
+  @override
+  String get reportShareStations => 'Stasiun';
+
+  @override
+  String get reportShareTowns => 'Kecamatan';
+
+  @override
+  String get reportDetailImageSaveSettingsRequired =>
+      'Izinkan akses foto di Pengaturan, lalu coba simpan lagi.';
+
+  @override
+  String get reportDetailImageSaveRestricted =>
+      'Perangkat Anda membatasi akses ke foto.';
+
+  @override
+  String get reportDetailImageSaveUnavailable =>
+      'Penyimpanan ke galeri tidak tersedia di perangkat ini.';
+
+  @override
+  String get reportShareSend => 'Bagikan';
+
+  @override
+  String get reportShareCopy => 'Salin';
+
+  @override
+  String get reportShareSave => 'Simpan';
+
+  @override
+  String get reportShareCopied => 'Gambar disalin';
+
+  @override
+  String get reportShareCopyFailed => 'Gambar tidak dapat disalin';
+
+  @override
+  String get reportShareUnsupportedLanguage =>
+      'Gambar berbagi gempa saat ini hanya mendukung bahasa Mandarin Tradisional (Taiwan).';
+
+  @override
+  String get reportShareUnsupportedReport =>
+      'Laporan ini tidak memiliki data terverifikasi yang diperlukan untuk membuat gambar.';
+
+  @override
+  String get reportShareRendererUnavailable =>
+      'Pustaka pembuat gambar tidak tersedia dalam versi ini.';
+
+  @override
+  String get reportShareRendererIncompatible =>
+      'Perender native tidak mendukung format ini.';
+
+  @override
+  String get reportShareTimeout => 'Waktu pembuatan gambar habis. Coba lagi.';
+
+  @override
+  String get reportShareRenderFailed =>
+      'Gagal membuat gambar berbagi gempa. Coba lagi.';
+
+  @override
+  String get reportShareExportFailed =>
+      'Gagal membuka menu berbagi sistem. Coba lagi.';
+
+  @override
   String get reportDetailImage => 'Gambar laporan';
 
   @override

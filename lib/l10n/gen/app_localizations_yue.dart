@@ -927,6 +927,75 @@ class AppLocalizationsYue extends AppLocalizations {
   String get shelterCapacityLabel => '收容人數';
 
   @override
+  String get reportShareTitle => '地震分享圖片';
+
+  @override
+  String get reportSharePreview => '地震分享圖預覽';
+
+  @override
+  String get reportShareFormat => '格式';
+
+  @override
+  String get reportShareMapMode => '地圖模式';
+
+  @override
+  String get reportShareTheme => '主題';
+
+  @override
+  String get reportShareCluster => '群組';
+
+  @override
+  String get reportShareStations => '測站';
+
+  @override
+  String get reportShareTowns => '鄉鎮';
+
+  @override
+  String get reportDetailImageSaveSettingsRequired => '請喺設定允許取用相片，再試儲存。';
+
+  @override
+  String get reportDetailImageSaveRestricted => '裝置限制咗相片存取權限。';
+
+  @override
+  String get reportDetailImageSaveUnavailable => '呢部裝置唔支援儲存到相簿。';
+
+  @override
+  String get reportShareSend => '分享';
+
+  @override
+  String get reportShareCopy => '複製';
+
+  @override
+  String get reportShareSave => '儲存';
+
+  @override
+  String get reportShareCopied => '已複製圖片';
+
+  @override
+  String get reportShareCopyFailed => '未能複製圖片';
+
+  @override
+  String get reportShareUnsupportedLanguage => '地震分享圖片暫時只支援台灣繁體中文。';
+
+  @override
+  String get reportShareUnsupportedReport => '呢份地震報告缺少可以核實嘅資料，整唔到分享圖片。';
+
+  @override
+  String get reportShareRendererUnavailable => '呢個版本載入唔到製作地震分享圖片嘅原生程式庫。';
+
+  @override
+  String get reportShareRendererIncompatible => '原生函式庫唔支援呢個格式。';
+
+  @override
+  String get reportShareTimeout => '製作分享圖片逾時，請再試。';
+
+  @override
+  String get reportShareRenderFailed => '整唔到地震分享圖片，請再試。';
+
+  @override
+  String get reportShareExportFailed => '開唔到系統分享，請再試。';
+
+  @override
   String get reportDetailImage => '地震報告圖';
 
   @override

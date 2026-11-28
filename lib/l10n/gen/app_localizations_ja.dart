@@ -932,6 +932,78 @@ class AppLocalizationsJa extends AppLocalizations {
   String get shelterCapacityLabel => '収容人数';
 
   @override
+  String get reportShareTitle => '地震の共有画像';
+
+  @override
+  String get reportSharePreview => '地震画像のプレビュー';
+
+  @override
+  String get reportShareFormat => '形式';
+
+  @override
+  String get reportShareMapMode => '地図の表示';
+
+  @override
+  String get reportShareTheme => 'テーマ';
+
+  @override
+  String get reportShareCluster => 'クラスタ';
+
+  @override
+  String get reportShareStations => '観測点';
+
+  @override
+  String get reportShareTowns => '市区町村';
+
+  @override
+  String get reportDetailImageSaveSettingsRequired =>
+      '設定で写真へのアクセスを許可してから、もう一度保存してください。';
+
+  @override
+  String get reportDetailImageSaveRestricted => 'この端末では写真へのアクセスが制限されています。';
+
+  @override
+  String get reportDetailImageSaveUnavailable => 'この端末では写真に保存できません。';
+
+  @override
+  String get reportShareSend => '共有';
+
+  @override
+  String get reportShareCopy => 'コピー';
+
+  @override
+  String get reportShareSave => '保存';
+
+  @override
+  String get reportShareCopied => '画像をコピーしました';
+
+  @override
+  String get reportShareCopyFailed => '画像をコピーできませんでした';
+
+  @override
+  String get reportShareUnsupportedLanguage =>
+      '地震の共有画像は現在、繁体字中国語（台湾）のみに対応しています。';
+
+  @override
+  String get reportShareUnsupportedReport =>
+      '確認済みのデータが不足しているため、この地震情報の共有画像を作成できません。';
+
+  @override
+  String get reportShareRendererUnavailable => 'このバージョンではネイティブ画像ライブラリを読み込めません。';
+
+  @override
+  String get reportShareRendererIncompatible => 'ネイティブレンダラーがこの形式に対応していません。';
+
+  @override
+  String get reportShareTimeout => '画像の作成がタイムアウトしました。もう一度お試しください。';
+
+  @override
+  String get reportShareRenderFailed => '地震の共有画像を作成できませんでした。もう一度お試しください。';
+
+  @override
+  String get reportShareExportFailed => 'システムの共有画面を開けませんでした。もう一度お試しください。';
+
+  @override
   String get reportDetailImage => '地震レポート画像';
 
   @override

@@ -8,7 +8,7 @@ import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/error/result.dart';
 import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/platform/native_library.dart';
-import 'package:dpip/features/earthquake/domain/earthquake_share_input.dart';
+import 'package:dpip/features/earthquake/domain/earthquake_report_snapshot.dart';
 import 'package:dpip/shared/seismic/report_picture/report_picture.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
@@ -48,6 +48,13 @@ Future<String> _smoke() async {
     'DPIP_REPORT_PICTURE_EXPECT',
     defaultValue: 'ready',
   );
+  final format = EqShareFormat.values.byName(
+    const String.fromEnvironment(
+      'DPIP_REPORT_PICTURE_SMOKE_FORMAT',
+      defaultValue: 'landscape16By9',
+    ),
+  );
+  final dimensions = '${format.width}x${format.height}';
   final opened = await ReportPicture.open();
   if (expected != 'ready') {
     final reason = ReportPictureFailureReason.values.byName(expected);
@@ -60,24 +67,42 @@ Future<String> _smoke() async {
     final library = _requireValue(
       NativeLibrary.open(ReportPicture.libraryName),
     );
-    for (final symbol in reportPictureAbiSymbols) {
+    final (abi, capabilities) = readReportPictureAbi(library);
+    const storySymbols = [
+      'eqr_qa_render_story_png_v1',
+      'eqr_qa_render_story_png_v2',
+    ];
+    final symbols = [
+      ...reportPictureAbiSymbols,
+      reportPictureOptionsSymbol,
+      'eqr_render_share_png_v3',
+      if (reportPictureStoryQa) ...storySymbols,
+    ];
+    for (final symbol in symbols) {
       _check(library.providesSymbol(symbol), 'Missing $symbol');
     }
-    final abi = readReportPictureAbi(library);
+    for (final symbol in storySymbols) {
+      _check(
+        library.providesSymbol(symbol) == reportPictureStoryQa,
+        'Unexpected $symbol for this build',
+      );
+    }
     _check(
-      abi == (0x00010002, 0x11f),
-      'Unexpected native ABI or capabilities: $abi',
+      abi == 0x00010004 &&
+          capabilities == (reportPictureStoryQa ? 0x1b1f : 0xb1f),
+      'Unexpected native ABI or capabilities: $abi/$capabilities',
     );
 
     final (bytes, sourceEvidence) = _loadFixture();
     final fixtureHash = sha256.convert(bytes);
 
-    final first = picture.renderSharePngV2(bytes);
-    final invalid = picture.renderSharePngV2(
+    final first = picture.renderSharePngV3(bytes, format: format);
+    final invalid = picture.renderSharePngV3(
       Uint8List.fromList(utf8.encode('{')),
+      format: format,
     );
     final callerBuffer = Uint8List.fromList(bytes);
-    final recovered = picture.renderSharePngV2(callerBuffer);
+    final recovered = picture.renderSharePngV3(callerBuffer, format: format);
     callerBuffer.fillRange(0, callerBuffer.length, 0);
 
     var completed = false;
@@ -94,7 +119,7 @@ Future<String> _smoke() async {
 
     final dispose = picture.dispose();
     _requireFailure(
-      await picture.renderSharePngV2(bytes),
+      await picture.renderSharePngV3(bytes, format: format),
       ReportPictureFailureReason.disposed,
     );
     final png = _requireValue(await first);
@@ -111,31 +136,61 @@ Future<String> _smoke() async {
       listEquals(png, nextPng),
       'Identical requests returned different PNG bytes',
     );
-    await _checkPng(png, EqTheme.light);
+    await _checkPng(png, EqTheme.light, format);
 
     final reopened = _requireValue(await ReportPicture.open());
     final Uint8List dark;
     try {
       _requireFailure(
-        await reopened.renderSharePngV2(Uint8List(1024 * 1024 + 1)),
+        await reopened.renderSharePngV3(
+          Uint8List(1024 * 1024 + 1),
+          format: format,
+        ),
         ReportPictureFailureReason.limitExceeded,
       );
       final badVersion = utf8
           .decode(bytes)
           .replaceFirst(
-            RegExp(r'"schema_version":\s*2\b'),
-            '"schema_version":3',
+            RegExp(r'"schema_version":\s*3\b'),
+            '"schema_version":2',
           );
       _requireFailure(
-        await reopened.renderSharePngV2(utf8.encode(badVersion)),
+        await reopened.renderSharePngV3(
+          utf8.encode(badVersion),
+          format: format,
+        ),
         ReportPictureFailureReason.unsupportedVersion,
         nativeStatus: -2,
       );
+      for (final alternate in EqShareFormat.values.where(
+        (item) => item != format,
+      )) {
+        final rendered = await reopened.renderSharePngV3(
+          bytes,
+          format: alternate,
+        );
+        if (alternate == EqShareFormat.story9By16 && !reportPictureStoryQa) {
+          _requireFailure(
+            rendered,
+            ReportPictureFailureReason.unsupportedFeature,
+          );
+        } else {
+          await _checkPng(_requireValue(rendered), EqTheme.light, alternate);
+        }
+      }
       dark = _requireValue(
-        await reopened.renderSharePngV2(bytes, theme: EqTheme.dark),
+        await reopened.renderSharePngV3(
+          bytes,
+          theme: EqTheme.dark,
+          format: format,
+        ),
       );
       final nextDark = _requireValue(
-        await reopened.renderSharePngV2(bytes, theme: EqTheme.dark),
+        await reopened.renderSharePngV3(
+          bytes,
+          theme: EqTheme.dark,
+          format: format,
+        ),
       );
       _check(
         listEquals(dark, nextDark),
@@ -145,17 +200,23 @@ Future<String> _smoke() async {
     } finally {
       await reopened.dispose();
     }
-    await _checkPng(dark, EqTheme.dark);
+    await _checkPng(dark, EqTheme.dark, format);
     final documents = await getApplicationDocumentsDirectory();
+    final filename = switch (format) {
+      EqShareFormat.landscape16By9 => 'report-picture',
+      EqShareFormat.information4By5 => 'report-picture-4x5',
+      EqShareFormat.story9By16 => 'report-picture-story',
+    };
     for (final (theme, bytes) in [(EqTheme.light, png), (EqTheme.dark, dark)]) {
-      final output = File('${documents.path}/report-picture-${theme.name}.png');
+      final output = File('${documents.path}/$filename-${theme.name}.png');
       await output.writeAsBytes(bytes, flush: true);
       Log.info(
-        'REPORT_PICTURE_PNG theme=${theme.name} dimensions=1920x1080 '
+        'REPORT_PICTURE_PNG theme=${theme.name} dimensions=$dimensions '
         'bytes=${bytes.length} sha256=${sha256.convert(bytes)} file=${output.path}',
       );
     }
-    return 'ABI=1.2 caps=0x11f exports=9 decoded=1920x1080 '
+    return 'ABI=${abi >> 16}.${abi & 0xffff} '
+        'caps=0x${capabilities.toRadixString(16)} exports=${symbols.length} decoded=$dimensions '
         'fixture_sha256=$fixtureHash themes=light,dark deterministic=pass '
         '$sourceEvidence '
         'root-event=responsive invalid=-1 version=-2 retry=pass dispose=pass reopen=pass';
@@ -165,45 +226,31 @@ Future<String> _smoke() async {
 }
 
 (Uint8List, String) _loadFixture() {
-  if (!ReportPictureFixtures.hasVerifiedSource) {
-    final bytes = ReportPictureFixtures.golden;
-    _check(
-      sha256.convert(bytes).toString() ==
-          '702a04ecdcd5fe7c81a45de86e122296cd3e30014b395a1ae52c351eb797f9f1',
-      'Unexpected synthetic v2 fixture',
-    );
-    return (bytes, 'source=synthetic');
-  }
-
   final fixture = ReportPictureFixtures.loadVerified();
-  final input = fixture.verifiedInput();
-  _requireInputFailure(
-    fixture.withoutIdentities(),
-    EarthquakeShareInputError.missingSourceIdentity,
-  );
-  _requireInputFailure(
-    ReportPictureFixtures.historicalWithoutIdentities(),
-    EarthquakeShareInputError.missingAreaIdentity,
-  );
+  final input = fixture.inputV3();
+  try {
+    ReportPictureFixtures.historicalV3();
+    throw StateError('Unexpectedly accepted historical report');
+  } on EarthquakeReportSourceException catch (error) {
+    _check(
+      error.code == EarthquakeReportSourceError.unsupportedProfile,
+      'Unexpected historical source failure: $error',
+    );
+  }
   return (
     input.bytes,
-    'report_id=${fixture.snapshot.report.id} '
-        'source_sha256=${fixture.snapshot.bodySha256} regions=10014:2,10015:1 '
-        'stations=${fixture.stationCount} missing-evidence=pass historical=pass',
+    'report_id=${input.snapshot.reportId} '
+        'source_sha256=${input.snapshot.bodySha256} '
+        'content_sha256=${input.contentSha256} '
+        'stations=${fixture.stationCount} historical=pass',
   );
 }
 
-void _requireInputFailure(
-  EarthquakeShareInput result,
-  EarthquakeShareInputError code,
-) {
-  _check(
-    result is UnsupportedEarthquakeShareInput && result.code == code,
-    'Expected adapter failure ${code.name}, got $result',
-  );
-}
-
-Future<void> _checkPng(Uint8List png, EqTheme theme) async {
+Future<void> _checkPng(
+  Uint8List png,
+  EqTheme theme,
+  EqShareFormat format,
+) async {
   _check(
     png.length >= 8 &&
         listEquals(png.sublist(0, 8), const [137, 80, 78, 71, 13, 10, 26, 10]),
@@ -214,7 +261,8 @@ Future<void> _checkPng(Uint8List png, EqTheme theme) async {
     final frame = await codec.getNextFrame();
     try {
       _check(
-        frame.image.width == 1920 && frame.image.height == 1080,
+        frame.image.width == format.width &&
+            frame.image.height == format.height,
         '${theme.name}: unexpected decoded dimensions',
       );
     } finally {
