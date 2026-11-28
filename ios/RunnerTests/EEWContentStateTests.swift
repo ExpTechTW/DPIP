@@ -341,23 +341,12 @@ final class EEWContentStateTests: XCTestCase {
     // MARK: - Layout
 
     /// iOS cuts a Lock Screen Live Activity off at 160 pt. Every scenario, in
-    /// the longest language, at the narrowest and widest phones.
+    /// every language, at the narrowest and widest phones.
     @MainActor
     func testLockScreenStaysWithinTheSystemHeight() {
-        let scenarios: [(String, State)] = [
-            ("cwa", make(alert: 0, eta: 28, local: 4)),
-            ("cwa", make(alert: 1, isFinal: true, max: 9, eta: 600, local: 9, localNsspe: 9, nsspeMax: 9)),
-            ("trem", make(alert: 0, eta: 21, rk: "4", local: 4)),
-            ("trem", make(alert: 0, max: 0, eta: 34, rk: "1", local: 0)),
-            ("trem", make(magnitude: 1, eta: nil, rk: "2", noSource: true, localNsspe: 3, nsspeMax: 3)),
-            ("trem", make(alert: 1, max: 4, eta: 8, rk: "4", local: 4, localNsspe: 5, nsspeMax: 5)),
-            ("trem", make(alert: 1, isFinal: true, max: 8, arrived: true, rk: "4", local: 7)),
-            ("trem", make(alert: 1, cancelled: true, rk: "/////")),
-            ("trem", make(report: 123, epicenter: String(repeating: "花蓮縣壽豐鄉東南方外海", count: 3), max: 8, rk: "4", local: 7)),
-        ]
         for language in ["zh-Hant", "en", "ja", "ko", "zh-Hans"] {
             let strings = Self.catalogStrings(language)
-            for (provider, state) in scenarios {
+            for (provider, state) in layoutScenarios {
                 for stale in [false, true] {
                     let report = EEWActivityReport(provider: provider, state: state, isStale: stale, strings: strings)
                     for width in [320.0, 375, 430] {
@@ -387,6 +376,35 @@ final class EEWContentStateTests: XCTestCase {
         XCTAssertLessThan(
             measured(EEWLockScreenView(report: cwa), width: 375).height,
             measured(EEWLockScreenView(report: withNote), width: 375).height)
+    }
+
+    /// Every kind of report the layouts must hold, at its widest.
+    private var layoutScenarios: [(String, State)] {
+        [
+            ("cwa", make(alert: 0, eta: 28, local: 4)),
+            ("cwa", make(alert: 1, isFinal: true, max: 9, eta: 600, local: 9, localNsspe: 9, nsspeMax: 9)),
+            ("trem", make(alert: 0, eta: 21, rk: "4", local: 4)),
+            ("trem", make(alert: 0, max: 0, eta: 34, rk: "1", local: 0)),
+            ("trem", make(magnitude: 1, eta: nil, rk: "2", noSource: true, localNsspe: 3, nsspeMax: 3)),
+            ("trem", make(alert: 1, max: 4, eta: 8, rk: "4", local: 4, localNsspe: 5, nsspeMax: 5)),
+            ("trem", make(alert: 1, isFinal: true, max: 8, arrived: true, rk: "4", local: 7)),
+            ("trem", make(alert: 1, cancelled: true, rk: "/////")),
+            ("trem", make(report: 123, epicenter: String(repeating: "花蓮縣壽豐鄉東南方外海", count: 3), max: 8, rk: "4", local: 7)),
+        ]
+    }
+
+    /// The Smart Stack card keeps the phone's order and rules and never runs
+    /// wider than the watch.
+    @MainActor
+    func testWatchLayoutFitsTheSmartStack() {
+        for language in ["zh-Hant", "en", "ja", "ko", "zh-Hans"] {
+            let strings = Self.catalogStrings(language)
+            for (provider, state) in layoutScenarios {
+                let report = EEWActivityReport(provider: provider, state: state, isStale: false, strings: strings)
+                let size = measured(EEWWatchView(report: report), width: 162)
+                XCTAssertLessThanOrEqual(size.width, 162.5, "\(language) \(provider) \(state)")
+            }
+        }
     }
 
     // MARK: - Helpers

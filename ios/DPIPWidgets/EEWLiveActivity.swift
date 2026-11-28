@@ -8,11 +8,18 @@ import WidgetKit
 @available(iOS 16.1, *)
 struct EEWLiveActivity: Widget {
     var body: some WidgetConfiguration {
+        // iOS 18 also shows a Live Activity in the Apple Watch Smart Stack.
+        // Without `.small` the watch gets the compact Island pieces; with it,
+        // EEWWatchView. SE-0360 lets the two branches differ in type.
+        if #available(iOS 18.0, *) {
+            return configuration.supplementalActivityFamilies([.small])
+        }
+        return configuration
+    }
+
+    private var configuration: some WidgetConfiguration {
         ActivityConfiguration(for: EEWActivityAttributes.self) { context in
-            let report = EEWActivityReport(context)
-            EEWLockScreenView(report: report)
-                .activityBackgroundTint(report.style.tint.color)
-                .activitySystemActionForegroundColor(.white)
+            EEWActivityContent(report: EEWActivityReport(context))
         } dynamicIsland: { context in
             let report = EEWActivityReport(context)
             return DynamicIsland {
@@ -45,6 +52,38 @@ struct EEWLiveActivity: Widget {
             // Keep event details clear of the curved system mask.
             .contentMargins(.horizontal, 22, for: .expanded)
             .keylineTint(report.style.background.color)
+        }
+    }
+}
+
+/// The activity's own view: the Lock Screen card, or on iOS 18 and later the
+/// watch layout when the system asks for the `.small` family.
+@available(iOS 16.1, *)
+private struct EEWActivityContent: View {
+    let report: EEWActivityReport
+
+    var body: some View {
+        Group {
+            if #available(iOS 18.0, *) {
+                EEWActivityFamilyContent(report: report)
+            } else {
+                EEWLockScreenView(report: report)
+            }
+        }
+        .activityBackgroundTint(report.style.tint.color)
+        .activitySystemActionForegroundColor(.white)
+    }
+}
+
+@available(iOS 18.0, *)
+private struct EEWActivityFamilyContent: View {
+    @Environment(\.activityFamily) private var family
+    let report: EEWActivityReport
+
+    var body: some View {
+        switch family {
+        case .small: EEWWatchView(report: report)
+        default: EEWLockScreenView(report: report)
         }
     }
 }
@@ -212,6 +251,25 @@ extension EEWActivityReport {
         EEWActivityPreviewData.tremNoSource
         EEWActivityPreviewData.tremLocalFromNsspe
         EEWActivityPreviewData.tremCancelled
+    }
+
+    @available(iOS 17.0, *)
+    #Preview("Apple Watch — Smart Stack") {
+        @ViewBuilder func watch(_ provider: String, _ state: EEWActivityAttributes.ContentState) -> some View {
+            let report = EEWActivityReport(provider: provider, state: state, isStale: false)
+            EEWWatchView(report: report)
+                .frame(width: 178)
+                .background(report.style.tint.color, in: RoundedRectangle(cornerRadius: 20))
+        }
+        return VStack(spacing: 12) {
+            watch("cwa", EEWActivityPreviewData.cwaStandard)
+            watch("trem", EEWActivityPreviewData.tremLocalFromNsspe)
+            watch("trem", EEWActivityPreviewData.tremNoSource)
+            watch("trem", EEWActivityPreviewData.tremCancelled)
+            watch("cwa", EEWActivityPreviewData.cwaArrived)
+        }
+        .padding()
+        .background(.black)
     }
 
     /// 抵達 the way production reaches it: the server's stale-date passed while

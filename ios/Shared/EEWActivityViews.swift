@@ -75,6 +75,7 @@ struct EEWIntensityBlock: View {
 
         static let lockScreen = Metrics(side: 56, radius: 14, digit: 32, unit: 13, ringGap: 2, ringWidth: 2.5)
         static let expanded = Metrics(side: 48, radius: 13, digit: 28, unit: 12, ringGap: 2, ringWidth: 2)
+        static let watch = Metrics(side: 40, radius: 11, digit: 24, unit: 10, ringGap: 2, ringWidth: 2)
     }
 
     let ordinal: Int?
@@ -210,6 +211,7 @@ struct EEWArrivalSlot: View {
 
         static let lockScreen = Metrics(countdown: 34, arrived: 24, text: 20)
         static let expanded = Metrics(countdown: 30, arrived: 20, text: 15)
+        static let watch = Metrics(countdown: 28, arrived: 20, text: 18)
     }
 
     let report: EEWActivityReport
@@ -605,5 +607,69 @@ struct EEWIslandMinimal: View {
         case .arrived, .unavailable, .cancelled:
             EEWIslandArrivalSymbol(report: report)
         }
+    }
+}
+
+// MARK: - Apple Watch
+
+/// The Smart Stack layout (`.small`). Same order as the phone, same colours,
+/// ring and "—" rules; depth, the maximum estimate and the notes do not fit
+/// and stay on the phone.
+///
+///     [kind] #2                  氣象署
+///     花蓮縣近海                   M6.6
+///     所在地預估        震波預計抵達
+///     [ 4級 ]          0:28
+@available(iOS 16.1, *)
+struct EEWWatchView: View {
+    let report: EEWActivityReport
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 7) {
+            HStack(spacing: 6) {
+                EEWKindBadge(report: report, size: 10)
+                Text(verbatim: report.reportNumber)
+                    .font(.system(size: 11, weight: .bold))
+                    .monospacedDigit()
+                Spacer(minLength: 4)
+                Text(verbatim: report.sourceText)
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundStyle(EEWActivityStyle.secondary)
+            }
+            HStack(alignment: .firstTextBaseline, spacing: 6) {
+                Text(verbatim: report.epicenter)
+                    .font(.system(size: 12, weight: .semibold))
+                    .truncationMode(.tail)
+                Spacer(minLength: 0)
+                Text(verbatim: report.magnitude)
+                    .font(EEWActivityStyle.rounded(13))
+                    .monospacedDigit()
+                    .layoutPriority(1)
+            }
+            HStack(alignment: .bottom, spacing: 12) {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(verbatim: report.localLabel)
+                        .font(.system(size: 10, weight: report.localIsLive ? .bold : .regular))
+                        .foregroundStyle(report.localIsLive ? Color.white : EEWActivityStyle.secondary)
+                    EEWIntensityBlock(
+                        ordinal: report.localIntensity, live: report.localIsLive, metrics: .watch,
+                        strings: report.strings)
+                        .padding(.leading, 4)
+                }
+                .accessibilityElement(children: .combine)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(verbatim: report.arrivalLabel)
+                        .font(.system(size: 10))
+                        .foregroundStyle(EEWActivityStyle.secondary)
+                    EEWArrivalSlot(report: report, metrics: .watch, alignment: .leading)
+                        .frame(height: 40, alignment: .leading)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .accessibilityElement(children: .combine)
+            }
+        }
+        .lineLimit(1)
+        .padding(10)
+        .foregroundStyle(.white)
     }
 }
