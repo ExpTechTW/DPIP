@@ -149,6 +149,17 @@ tasks.matching { it.name == "packageReleaseUnitTestForUnitTest" }.configureEach 
     dependsOn("copyFlutterAssetsRelease")
 }
 
+// The JVM suite in parallel forks. Gradle runs a test task in a single JVM by
+// default, which left ~630 Robolectric tests on one fork for 15-30 minutes. A
+// fork keeps about two cores busy, hence half the processors. Gradle hands out
+// whole classes, so the slowest class (a render-regression matrix, ~5 minutes)
+// is the floor. No state crosses a fork: each class writes its evidence to a
+// build/ directory of its own, Robolectric gives every test a fresh app data
+// directory, and its runtime download is file-locked across processes.
+tasks.withType<Test>().configureEach {
+    maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).coerceAtLeast(1)
+}
+
 flutter {
     source = "../.."
 }
