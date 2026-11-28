@@ -43,6 +43,16 @@ object WidgetApi {
 
     fun forecastUrl(regionCode: String): String =
         "https://$host/api/v5/meteor/weather/forecast/$regionCode"
+
+    /**
+     * The per-minute rain nowcast is not on the region topology: it lives on
+     * the external host the app's `RainHourTrendApi` reads, and `api.md` lists
+     * both callers. Moving it is an `api.md` change made in both places.
+     */
+    const val rainHost = "exptech.dingbot.tw"
+
+    fun rainForecastUrl(regionCode: String): String =
+        "https://$rainHost/api/weather/rainforecast/$regionCode"
 }
 
 /** A transport or decode failure. The caller keeps its previous snapshot. */
@@ -123,6 +133,19 @@ object WidgetHttp {
         // rest rather than discarding the whole township.
         val decoded = points.mapNotNull { WidgetSnapshotDecoder.decodeForecastPoint(it) }
         return RemoteForecast(updateTime, decoded)
+    }
+
+    /**
+     * The next hour's rain for a township, with the app's decode: an all-empty
+     * envelope is a dry hour starting at [calibratedNowMilliseconds]'s minute,
+     * and anything malformed is an exception, never a dry hour.
+     */
+    fun fetchRainTrend(regionCode: String, calibratedNowMilliseconds: Long): RainHourTrend {
+        if (!isValidRegionCode(regionCode)) throw WidgetHttpException("invalid region code")
+        val root = WidgetJsonParser.parse(get(WidgetApi.rainForecastUrl(regionCode)))
+            ?: throw WidgetHttpException("invalid rain payload")
+        return RainHourTrend.decode(root, calibratedNowMilliseconds)
+            ?: throw WidgetHttpException("malformed rain series")
     }
 
     private fun get(url: String): String {

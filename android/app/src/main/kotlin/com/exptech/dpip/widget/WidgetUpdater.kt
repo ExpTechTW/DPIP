@@ -14,23 +14,34 @@ import com.exptech.dpip.R
  */
 object WidgetUpdater {
 
+    /**
+     * Re-renders every instance the launcher has.
+     *
+     * The one render that knows every instance, so it is the one that decides
+     * whether the rain chart's five-minute redraw keeps running
+     * ([WidgetRainTicker]); a partial render can only start it.
+     */
     fun updateAll(context: Context) {
         val manager = managerOrNull(context) ?: return
-        for (id in liveAppWidgetIds(context, manager)) updateInstance(context, manager, id)
+        var chart = false
+        for (id in liveAppWidgetIds(context, manager)) chart = updateInstance(context, manager, id) or chart
+        if (chart) WidgetRainTicker.arm(context) else WidgetRainTicker.cancel(context)
     }
 
     fun updateInstance(context: Context, appWidgetId: Int) {
-        updateInstance(context, managerOrNull(context) ?: return, appWidgetId)
+        if (updateInstance(context, managerOrNull(context) ?: return, appWidgetId)) WidgetRainTicker.arm(context)
     }
 
     /** Re-renders every instance of one address from the cache. */
     fun updateAddress(context: Context, address: WidgetAddress) {
         val manager = managerOrNull(context) ?: return
+        var chart = false
         for (instance in WidgetStore.open(context).readInstances()) {
             if (instance.address.sourceIdentifier == address.sourceIdentifier) {
-                updateInstance(context, manager, instance.appWidgetId)
+                chart = updateInstance(context, manager, instance.appWidgetId) or chart
             }
         }
+        if (chart) WidgetRainTicker.arm(context)
     }
 
     /**
@@ -43,17 +54,21 @@ object WidgetUpdater {
     private fun managerOrNull(context: Context): AppWidgetManager? =
         AppWidgetManager.getInstance(context)
 
+    /** Submits one instance's views; true when any of its boxes drew a rain chart. */
     private fun updateInstance(
         context: Context,
         manager: AppWidgetManager,
         appWidgetId: Int,
-    ) {
-        try {
-            manager.updateAppWidget(appWidgetId, render(context, manager, appWidgetId))
+    ): Boolean {
+        return try {
+            val (views, chart) = build(context, manager, appWidgetId)
+            manager.updateAppWidget(appWidgetId, views)
+            chart
         } catch (error: Exception) {
             // A launcher that has already removed the instance throws here; that
             // is not a failure worth propagating into a worker result.
             WidgetLog.warning(context, "update failed id=$appWidgetId error=${error.logName()}")
+            false
         }
     }
 
@@ -63,22 +78,28 @@ object WidgetUpdater {
      * The store is read once per instance; each launcher box then only lays the
      * same data out at its own size, all against one calibrated instant.
      */
-    fun render(context: Context, manager: AppWidgetManager, appWidgetId: Int): RemoteViews {
+    fun render(context: Context, manager: AppWidgetManager, appWidgetId: Int): RemoteViews =
+        build(context, manager, appWidgetId).first
+
+    private fun build(context: Context, manager: AppWidgetManager, appWidgetId: Int): Pair<RemoteViews, Boolean> {
         val options = optionsOf(manager, appWidgetId)
         val data = InstanceData.load(context, appWidgetId)
-        fun child(size: SizeF) = WidgetRenderer.render(
-            context, data.present(size.width.toInt(), size.height.toInt()), appWidgetId,
-        )
-        val boxes = WidgetSizes.boxes(options)
-        if (android.os.Build.VERSION.SDK_INT >= 31) {
-            return RemoteViews(boxes.associateWith(::child))
+        var chart = false
+        fun child(size: SizeF): RemoteViews {
+            val presentation = data.present(size.width.toInt(), size.height.toInt())
+            if (presentation.rainChart != null) chart = true
+            return WidgetRenderer.render(context, presentation, appWidgetId)
         }
-        if (boxes.size == 1) return child(boxes.first())
-        // Each rotation by name. Recovering the two from `boxes` by width cannot
-        // tell them apart when a launcher reports one width for both — see
-        // WidgetSizes.RotationBoxes.
-        val rotations = WidgetSizes.rotationBoxes(options)
-        return RemoteViews(child(rotations.landscape), child(rotations.portrait))
+        val boxes = WidgetSizes.boxes(options)
+        val views = when {
+            android.os.Build.VERSION.SDK_INT >= 31 -> RemoteViews(boxes.associateWith(::child))
+            boxes.size == 1 -> child(boxes.first())
+            // Each rotation by name. Recovering the two from `boxes` by width
+            // cannot tell them apart when a launcher reports one width for both
+            // — see WidgetSizes.RotationBoxes.
+            else -> WidgetSizes.rotationBoxes(options).let { RemoteViews(child(it.landscape), child(it.portrait)) }
+        }
+        return views to chart
     }
 
     fun presentation(
@@ -107,6 +128,7 @@ object WidgetUpdater {
         private val longitude: Double?,
         private val feedback: WidgetRefreshFeedback?,
         private val calibratedNowMilliseconds: Long?,
+        private val rain: StoredRainTrend? = null,
     ) {
         private val strings = WidgetUpdater.strings(context)
         private val fontScale = context.resources.configuration.fontScale
@@ -128,6 +150,7 @@ object WidgetUpdater {
                 availableWidthDp = widthDp,
                 availableHeightDp = heightDp,
                 fontScale = fontScale,
+                rain = rain,
             ).copy(refreshFeedback = feedback)
         }
 
@@ -174,6 +197,7 @@ object WidgetUpdater {
                     longitude = catalogCentroid?.longitude ?: township?.longitude,
                     feedback = store.readRefreshFeedback(address, System.currentTimeMillis())?.state,
                     calibratedNowMilliseconds = calibratedNow,
+                    rain = stored?.snapshot?.regionCode?.let(store::readRainTrend),
                 )
             }
         }
@@ -196,6 +220,13 @@ object WidgetUpdater {
         locationDisabled = context.getString(R.string.widget_location_disabled),
         locationUnavailable = context.getString(R.string.widget_location_unavailable),
         locationOutside = context.getString(R.string.widget_location_outside),
+        rainScattered = context.getString(R.string.widget_rain_scattered),
+        rainLightSustained = context.getString(R.string.widget_rain_light_sustained),
+        rainLightStopping = context.getString(R.string.widget_rain_light_stopping),
+        rainHeavySustained = context.getString(R.string.widget_rain_heavy_sustained),
+        rainHeavyStopping = context.getString(R.string.widget_rain_heavy_stopping),
+        rainNow = context.getString(R.string.widget_rain_now),
+        rainMinute = context.getString(R.string.widget_rain_minute),
     )
 
     /**

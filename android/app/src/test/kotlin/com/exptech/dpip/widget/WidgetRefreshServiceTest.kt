@@ -624,4 +624,68 @@ class WidgetRefreshServiceTest {
             presentation.badgeText,
         )
     }
+
+    // ── The next hour's rain ────────────────────────────────────────────────
+
+    private fun rain(vararg leading: Double) = RainHourTrend(1_791_454_380, leading.toList() + List(60 - leading.size) { 0.0 })
+
+    @Test
+    fun `the rain is fetched for the township the observation landed for`() {
+        val asked = ArrayList<Pair<String, Long>>()
+        val result = WidgetRefreshService(
+            context = context, store = store,
+            resolveAddress = { LocationResolution.Resolved(resolved("100")) },
+            synchronizeClock = { true },
+            snapshotTime = { WidgetSnapshotTime(1_791_454_400_000L, 0) },
+            fetchWeather = { _, _ -> observation() },
+            fetchForecast = { forecastUpdate() },
+            nowMilliseconds = { 1L },
+            fetchRainTrend = { region, now -> asked.add(region to now); rain(6.0) },
+            calibratedNowMilliseconds = { 1_791_454_400_000L },
+        ).refresh(currentLocation)
+
+        assertEquals(WidgetRefreshResult.Refreshed, result)
+        assertEquals(listOf("100" to 1_791_454_400_000L), asked)
+        assertEquals(rain(6.0), store.readRainTrend("100")!!.trend)
+    }
+
+    @Test
+    fun `a failed rain fetch keeps the trend already cached`() {
+        assertTrue(store.commitRainTrend("407", rain(8.0), writtenAt = 1L))
+
+        val result = WidgetRefreshService(
+            context = context, store = store,
+            resolveAddress = { LocationResolution.Resolved(resolved("407")) },
+            synchronizeClock = { true },
+            snapshotTime = { WidgetSnapshotTime(1_791_454_400_000L, 0) },
+            fetchWeather = { _, _ -> observation() },
+            fetchForecast = { forecastUpdate() },
+            nowMilliseconds = { 1L },
+            fetchRainTrend = { _, _ -> throw WidgetHttpException("malformed rain series") },
+            calibratedNowMilliseconds = { 1_791_454_400_000L },
+        ).refresh(currentLocation)
+
+        assertEquals("rain never downgrades the weather", WidgetRefreshResult.Refreshed, result)
+        assertEquals(rain(8.0), store.readRainTrend("407")!!.trend)
+    }
+
+    @Test
+    fun `no rain is fetched when the observation did not land`() {
+        var asked = 0
+        store.commitCurrentWeather(currentSnapshot("407", observationSeconds = 1_791_454_900), writtenAt = 1L)
+
+        val result = WidgetRefreshService(
+            context = context, store = store,
+            resolveAddress = { LocationResolution.Resolved(resolved("407")) },
+            synchronizeClock = { true },
+            snapshotTime = { WidgetSnapshotTime(1_791_454_400_000L, 0) },
+            fetchWeather = { _, _ -> observation(time = 1_791_454_316) },
+            fetchForecast = { forecastUpdate() },
+            nowMilliseconds = { 1L },
+            fetchRainTrend = { _, _ -> asked++; rain(6.0) },
+        ).refresh(currentLocation)
+
+        assertEquals(WidgetRefreshResult.Superseded, result)
+        assertEquals(0, asked)
+    }
 }

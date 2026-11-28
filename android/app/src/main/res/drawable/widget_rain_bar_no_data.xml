@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A minute the forecast does not cover: a full-height grey bar, the
+     widget's reading of the app card's grey no-data band. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/widget_rain_no_data" />
+</shape>

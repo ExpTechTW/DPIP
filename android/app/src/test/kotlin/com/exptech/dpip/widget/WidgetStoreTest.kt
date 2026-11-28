@@ -605,4 +605,39 @@ class WidgetStoreTest {
         )
     }
 
+
+    // ── Next-hour rain ──────────────────────────────────────────────────────
+
+    @Test
+    fun `a rain trend round-trips per township and is replaced whole`() {
+        val wet = RainHourTrend(1_791_454_200, List(60) { it * 0.5 })
+        assertTrue(store.commitRainTrend("407", wet, writtenAt = 1L))
+        assertEquals(StoredRainTrend("407", wet), store.readRainTrend("407"))
+        assertNull(store.readRainTrend("100"))
+
+        val dry = RainHourTrend(1_791_454_800, List(60) { 0.0 })
+        assertTrue(store.commitRainTrend("407", dry, writtenAt = 2L))
+        assertEquals(dry, store.readRainTrend("407")!!.trend)
+    }
+
+    @Test
+    fun `the v6 upgrade only adds the rain cache`() {
+        assertTrue(store.writeCatalog(catalog("407"), 1L))
+        store.writeInstance(11, saved, "407", 1L)
+        assertEquals(WidgetWriteResult.Written, commit())
+        assertEquals(WidgetWriteResult.Written, commitForecast())
+        SQLiteDatabase.openDatabase(
+            context.getDatabasePath(WidgetStore.DATABASE_NAME).path, null, SQLiteDatabase.OPEN_READWRITE,
+        ).use {
+            it.execSQL("DROP TABLE widget_rain_trends")
+            it.version = 5
+        }
+
+        val upgraded = WidgetStore.openUncached(context)
+
+        assertEquals(snapshot().observationTime, upgraded.readCurrentWeather(saved)?.snapshot?.observationTime)
+        assertEquals(9_000L, upgraded.readForecast(saved)?.expiresAtMilliseconds)
+        assertEquals(saved, upgraded.readInstance(11)?.address)
+        assertTrue(upgraded.commitRainTrend("407", RainHourTrend(60, List(60) { 1.0 }), writtenAt = 1L))
+    }
 }

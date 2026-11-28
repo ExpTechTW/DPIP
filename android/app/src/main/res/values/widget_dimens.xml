@@ -43,6 +43,9 @@
     <dimen name="widget_radius">20dp</dimen>
 
     <dimen name="widget_spacing_xs">4dp</dimen>
+    <!-- The rain chart's bar band and the gap that separates its minutes. -->
+    <dimen name="widget_rain_chart_height">30dp</dimen>
+    <dimen name="widget_rain_bar_gap">1dp</dimen>
     <dimen name="widget_spacing_sm">6dp</dimen>
     <dimen name="widget_spacing_md">12dp</dimen>
 

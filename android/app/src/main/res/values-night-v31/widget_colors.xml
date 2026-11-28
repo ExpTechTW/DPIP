@@ -6,4 +6,5 @@
     <color name="widget_secondary">@android:color/system_neutral2_200</color>
     <color name="widget_icon_tint">@android:color/system_neutral2_200</color>
     <color name="widget_notice">@android:color/system_neutral2_200</color>
+    <color name="widget_rain_bar">@android:color/system_accent1_200</color>
 </resources>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One minute of the rain chart: a bottom-anchored clip whose level
+     (0–10000) WidgetRenderer sets to the minute's share of the 35 mm ceiling. -->
+<clip xmlns:android="http://schemas.android.com/apk/res/android"
+    android:clipOrientation="vertical"
+    android:drawable="@drawable/widget_rain_bar_fill"
+    android:gravity="bottom" />

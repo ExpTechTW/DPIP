@@ -36,4 +36,9 @@
          with no container: an aged reading has to be legible without becoming
          the loudest thing on the screen, which the old error pill was. -->
     <color name="widget_notice">#FF6C6C70</color>
+    <!-- The rain chart: its bars in the one accent the Widget has, the way
+         the app's trend card draws them in the theme's primary, and the
+         minutes the forecast does not cover in a faint secondary ink. -->
+    <color name="widget_rain_bar">#FF007AFF</color>
+    <color name="widget_rain_no_data">#296C6C70</color>
 </resources>

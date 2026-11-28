@@ -55,4 +55,14 @@
     <string name="widget_compact_location">Di matukoy</string>
     <string name="widget_compact_details">Buksan ang app para sa buong detalye ng panahon</string>
     <string name="widget_compact_attention">Buksan app</string>
+
+    <!-- The next-hour rain chart; texts are the app's homeRainTrend* and mapTimelineNow. -->
+    <string name="widget_rain_title">Ulan sa susunod na oras</string>
+    <string name="widget_rain_scattered">Posibleng mahinang ulan</string>
+    <string name="widget_rain_light_sustained">Tuloy-tuloy na mahinang ulan sa susunod na oras</string>
+    <string name="widget_rain_light_stopping">Baka huminto ang mahinang ulan sa loob ng %1$d minuto</string>
+    <string name="widget_rain_heavy_sustained">Tuloy-tuloy na malakas na ulan sa susunod na oras</string>
+    <string name="widget_rain_heavy_stopping">Baka huminto ang malakas na ulan sa loob ng %1$d minuto</string>
+    <string name="widget_rain_now">Ngayon</string>
+    <string name="widget_rain_minute">%1$d min</string>
 </resources>

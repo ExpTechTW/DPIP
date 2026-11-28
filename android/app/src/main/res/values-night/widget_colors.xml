@@ -6,4 +6,6 @@
     <color name="widget_secondary">#FF9A9AA0</color>
     <color name="widget_icon_tint">#FF9A9AA0</color>
     <color name="widget_notice">#FF9A9AA0</color>
+    <color name="widget_rain_bar">#FF0A84FF</color>
+    <color name="widget_rain_no_data">#339A9AA0</color>
 </resources>

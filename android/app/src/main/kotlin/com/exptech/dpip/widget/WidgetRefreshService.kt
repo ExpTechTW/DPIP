@@ -57,6 +57,12 @@ class WidgetRefreshService(
     private val fetchWeather: (Double, Double) -> RemoteCurrentWeather?,
     private val fetchForecast: (String) -> RemoteForecast,
     private val nowMilliseconds: () -> Long,
+    /**
+     * The next hour's rain for a township, decoded against the calibrated
+     * instant it is given (a dry hour starts at its minute). Throws on any
+     * failure, a malformed response included.
+     */
+    private val fetchRainTrend: (String, Long) -> RainHourTrend = { _, _ -> throw WidgetHttpException("no rain source") },
     /** The trusted clock, read at commit time so a receipt is dated when it arrives. */
     private val calibratedNowMilliseconds: () -> Long? = { WidgetClock.calibratedNowMilliseconds() },
 ) {
@@ -144,6 +150,7 @@ class WidgetRefreshService(
         }
 
         refreshForecast(location)
+        refreshRain(location)
         // Committed, but with no anchor the screen cannot call it fresh: a
         // bounded retry is the quickest way to an anchor.
         return if (calibrated) WidgetRefreshResult.Refreshed else WidgetRefreshResult.Failed
@@ -203,6 +210,26 @@ class WidgetRefreshService(
             ),
             writtenAt = receivedAt,
         )
+    }
+
+    /**
+     * The next hour's rain for the township this round resolved to.
+     *
+     * Fetched on every refresh that landed its observation: it is a nowcast,
+     * and an hour-old one is the chart the presenter refuses to draw. A failure
+     * keeps the previous trend, which the presenter draws only while its own
+     * hour lasts and only under an observation for the same township; a
+     * malformed response is a failure too, never a dry hour.
+     */
+    private fun refreshRain(location: ResolvedWeatherLocation) {
+        val calibratedNow = calibratedNowMilliseconds() ?: return
+        val trend = try {
+            fetchRainTrend(location.regionCode, calibratedNow)
+        } catch (error: Exception) {
+            WidgetLog.warning(context, "rain failed region=${location.regionCode} error=${error.logName()}")
+            return
+        }
+        store.commitRainTrend(location.regionCode, trend, nowMilliseconds())
     }
 
     /** Builds the schema-v7 snapshot, identically to the iOS factory. */
@@ -270,6 +297,7 @@ class WidgetRefreshService(
                     WidgetHttp.fetchCurrentWeather(latitude, longitude)
                 },
                 fetchForecast = { regionCode -> WidgetHttp.fetchForecast(regionCode) },
+                fetchRainTrend = { regionCode, calibratedNow -> WidgetHttp.fetchRainTrend(regionCode, calibratedNow) },
                 nowMilliseconds = { System.currentTimeMillis() },
             )
         }

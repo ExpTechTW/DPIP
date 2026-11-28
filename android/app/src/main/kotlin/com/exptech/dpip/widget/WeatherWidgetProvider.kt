@@ -110,6 +110,11 @@ class WeatherWidgetProvider : AppWidgetProvider() {
      */
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
+        if (intent.action == WidgetRainTicker.ACTION_TICK) {
+            // Cache only: the chart moves along, and nothing is fetched.
+            WidgetUpdater.updateAll(context)
+            return
+        }
         if (intent.action != WidgetRenderer.ACTION_REFRESH) return
 
         val appWidgetId = intent.getIntExtra(

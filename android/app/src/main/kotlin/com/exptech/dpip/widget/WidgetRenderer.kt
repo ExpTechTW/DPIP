@@ -168,14 +168,14 @@ object WidgetRenderer {
                     )
                     if (full) renderSecondDetailRow(views, presentation)
                 }
-                renderForecast(context, views, presentation, R.layout.widget_forecast_item)
+                renderHourly(context, views, presentation, R.layout.widget_forecast_item)
             }
 
             WidgetSizeClass.Large -> {
                 setOptionalText(views, R.id.widget_apparent, presentation.apparentText)
                 renderDetailRow(views, presentation)
                 renderSecondDetailRow(views, presentation)
-                renderForecast(context, views, presentation, R.layout.widget_forecast_item_large)
+                renderHourly(context, views, presentation, R.layout.widget_forecast_item_large)
             }
         }
         return views
@@ -321,6 +321,43 @@ object WidgetRenderer {
         }))
     }
 
+    /**
+     * The hourly row or the rain chart — never both, the way the app's hero
+     * card hands its slot to the trend when the next hour has rain.
+     */
+    private fun renderHourly(
+        context: Context,
+        views: RemoteViews,
+        presentation: WidgetPresentation,
+        itemLayout: Int,
+    ) {
+        val chart = presentation.rainChart
+        views.setViewVisibility(R.id.widget_forecast_container, if (chart == null) View.VISIBLE else View.GONE)
+        views.setViewVisibility(R.id.widget_rain_chart, if (chart == null) View.GONE else View.VISIBLE)
+        if (chart == null) {
+            renderForecast(context, views, presentation, itemLayout)
+            return
+        }
+        views.removeAllViews(R.id.widget_forecast_container)
+        views.setTextViewText(R.id.widget_rain_summary, chart.summary)
+        views.setContentDescription(
+            R.id.widget_rain_chart,
+            "${context.getString(R.string.widget_rain_title)}, ${chart.summary}",
+        )
+        chart.levels.forEachIndexed { minute, level ->
+            val id = rainBarIds[minute]
+            if (level == null) {
+                views.setImageViewResource(id, R.drawable.widget_rain_bar_no_data)
+            } else {
+                // The drawable first, then its level: a fresh drawable starts
+                // at level 0, so the order is what makes the bar its height.
+                views.setImageViewResource(id, R.drawable.widget_rain_bar)
+                views.setInt(id, "setImageLevel", level)
+            }
+        }
+        chart.ticks.forEachIndexed { index, tick -> views.setTextViewText(rainTickIds[index], tick) }
+    }
+
     private fun renderForecast(
         context: Context,
         views: RemoteViews,
@@ -458,6 +495,7 @@ object WidgetRenderer {
             if (compact) presentation.humidityText?.let { "${context.getString(R.string.widget_humidity)} $it" } else null,
             if (compact) presentation.rainText?.let { "${context.getString(R.string.widget_rain)} $it" } else null,
             presentation.badgeText,
+            presentation.rainChart?.summary,
             if (compact) presentation.hintText else null,
             if (compact) context.getString(R.string.widget_compact_details) else null,
         )
@@ -520,6 +558,24 @@ object WidgetRenderer {
 
     private fun requestCode(appWidgetId: Int, action: Int): Int =
         (appWidgetId and 0x0FFF_FFFF) * 4 + action
+
+    /** The sixty minute bars, in order: `RemoteViews` addresses views by id only. */
+    private val rainBarIds = intArrayOf(
+        R.id.widget_rain_bar_00, R.id.widget_rain_bar_01, R.id.widget_rain_bar_02, R.id.widget_rain_bar_03, R.id.widget_rain_bar_04,
+        R.id.widget_rain_bar_05, R.id.widget_rain_bar_06, R.id.widget_rain_bar_07, R.id.widget_rain_bar_08, R.id.widget_rain_bar_09,
+        R.id.widget_rain_bar_10, R.id.widget_rain_bar_11, R.id.widget_rain_bar_12, R.id.widget_rain_bar_13, R.id.widget_rain_bar_14,
+        R.id.widget_rain_bar_15, R.id.widget_rain_bar_16, R.id.widget_rain_bar_17, R.id.widget_rain_bar_18, R.id.widget_rain_bar_19,
+        R.id.widget_rain_bar_20, R.id.widget_rain_bar_21, R.id.widget_rain_bar_22, R.id.widget_rain_bar_23, R.id.widget_rain_bar_24,
+        R.id.widget_rain_bar_25, R.id.widget_rain_bar_26, R.id.widget_rain_bar_27, R.id.widget_rain_bar_28, R.id.widget_rain_bar_29,
+        R.id.widget_rain_bar_30, R.id.widget_rain_bar_31, R.id.widget_rain_bar_32, R.id.widget_rain_bar_33, R.id.widget_rain_bar_34,
+        R.id.widget_rain_bar_35, R.id.widget_rain_bar_36, R.id.widget_rain_bar_37, R.id.widget_rain_bar_38, R.id.widget_rain_bar_39,
+        R.id.widget_rain_bar_40, R.id.widget_rain_bar_41, R.id.widget_rain_bar_42, R.id.widget_rain_bar_43, R.id.widget_rain_bar_44,
+        R.id.widget_rain_bar_45, R.id.widget_rain_bar_46, R.id.widget_rain_bar_47, R.id.widget_rain_bar_48, R.id.widget_rain_bar_49,
+        R.id.widget_rain_bar_50, R.id.widget_rain_bar_51, R.id.widget_rain_bar_52, R.id.widget_rain_bar_53, R.id.widget_rain_bar_54,
+        R.id.widget_rain_bar_55, R.id.widget_rain_bar_56, R.id.widget_rain_bar_57, R.id.widget_rain_bar_58, R.id.widget_rain_bar_59,
+    )
+
+    private val rainTickIds = intArrayOf(R.id.widget_rain_tick_0, R.id.widget_rain_tick_1, R.id.widget_rain_tick_2, R.id.widget_rain_tick_3, R.id.widget_rain_tick_4, R.id.widget_rain_tick_5)
 
     private const val REQUEST_OPEN = 1
     private const val REQUEST_REFRESH = 3

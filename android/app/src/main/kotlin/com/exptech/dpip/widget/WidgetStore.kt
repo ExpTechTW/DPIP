@@ -66,6 +66,7 @@ data class StoredCurrentWeather(
  *   **Durable.**
  * * `widget_snapshots`, `widget_forecasts` + `widget_forecast_points` — the
  *   cache. Re-fetchable.
+ * * `widget_rain_trends` — the next hour's rain, per township. Re-fetchable.
  * * `widget_source_state` — per address: the position degradation, the
  *   acquisition counter, the last successful refresh and the manual-refresh
  *   feedback. Re-derivable.
@@ -574,6 +575,44 @@ class WidgetStore private constructor(
         )
     }
 
+    // ── Next-hour rain ──────────────────────────────────────────────────────
+
+    /**
+     * Stores the trend for one township, replacing the previous one.
+     *
+     * Keyed by township rather than by address: the nowcast is a fact about a
+     * place, so two addresses that resolve to the same township share it, and
+     * the presenter only draws it under an observation that names the same one.
+     */
+    @Synchronized
+    fun commitRainTrend(regionCode: String, trend: RainHourTrend, writtenAt: Long): Boolean =
+        attempt("rain.write", regionCode) {
+            helper.writableDatabase.insertWithOnConflict(
+                TABLE_RAIN,
+                null,
+                contentValuesOf(
+                    "region_code" to regionCode,
+                    "start_second" to trend.startSecond,
+                    "samples" to trend.mm.joinToString(","),
+                    "written_at" to writtenAt,
+                ),
+                SQLiteDatabase.CONFLICT_REPLACE,
+            ) != -1L
+        } ?: false
+
+    @Synchronized
+    fun readRainTrend(regionCode: String): StoredRainTrend? = quietly("rain.read") {
+        helper.readableDatabase.rawQuery(
+            "SELECT start_second, samples FROM $TABLE_RAIN WHERE region_code = ?",
+            arrayOf(regionCode),
+        ).use { cursor ->
+            if (!cursor.moveToFirst()) return@quietly null
+            val samples = cursor.getString(1).split(',').map { it.toDoubleOrNull() ?: return@quietly null }
+            if (samples.size != RainHourTrend.SAMPLES) return@quietly null
+            StoredRainTrend(regionCode, RainHourTrend(cursor.getLong(0), samples))
+        }
+    }
+
     // ── Per-address live state ──────────────────────────────────────────────
 
     /**
@@ -825,6 +864,11 @@ class WidgetStore private constructor(
          * boolean, which becomes the degradation it meant.
          */
         override fun onUpgrade(database: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+            if (oldVersion == 5) {
+                // Additive: the rain cache is new, everything else is v5's.
+                createRainTable(database)
+                return
+            }
             val degradations = readDegradations(database)
             val keepSnapshots = oldVersion >= 3
             rebuildCache(database, keepSnapshots)
@@ -908,7 +952,19 @@ class WidgetStore private constructor(
             )
         }
 
+        private fun createRainTable(database: SQLiteDatabase) {
+            database.execSQL(
+                "CREATE TABLE IF NOT EXISTS $TABLE_RAIN (" +
+                    "region_code TEXT PRIMARY KEY," +
+                    "start_second INTEGER NOT NULL," +
+                    // Sixty comma-separated millimetre values, minute by minute.
+                    "samples TEXT NOT NULL," +
+                    "written_at INTEGER NOT NULL)",
+            )
+        }
+
         private fun createCacheTables(database: SQLiteDatabase) {
+            createRainTable(database)
             database.execSQL(
                 "CREATE TABLE IF NOT EXISTS $TABLE_SNAPSHOTS (" +
                     "source_identifier TEXT PRIMARY KEY," +
@@ -989,8 +1045,9 @@ class WidgetStore private constructor(
          * * 5 — one refresh chain: the reservation/fence table, the forecast
          *   demand and the separate feedback table are gone; acquisition,
          *   refresh time and feedback live on the source state.
+         * * 6 — additive next-hour rain trends.
          */
-        const val DATABASE_VERSION = 5
+        const val DATABASE_VERSION = 6
         private const val META_CATALOG = 1
 
         private const val TABLE_INSTANCES = "widget_instances"
@@ -1000,6 +1057,7 @@ class WidgetStore private constructor(
         private const val TABLE_SNAPSHOTS = "widget_snapshots"
         private const val TABLE_FORECASTS = "widget_forecasts"
         private const val TABLE_FORECAST_POINTS = "widget_forecast_points"
+        private const val TABLE_RAIN = "widget_rain_trends"
 
         /** Everything re-derivable. The durable tables are deliberately absent. */
         private val CACHE_TABLES = listOf(
@@ -1007,6 +1065,7 @@ class WidgetStore private constructor(
             TABLE_FORECASTS,
             TABLE_FORECAST_POINTS,
             TABLE_SOURCE_STATE,
+            TABLE_RAIN,
         )
 
         /** Tables earlier schemas had and v5 no longer creates. */

@@ -263,5 +263,6 @@ object WidgetRefresh {
         workManager.cancelUniqueWork(refreshWorkName)
         workManager.cancelUniqueWork(localRerenderWorkName)
         workManager.cancelAllWorkByTag(workTag)
+        WidgetRainTicker.cancel(context)
     }
 }

@@ -5,6 +5,7 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import kotlin.math.roundToInt
 
 /** Which of the three layouts an instance's measured size selects. */
 enum class WidgetSizeClass { Small, Medium, Large }
@@ -39,6 +40,20 @@ data class ForecastPresentation(
     val popText: String,
     val condition: WidgetWeatherCondition,
     val isNight: Boolean,
+)
+
+/**
+ * The next-hour rain chart, already decided: sixty one-minute bars starting at
+ * "now", like the home sheet's trend card.
+ *
+ * [levels] holds one entry per bar: the share of the [RainHourTrend.MAXIMUM_MM]
+ * ceiling as a drawable level (0–10000), or null for a minute the forecast does
+ * not cover, which is drawn grey.
+ */
+data class RainChartPresentation(
+    val levels: List<Int?>,
+    val summary: String,
+    val ticks: List<String>,
 )
 
 /**
@@ -103,6 +118,11 @@ data class WidgetPresentation(
     val fontScale: Float,
     /** Manual refresh feedback, separate from data staleness and location hints. */
     val refreshFeedback: WidgetRefreshFeedback? = null,
+    /**
+     * The next hour's rain, drawn instead of [forecast] when the hour is wet;
+     * null keeps the hourly row.
+     */
+    val rainChart: RainChartPresentation? = null,
 ) {
     /** The height the layout budgets are written against. */
     val effectiveHeightDp: Int get() = (availableHeightDp / fontScale).toInt()
@@ -147,6 +167,15 @@ data class WidgetStrings(
     val locationDisabled: String,
     val locationUnavailable: String,
     val locationOutside: String,
+    // The rain chart's words, from the app's `homeRainTrend*` and
+    // `mapTimelineNow`; `%1$d` is the minute count.
+    val rainScattered: String = "Light showers possible",
+    val rainLightSustained: String = "Light rain continuing for the next hour",
+    val rainLightStopping: String = "Light rain likely to stop in %1${'$'}d minutes",
+    val rainHeavySustained: String = "Heavy rain continuing for the next hour",
+    val rainHeavyStopping: String = "Heavy rain likely to stop in %1${'$'}d minutes",
+    val rainNow: String = "Now",
+    val rainMinute: String = "%1${'$'}d min",
 )
 
 /**
@@ -317,6 +346,7 @@ object WidgetPresenter {
         availableWidthDp: Int = minimumWidthDp,
         availableHeightDp: Int = defaultAvailableHeightDp,
         fontScale: Float = 1f,
+        rain: StoredRainTrend? = null,
     ): WidgetPresentation {
         val compactLayout = sizeClass == WidgetSizeClass.Small &&
             compactLayout(availableWidthDp, availableHeightDp, fontScale)
@@ -462,8 +492,72 @@ object WidgetPresenter {
             availableWidthDp = availableWidthDp,
             availableHeightDp = availableHeightDp,
             fontScale = fontScale,
+            // Only a position the Widget trusts may carry a township's rain: a
+            // Current Location outside Taiwan, or one that cannot be fixed, has
+            // no township to draw it for.
+            rainChart = if (supportsForecast && calibratedNow != null && !degraded) {
+                rainChart(rain, snapshot.regionCode, calibratedNow, strings)
+            } else {
+                null
+            },
         )
     }
+
+    /**
+     * The chart for the township the observation names, or null when there is
+     * nothing true to draw: no trend, a trend for another township, a dry hour,
+     * a trend whose hour has passed, or no trusted clock to place "now" in it.
+     *
+     * The bars start at the current minute, the way the app's card does
+     * (`home_rain_trend_section.dart`): minutes before the data begins and
+     * after it ends have no forecast and are grey. A Widget cannot redraw every
+     * minute, so the renderer's caller redraws it every five while it is on
+     * screen; between those, it is at most a few minutes behind.
+     */
+    fun rainChart(
+        stored: StoredRainTrend?,
+        regionCode: String,
+        calibratedNowMilliseconds: Long,
+        strings: WidgetStrings,
+    ): RainChartPresentation? {
+        if (stored == null || stored.regionCode != regionCode) return null
+        val trend = stored.trend
+        if (calibratedNowMilliseconds >= trend.endMilliseconds) return null
+        val summary = trend.summary
+        val text = when (summary.grade) {
+            RainHourTrendGrade.None -> return null
+            RainHourTrendGrade.Scattered -> strings.rainScattered
+            RainHourTrendGrade.Light -> summary.stopInMinutes
+                ?.let { String.format(Locale.getDefault(), strings.rainLightStopping, it) }
+                ?: strings.rainLightSustained
+            RainHourTrendGrade.Heavy -> summary.stopInMinutes
+                ?.let { String.format(Locale.getDefault(), strings.rainHeavyStopping, it) }
+                ?: strings.rainHeavySustained
+        }
+        // Whole minutes since the data starts, truncated toward zero like
+        // Dart's `Duration.inMinutes`; negative when the data is ahead of now.
+        val elapsed = ((calibratedNowMilliseconds - trend.startSecond * 1_000) / 60_000)
+            .coerceIn(-RainHourTrend.SAMPLES.toLong(), RainHourTrend.SAMPLES.toLong()).toInt()
+        val levels = List(RainHourTrend.SAMPLES) { minute ->
+            trend.mm.getOrNull(minute + elapsed)?.let { rainLevel(it) }
+        }
+        return RainChartPresentation(
+            levels = levels,
+            summary = text,
+            ticks = rainTicks.map { minute ->
+                if (minute == 0) strings.rainNow else String.format(Locale.getDefault(), strings.rainMinute, minute)
+            },
+        )
+    }
+
+    /** One bar's drawable level: its share of the 35 mm ceiling, clamped. */
+    fun rainLevel(mm: Double): Int =
+        if (mm <= 0) 0 else (mm.coerceAtMost(RainHourTrend.MAXIMUM_MM) / RainHourTrend.MAXIMUM_MM * maximumLevel).roundToInt()
+
+    private const val maximumLevel = 10_000
+
+    /** The app's axis ticks, minutes from now. */
+    private val rainTicks = listOf(0, 10, 20, 30, 40, 50)
 
     /** A failed fix can recover; permissions and disabled services need user action. */
     private fun canRefresh(

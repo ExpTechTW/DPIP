@@ -59,4 +59,14 @@
     <string name="widget_compact_location">位置不明</string>
     <string name="widget_compact_details">アプリで詳しい天気情報を確認</string>
     <string name="widget_compact_attention">アプリへ</string>
+
+    <!-- The next-hour rain chart; texts are the app's homeRainTrend* and mapTimelineNow. -->
+    <string name="widget_rain_title">今後1時間の雨</string>
+    <string name="widget_rain_scattered">にわか雨の可能性があります</string>
+    <string name="widget_rain_light_sustained">今後1時間は小雨が続きます</string>
+    <string name="widget_rain_light_stopping">%1$d分後に小雨が止む見込みです</string>
+    <string name="widget_rain_heavy_sustained">今後1時間は大雨が続きます</string>
+    <string name="widget_rain_heavy_stopping">%1$d分後に大雨が止む見込みです</string>
+    <string name="widget_rain_now">現在</string>
+    <string name="widget_rain_minute">%1$d分</string>
 </resources>
