@@ -10,6 +10,10 @@
 #      @@locale + languageName (the picker is derived from languageName, never a
 #      hardcoded list) and its message-key SET exactly matches the template —
 #      a MISSING key silently falls back to English; an EXTRA key is dead weight.
+#      And no lib/l10n/*.arb, the template included, names a key twice in one
+#      object: JSON keeps only the last copy, so an edit to the other one is
+#      silently ignored — and parity cannot see it, because both copies have
+#      collapsed into one key before anything is compared.
 #   2. No hardcoded user-facing strings: a string LITERAL containing CJK / kana /
 #      Hangul / Thai text must not appear in a feature's presentation layer or in
 #      shared/widgets — those go through AppLocalizations/ARB. Comments are
@@ -48,7 +52,7 @@ template=$(grep -E '^template-arb-file:' l10n.yaml | sed -E 's/.*:[[:space:]]*//
 # matches check_layering.sh. (Captured via $(…) then fed with <<< — a heredoc
 # inside <(…) process substitution mis-parses on bash 3.2.)
 arb_violations=$(python3 - "$arb_dir" "$template" <<'PY'
-import json, glob, os, sys
+import json, glob, os, re, sys
 
 arb_dir, template = sys.argv[1], sys.argv[2]
 tpl_path = os.path.join(arb_dir, template)
@@ -65,6 +69,64 @@ def message_keys(obj):
     # ARB metadata keys start with '@' (@key descriptions) or '@@' (@@locale).
     # Translatable messages are everything else — that's what must be in parity.
     return {k for k in obj if not k.startswith("@")}
+
+# A JSON string, whole — so a brace, comma or quote inside one is never read as
+# structure — or one structural character. Whitespace, ':', numbers and
+# literals open, close and separate nothing, so the scan steps over them.
+TOKEN = re.compile(r'"(?:[^"\\]|\\.)*"|[{}\[\],]')
+
+def duplicate_keys(text):
+    """Yield (container, key, first_line, line) for every key named twice in
+    the same object. json.load cannot say: it keeps the last copy and drops the
+    rest, and object_pairs_hook would show the pairs but not where they are.
+    So keep a frame per open object with the keys seen in it. A key is only
+    compared within its own object, which is what lets every @entry and
+    placeholder repeat `description` / `type` / `example`: those are the same
+    name in different objects, not a duplicate. Only fed text json.loads has
+    accepted, so the scan never has to cope with malformed input."""
+    frames = []   # per open container: {key: line} for an object, None for an array
+    names = []    # what each container is the value of, for the message
+    expect_key = False
+    key = None    # the last key read; names the value that follows it
+    line, counted = 1, 0
+    for m in TOKEN.finditer(text):
+        tok = m.group()
+        if tok[0] == '"':
+            if not expect_key:
+                continue          # a value
+            line += text.count("\n", counted, m.start())
+            counted = m.start()
+            key = json.loads(tok)  # decoded, so "a" and "a" are one key
+            seen = frames[-1]
+            if key in seen:
+                yield " → ".join(names[1:]), key, seen[key], line
+            else:
+                seen[key] = line
+            expect_key = False
+        elif tok in "{[":
+            names.append(key if frames and frames[-1] is not None else "[]")
+            frames.append({} if tok == "{" else None)
+            expect_key = tok == "{"
+        elif tok in "}]":
+            frames.pop()
+            names.pop()
+        else:  # ',' — in an object the next string is a key again
+            expect_key = frames[-1] is not None
+
+# Every ARB, the template too: gen-l10n reads them all the same way. A file that
+# does not parse is skipped here and reported by the parity check below.
+for path in sorted(glob.glob(os.path.join(arb_dir, "*.arb"))):
+    try:
+        with open(path, encoding="utf-8") as f:
+            text = f.read()
+        json.loads(text)
+    except (OSError, ValueError):
+        continue
+    for container, key, first, again in duplicate_keys(text):
+        inside = f" in {container}" if container else ""
+        print(f'{path}:{again} → key "{key}"{inside} is already defined at '
+              f"line {first} (JSON keeps only the last copy, so an edit to "
+              f"the other one is silently ignored)")
 
 tpl, err = load(tpl_path)
 if err:
@@ -279,4 +341,4 @@ if [ "$fail" -ne 0 ]; then
   exit 1
 fi
 
-echo "l10n OK — ARB locales in parity; no hardcoded UI strings; native Intent tables valid."
+echo "l10n OK — ARB locales in parity, no key defined twice; no hardcoded UI strings; native Intent tables valid."
