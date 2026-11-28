@@ -8,82 +8,22 @@ import XCTest
 final class EEWPresentationTests: XCTestCase {
     private let epoch = Date(timeIntervalSince1970: 1_000_000)
 
-    func testPersonalizationFallsBackIndependently() {
-        for local in [nil, 4] as [Int?] {
-            for eta in [nil, epoch] as [Date?] {
-                let state = state(local: local, eta: eta)
-                XCTAssertEqual(EEWPresentation.intensity(for: state), local ?? 5)
-                XCTAssertEqual(
-                    EEWPresentation.intensityLabel(for: state),
-                    local == nil ? "eew.intensity.max" : "eew.intensity.local")
-                XCTAssertEqual(EEWPresentation.arrival(for: state), eta.map { .countdown($0) } ?? .unavailable)
-                XCTAssertEqual(state.estimatedLocalIntensity, local)
-                XCTAssertEqual(state.estimatedSArrivalAt, eta)
-            }
-        }
+    func testIntensityGrades() {
+        // 0 is a real level, "not felt" (「0級」); only nil and out-of-range
+        // values are "not determined" (「—」).
+        XCTAssertEqual(
+            (0...10).map { EEWIntensity.grade($0) },
+            [.level(0), .level(1), .level(2), .level(3), .level(4), .weak(5), .strong(5), .weak(6), .strong(6),
+             .level(7), nil])
+        XCTAssertNil(EEWIntensity.grade(nil))
+        XCTAssertNil(EEWIntensity.grade(-1))
     }
 
-    func testExplicitArrivalWinsWithOrWithoutPersonalization() {
-        for local in [nil, 4] as [Int?] {
-            for eta in [nil, epoch.addingTimeInterval(-5), epoch.addingTimeInterval(35)] as [Date?] {
-                let state = state(local: local, eta: eta, arrived: true)
-                XCTAssertEqual(EEWPresentation.arrival(for: state), .arrived)
-                XCTAssertEqual(EEWPresentation.intensity(for: state), local ?? 5)
-            }
-        }
-    }
-
-    func testZeroAndExpiredETADoNotInferArrival() {
-        for eta in [epoch, epoch.addingTimeInterval(-5)] {
-            let state = state(local: nil, eta: eta)
-            XCTAssertEqual(EEWPresentation.arrival(for: state), .countdown(eta))
-            XCTAssertFalse(state.waveArrived)
-        }
-    }
-
-    func testDiscreteIntensityTextAndSpokenMapping() {
-        for (ordinal, key) in [(5, "5weak"), (6, "5strong"), (7, "6weak"), (8, "6strong")] {
-            for compact in [false, true] {
-                XCTAssertEqual(
-                    EEWPresentation.intensityText(ordinal, compact: compact),
-                    .init(key: "eew.intensity." + key, level: nil))
-                XCTAssertEqual(
-                    EEWPresentation.intensityText(ordinal, compact: compact, spoken: true),
-                    .init(key: "eew.intensity." + key + ".spoken", level: nil))
-            }
-        }
-        for (ordinal, level) in [(1, 1), (2, 2), (3, 3), (4, 4), (9, 7)] {
-            XCTAssertEqual(EEWPresentation.intensityText(ordinal), .init(key: "eew.intensity.format", level: level))
-            XCTAssertEqual(
-                EEWPresentation.intensityText(ordinal, compact: true),
-                .init(key: "eew.intensity.compact.format", level: level))
-            XCTAssertEqual(
-                EEWPresentation.intensityText(ordinal, compact: true, spoken: true),
-                .init(key: "eew.intensity.format", level: level))
-        }
-    }
-
-    func testReportDetailsDoNotChangePrimaryStateSelection() {
-        let state = state(
-            local: 8, eta: epoch, report: 123,
-            epicenter: "Long epicenter used only as synthetic layout stress data")
-        XCTAssertEqual(state.reportNo, 123)
-        XCTAssertEqual(EEWPresentation.intensity(for: state), 8)
-        XCTAssertEqual(EEWPresentation.arrival(for: state), .countdown(epoch))
-    }
-
-    func testIslandFallbackPreservesArrivalSemantics() {
-        for local in [nil, 4, 5, 8] as [Int?] {
-            XCTAssertEqual(EEWPresentation.islandArrivalSymbol(for: state(local: local, eta: epoch)), "clock")
-            XCTAssertEqual(
-                EEWPresentation.islandArrivalSymbol(for: state(local: local, eta: nil)),
-                "clock.badge.questionmark")
-            for eta in [nil, epoch] as [Date?] {
-                XCTAssertEqual(
-                    EEWPresentation.islandArrivalSymbol(for: state(local: local, eta: eta, arrived: true)),
-                    "checkmark")
-            }
-        }
+    func testIslandSymbolsKeepArrivalSemantics() {
+        XCTAssertEqual(EEWPresentation.islandArrivalSymbol(for: .countdown(epoch)), "clock")
+        XCTAssertEqual(EEWPresentation.islandArrivalSymbol(for: .unavailable), "clock.badge.questionmark")
+        XCTAssertEqual(EEWPresentation.islandArrivalSymbol(for: .arrived), "checkmark")
+        XCTAssertEqual(EEWPresentation.islandArrivalSymbol(for: .cancelled), "xmark")
     }
 
     func testTimerEnvelopeReservesRemainingDigitsAcrossETABoundary() {
@@ -95,76 +35,93 @@ final class EEWPresentationTests: XCTestCase {
             (599, "8:88", "8:88"), (600, "88:88", "8:88"), (6_000, "888:88", "88:88"),
             (5_999.9, "888:88", "88:88"),
         ] {
-            let state = state(local: nil, eta: epoch.addingTimeInterval(seconds))
+            let arrival = epoch.addingTimeInterval(seconds)
             for (elapsed, expected) in [(0.0, sample), (1.0, afterOneSecond), (seconds + 1, "8:88")] {
                 XCTAssertEqual(
-                    EEWPresentation.islandTimerSample(for: state, now: epoch.addingTimeInterval(elapsed)),
+                    EEWPresentation.islandTimerSample(arrival: arrival, now: epoch.addingTimeInterval(elapsed)),
                     expected)
-                XCTAssertEqual(EEWPresentation.arrival(for: state), .countdown(epoch.addingTimeInterval(seconds)))
             }
         }
-        XCTAssertEqual(EEWPresentation.islandTimerSample(for: state(local: nil, eta: nil), now: epoch), "8:88")
+        XCTAssertEqual(EEWPresentation.islandTimerSample(arrival: nil, now: epoch), "8:88")
     }
 
-    func testBadgePaletteAndSmallTextContrast() {
-        // Pin the published DPIP palette, including every CWA weak/strong ordinal.
-        let expected = [
-            0x9E9E9E, 0x003264, 0x0064C8, 0x1E9632, 0xFFC800,
-            0xFF9600, 0xFF6400, 0xFF0000, 0xC00000, 0x9600C8,
+    func testIntensityPaletteAndFixedTextColours() {
+        // trem-monitor's palette; black text on 4, 5弱 and 5強, white on the
+        // rest — including 6弱's red, which a contrast rule would make black.
+        let expected: [(Int?, UInt32, UInt32)] = [
+            (1, 0x003264, 0xFFFFFF), (2, 0x0064C8, 0xFFFFFF), (3, 0x1E9632, 0xFFFFFF),
+            (4, 0xFFC800, 0x000000), (5, 0xFF9600, 0x000000), (6, 0xFF6400, 0x000000),
+            (7, 0xFF0000, 0xFFFFFF), (8, 0xC00000, 0xFFFFFF), (9, 0x9600C8, 0xFFFFFF),
+            (0, 0x48484A, 0xFFFFFF), (nil, 0x48484A, 0xFFFFFF), (-1, 0x48484A, 0xFFFFFF), (10, 0x48484A, 0xFFFFFF),
         ]
-        for (ordinal, rgb) in expected.enumerated() {
-            let background = components(EEWIntensityColor.color(for: ordinal))
-            XCTAssertEqual(background[0], Double((rgb >> 16) & 255) / 255, accuracy: 0.001)
-            XCTAssertEqual(background[1], Double((rgb >> 8) & 255) / 255, accuracy: 0.001)
-            XCTAssertEqual(background[2], Double(rgb & 255) / 255, accuracy: 0.001)
-            XCTAssertEqual(background[3], 1, accuracy: 0.001)
-            let foreground = components(EEWIntensityColor.foreground(for: ordinal))
-            let luminances = [luminance(background), luminance(foreground)].sorted()
-            let contrast = (luminances[1] + 0.05) / (luminances[0] + 0.05)
-            XCTAssertGreaterThanOrEqual(contrast, 4.5, "Small badge text: ordinal \(ordinal)")
-        }
-        for unknown in [-1, 10] {
-            XCTAssertEqual(
-                components(EEWIntensityColor.color(for: unknown)),
-                components(EEWIntensityColor.color(for: 0)))
+        for (ordinal, background, foreground) in expected {
+            XCTAssertEqual(EEWIntensityColor.background(for: ordinal).hex, background, "\(String(describing: ordinal))")
+            XCTAssertEqual(EEWIntensityColor.foreground(for: ordinal).hex, foreground, "\(String(describing: ordinal))")
+            let rgb = components(EEWIntensityColor.color(for: ordinal))
+            XCTAssertEqual(rgb[0], Double((background >> 16) & 255) / 255, accuracy: 0.001)
+            XCTAssertEqual(rgb[1], Double((background >> 8) & 255) / 255, accuracy: 0.001)
+            XCTAssertEqual(rgb[2], Double(background & 255) / 255, accuracy: 0.001)
+            XCTAssertEqual(rgb[3], 1, accuracy: 0.001)
         }
     }
 
-    func testEveryIntensityKeepsLocalAndMaximumFallbackSemantics() {
-        for ordinal in 0...9 {
-            for local in [nil, ordinal] as [Int?] {
-                for eta in [nil, epoch] as [Date?] {
-                    let state = EEWActivityAttributes.ContentState(
-                        reportNo: 1, originAt: epoch, magnitude: 6, depthKm: 20,
-                        epicenter: "Synthetic epicenter", reportMaxIntensity: ordinal,
-                        estimatedLocalIntensity: local, estimatedSArrivalAt: eta, waveArrived: false
-                    )
-                    XCTAssertEqual(EEWPresentation.intensity(for: state), ordinal)
-                    XCTAssertEqual(
-                        EEWPresentation.intensityLabel(for: state),
-                        local == nil ? "eew.intensity.max" : "eew.intensity.local"
-                    )
-                    XCTAssertEqual(EEWPresentation.arrival(for: state), eta.map { .countdown($0) } ?? .unavailable)
-                }
+    /// Every eew.* key carries every language the widget catalog ships. A key
+    /// missing one of them rendered as the key itself under that language
+    /// (all of them did under Japanese); languages the catalog has no entry
+    /// for at all fall back to English, the development region.
+    func testEveryLiveActivityStringHasEveryCatalogLanguage() throws {
+        let catalogURL = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appendingPathComponent("DPIPWidgets/Localizable.xcstrings")
+        let catalog = try XCTUnwrap(
+            JSONSerialization.jsonObject(with: Data(contentsOf: catalogURL)) as? [String: Any])
+        XCTAssertEqual(catalog["sourceLanguage"] as? String, "en")
+        let strings = try XCTUnwrap(catalog["strings"] as? [String: [String: Any]])
+        let languages = Set(strings.values.flatMap { (($0["localizations"] as? [String: Any]) ?? [:]).keys })
+        XCTAssertEqual(languages, ["en", "ja", "ko", "zh-Hans", "zh-Hant"])
+
+        let keys = strings.keys.filter { $0.hasPrefix("eew.") }
+        XCTAssertFalse(keys.isEmpty)
+        for key in keys {
+            let localizations = try XCTUnwrap(strings[key]?["localizations"] as? [String: Any], key)
+            XCTAssertEqual(Set(localizations.keys), languages, key)
+            var specifiers: Set<[String]> = []
+            for (language, localization) in localizations {
+                let unit = try XCTUnwrap(
+                    (localization as? [String: Any])?["stringUnit"] as? [String: Any], "\(key) \(language)")
+                XCTAssertEqual(unit["state"] as? String, "translated", "\(key) \(language)")
+                let value = try XCTUnwrap(unit["value"] as? String, "\(key) \(language)")
+                XCTAssertFalse(value.isEmpty, "\(key) \(language)")
+                specifiers.insert(Self.formatSpecifiers(value))
             }
+            // String(format:) with a mismatched translation reads garbage.
+            XCTAssertEqual(specifiers.count, 1, "Format specifiers differ across languages: \(key)")
         }
+    }
+
+    private static func formatSpecifiers(_ format: String) -> [String] {
+        let pattern = try! NSRegularExpression(pattern: "%(?:\\d+\\$)?[-+ 0#]*\\d*(?:\\.\\d+)?(?:l{0,2}|h{0,2})[@dDiuUxXoOfFeEgGcCsSp%]")
+        let range = NSRange(format.startIndex..., in: format)
+        return pattern.matches(in: format, range: range).map { (format as NSString).substring(with: $0.range) }
     }
 
     @MainActor
     func testLargeTypeStillDegradesWithoutOverflow() {
         for size in [DynamicTypeSize.xxxLarge, .accessibility3] {
             for limited in [false, true] {
-                let content = EEWIslandIntensityPresentation(intensity: 8, limitedInWidth: limited) {
-                    Text(verbatim: "6強")
-                } testBadge: {
-                    Text(verbatim: "TEST").font(.system(size: 8, weight: .bold))
-                }
-                .font(.caption.bold())
-                .dynamicTypeSize(size)
-                for width in [4.0, 12, 24, 32, 40, 60, 100] {
-                    let measuredSize = measured(content, width: width)
-                    XCTAssertLessThanOrEqual(measuredSize.width, width + 0.5)
-                    XCTAssertLessThanOrEqual(measuredSize.height, 36.5)
+                for live in [false, true] {
+                    let content = EEWIslandIntensityPresentation(intensity: 8, live: live, limitedInWidth: limited) {
+                        Text(verbatim: "6強")
+                    } source: {
+                        Text(verbatim: "氣象署").font(.system(size: 10, weight: .heavy))
+                    }
+                    .dynamicTypeSize(size)
+                    for width in [4.0, 12, 24, 32, 40, 60, 100] {
+                        let measuredSize = measured(content, width: width)
+                        XCTAssertLessThanOrEqual(measuredSize.width, width + 0.5)
+                        XCTAssertLessThanOrEqual(measuredSize.height, 36.5)
+                    }
                 }
             }
         }
@@ -175,15 +132,14 @@ final class EEWPresentationTests: XCTestCase {
         for (ordinal, label) in [
             (1, "1"), (2, "2"), (3, "3"), (4, "4"),
             (5, "5弱"), (6, "5強"), (7, "6弱"), (8, "6強"), (9, "7"),
-            (5, "5−"), (6, "5+"), (7, "6−"), (8, "6+"),
+            (5, "5−"), (6, "5+"), (7, "6−"), (8, "6+"), (0, "—"),
         ] {
             for limited in [false, true] {
                 let content = EEWIslandIntensityPresentation(intensity: ordinal, limitedInWidth: limited) {
                     Text(verbatim: label)
-                } testBadge: {
-                    Text(verbatim: "TEST").font(.system(size: 8, weight: .bold))
+                } source: {
+                    Text(verbatim: "TREM").font(.system(size: 10, weight: .heavy))
                 }
-                .font(.caption.bold())
                 let badge = EEWIslandIntensityBadge(intensity: ordinal) { Text(verbatim: label) }
                 let dense = EEWIslandIntensityBadge(intensity: ordinal, dense: true) { Text(verbatim: label) }
                 let badgeSize = measured(badge, width: 200)
@@ -194,11 +150,10 @@ final class EEWPresentationTests: XCTestCase {
                 if limited {
                     XCTAssertEqual(normal.width, badgeSize.width, accuracy: 0.5)
                 } else {
+                    // Block and source, then the block alone once the source
+                    // no longer fits.
                     XCTAssertGreaterThan(normal.width, badgeSize.width)
-                    // TEST may disappear while waveform + full badge still fit.
-                    let withoutTest = measured(content, width: normal.width - 1)
-                    XCTAssertGreaterThan(withoutTest.width, badgeSize.width)
-                    XCTAssertLessThan(withoutTest.width, normal.width)
+                    XCTAssertEqual(measured(content, width: normal.width - 1).width, badgeSize.width, accuracy: 0.5)
                 }
                 let narrow = measured(content, width: denseSize.width + 0.5)
                 XCTAssertEqual(narrow.width, denseSize.width, accuracy: 0.5)
@@ -215,6 +170,23 @@ final class EEWPresentationTests: XCTestCase {
                 }
             }
         }
+    }
+
+    /// The nsspe ring is drawn outside the block: the same layout size with
+    /// or without it, so nothing moves when a township joins the list.
+    @MainActor
+    func testLiveRingDoesNotMoveTheLayout() {
+        for metrics in [EEWIntensityBlock.Metrics.lockScreen, .expanded] {
+            for ordinal in [nil, 3, 5, 9] as [Int?] {
+                let plain = EEWIntensityBlock(ordinal: ordinal, live: false, metrics: metrics, strings: .main)
+                let live = EEWIntensityBlock(ordinal: ordinal, live: true, metrics: metrics, strings: .main)
+                XCTAssertEqual(measured(plain, width: 200), measured(live, width: 200))
+                XCTAssertEqual(measured(plain, width: 200).width, metrics.side, accuracy: 0.5)
+            }
+        }
+        let badge = EEWIslandIntensityBadge(intensity: 5) { Text(verbatim: "5弱") }
+        let liveBadge = EEWIslandIntensityBadge(intensity: 5, live: true) { Text(verbatim: "5弱") }
+        XCTAssertEqual(measured(badge, width: 200), measured(liveBadge, width: 200))
     }
 
     @MainActor
@@ -254,13 +226,6 @@ final class EEWPresentationTests: XCTestCase {
         var alpha: CGFloat = 0
         XCTAssertTrue(UIColor(color).getRed(&red, green: &green, blue: &blue, alpha: &alpha))
         return [red, green, blue, alpha].map(Double.init)
-    }
-
-    private func luminance(_ components: [Double]) -> Double {
-        let linear = components.prefix(3).map { value in
-            value <= 0.04045 ? value / 12.92 : pow((value + 0.055) / 1.055, 2.4)
-        }
-        return 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2]
     }
 
     @MainActor
@@ -367,16 +332,6 @@ final class EEWPresentationTests: XCTestCase {
             return host.sizeThatFits(in: CGSize(width: width, height: 36))
         }
     }
-
-    private func state(
-        local: Int?, eta: Date?, arrived: Bool = false,
-        report: Int = 4, epicenter: String = "Synthetic epicenter"
-    ) -> EEWActivityAttributes.ContentState {
-        .init(
-            reportNo: report, originAt: epoch, magnitude: 6.1, depthKm: 20,
-            epicenter: epicenter, reportMaxIntensity: 5, estimatedLocalIntensity: local,
-            estimatedSArrivalAt: eta, waveArrived: arrived)
-    }
 }
 
 @MainActor
@@ -395,17 +350,13 @@ struct EEWCountdownInkTests {
             let now = Date(timeIntervalSince1970: 5_000_000_000 + fraction)
             for seconds in [600.0, 599.9, 599.1, 599, 120, 60, 59, 18, 9, 0] {
                 let arrival = now.addingTimeInterval(seconds)
-                let state = EEWActivityAttributes.ContentState(
-                    reportNo: 1, originAt: now, magnitude: 6, depthKm: 20,
-                    epicenter: "Synthetic epicenter", reportMaxIntensity: 5,
-                    estimatedLocalIntensity: 4, estimatedSArrivalAt: arrival, waveArrived: false)
                 let timer = Text(timerInterval: now...arrival, pauseTime: now, countsDown: true, showsHours: false)
                     .monospacedDigit()
                     .foregroundStyle(.white)
                 for font in [Font.caption.bold(), .caption2.bold()] {
                     for locale in [Locale(identifier: "zh_TW"), Locale(identifier: "en_US")] {
                         let envelope = EEWIslandTimerEnvelope(
-                            sample: EEWPresentation.islandTimerSample(for: state, now: now)
+                            sample: EEWPresentation.islandTimerSample(arrival: arrival, now: now)
                         ) { timer }
                             .font(font)
                             .environment(\.locale, locale)

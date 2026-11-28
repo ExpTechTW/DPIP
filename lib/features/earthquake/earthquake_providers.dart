@@ -1,6 +1,7 @@
 import 'package:dpip/core/build/demo_flags.dart';
 import 'package:dpip/core/di/shared_deps.dart';
 import 'package:dpip/core/network/sse_mux.dart';
+import 'package:dpip/core/platform/eew_live_activity_data.dart';
 import 'package:dpip/core/settings/eew_cwa_only_settings.dart';
 import 'package:dpip/core/settings/eew_spoken_announcement_settings.dart';
 import 'package:dpip/core/storage/ml_model_store.dart';
@@ -12,7 +13,9 @@ import 'package:dpip/core/realtime/realtime_config.dart';
 import 'package:dpip/core/realtime/realtime_notifier.dart';
 import 'package:dpip/core/realtime/realtime_source.dart';
 import 'package:dpip/core/realtime/ticker.dart';
+import 'package:dpip/core/version/app_build.dart';
 import 'package:dpip/features/earthquake/data/earthquake_api.dart';
+import 'package:dpip/features/earthquake/data/eew_live_activity_publisher.dart';
 import 'package:dpip/features/earthquake/data/eew_ml_max_source.dart';
 import 'package:dpip/features/earthquake/data/eew_realtime_source.dart';
 import 'package:dpip/features/earthquake/data/eew_repository_impl.dart';
@@ -73,6 +76,20 @@ List<SingleChildWidget> earthquakeProviders(SharedDeps deps) {
   // here and shared as a `Future` (mirrors `Future<TownBoundaries>` in
   // `core_providers.dart`) so a consumer just awaits it, no repeated I/O.
   final travelTimeTable = const SeismicTravelTimeSource().load();
+
+  // The iOS EEW Live Activity works out local shaking and the S-wave arrival
+  // itself, on renders the app may not be running for: hand its widget the
+  // packed S-wave table and the observer through the App Group. iOS only; a
+  // no-op elsewhere (including tests).
+  EewLiveActivityPublisher(
+    data: const EewLiveActivityData(),
+    table: travelTimeTable,
+    appBuild: AppBuild.code,
+    lastFix: deps.locationService.lastKnownFix,
+    fixes: deps.deviceLocationReporter.fixes,
+    regions: deps.regionStore,
+    towns: deps.townDirectory,
+  ).start();
 
   // Bundled RTS box grid (asset load, not network) — same `Future` pattern.
   final boxGrid = const RtsBoxGridSource().load();

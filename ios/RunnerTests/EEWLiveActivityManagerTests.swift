@@ -14,7 +14,7 @@ final class EEWLiveActivityManagerTests: XCTestCase {
         try await updater.update(activityId: "silent", previous: state(), activityState: .active, mode: .silent) {
             content, alert in
             updates += 1
-            XCTAssertTrue(content.waveArrived)
+            XCTAssertEqual(content, self.state())
             XCTAssertNil(alert)
         }
         XCTAssertEqual(updates, 1)
@@ -28,7 +28,7 @@ final class EEWLiveActivityManagerTests: XCTestCase {
             let send: (Runner.EEWActivityAttributes.ContentState, AlertConfiguration?) async -> Void = { content, alert in
                 updates += 1
                 if alert != nil { alerts += 1 }
-                XCTAssertTrue(content.waveArrived)
+                XCTAssertEqual(content, self.state())
             }
             try await updater.update(activityId: "mock", previous: state(), activityState: .active,
                                      mode: firstMode, send: send)
@@ -67,13 +67,13 @@ final class EEWLiveActivityManagerTests: XCTestCase {
         }
     }
 
-    func testAlreadyArrivedAndEndedActivitiesAreNotUpdated() async {
-        for (lifecycle, arrived) in [(ActivityState.active, true), (.ended, false), (.dismissed, false)] {
+    func testEndedActivitiesAreNotUpdated() async {
+        for lifecycle in [ActivityState.ended, .dismissed] {
             let updater = EEWMockArrivalUpdater()
             do {
-                try await updater.update(activityId: "mock", previous: state(arrived: arrived),
+                try await updater.update(activityId: "mock", previous: state(),
                                          activityState: lifecycle, mode: .alert) { _, _ in
-                    XCTFail("Must not update arrived or ended activities")
+                    XCTFail("Must not update ended activities")
                 }
                 XCTFail("Invalid activity must be rejected")
             } catch {
@@ -83,41 +83,39 @@ final class EEWLiveActivityManagerTests: XCTestCase {
         }
     }
 
-    func testExpiredCountdownDoesNotInferArrivalOrRequestAnAlert() {
-        let updater = EEWMockArrivalUpdater()
-        for eta in [epoch, epoch.addingTimeInterval(-5)] {
-            let content = state(eta: eta)
-            XCTAssertFalse(content.waveArrived)
-            XCTAssertFalse(updater.hasArrived("mock"))
-            XCTAssertEqual(Runner.EEWPresentation.arrival(for: content), .countdown(eta))
-        }
+    func testUpdaterHasNoClockInput() {
         // There is no clock/timer input to the updater; only the explicit
         // update method can reach the ActivityKit send closure.
+        XCTAssertFalse(EEWMockArrivalUpdater().hasArrived("mock"))
         XCTAssertNil(EEWMockArrivalUpdater.Mode.silent.alertConfiguration)
     }
 
-    @available(iOS 16.2, *)
-    func testArrivalPreservesGenericAndPersonalizedFieldsAndAllowsNewActivities() async throws {
-        let updater = EEWMockArrivalUpdater()
-        for local in [nil, 3] as [Int?] {
-            for eta in [nil, epoch] as [Date?] {
-                let previous = state(local: local, eta: eta)
-                try await updater.update(activityId: "local=\(String(describing: local)),eta=\(String(describing: eta))", previous: previous,
-                                         activityState: .stale, mode: .alert) { content, alert in
-                    XCTAssertEqual(content.reportNo, previous.reportNo)
-                    XCTAssertEqual(content.originAt, previous.originAt)
-                    XCTAssertEqual(content.magnitude, previous.magnitude)
-                    XCTAssertEqual(content.depthKm, previous.depthKm)
-                    XCTAssertEqual(content.epicenter, previous.epicenter)
-                    XCTAssertEqual(content.reportMaxIntensity, previous.reportMaxIntensity)
-                    XCTAssertEqual(content.estimatedLocalIntensity, local)
-                    XCTAssertEqual(content.estimatedSArrivalAt, eta)
-                    XCTAssertEqual(Runner.EEWPresentation.intensity(for: content), local ?? 5)
-                    XCTAssertEqual(Runner.EEWPresentation.arrival(for: content), .arrived)
-                    XCTAssertNotNil(alert)
-                }
-            }
+    func testMockReportsAreTheCWAFormat() throws {
+        let origin = Date(timeIntervalSince1970: 1_795_888_105)
+        for (serial, magnitude, maximum) in [(1, 5.7, 4), (2, 5.9, 4), (4, 6.1, 5)] {
+            let state = EEWLiveActivityManager.mockReport(serial: serial, origin: origin)
+            let payload = try XCTUnwrap(Runner.EEWPayload(state.d, provider: "cwa"))
+            XCTAssertEqual(payload.serial, serial)
+            XCTAssertEqual(payload.origin, origin)
+            XCTAssertEqual(payload.magnitude, magnitude)
+            XCTAssertEqual(payload.maxIntensity, maximum)
+            XCTAssertEqual(payload.flags, [])
         }
+    }
+
+    /// The server's stale-date (§4): its arrival + 2 s; origin + 180 s when
+    /// there is nothing to estimate from.
+    func testMockStaleDateFollowsTheServerRule() throws {
+        let origin = Date(timeIntervalSince1970: 1_795_888_105)
+        let state = EEWLiveActivityManager.mockReport(serial: 1, origin: origin)
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let store = Runner.EEWLiveActivityStore(directory: directory)
+        XCTAssertEqual(
+            EEWLiveActivityManager.staleDate(for: state, provider: "cwa", store: store), origin.addingTimeInterval(180))
+        XCTAssertEqual(
+            EEWLiveActivityManager.staleDate(for: state, provider: "cwa", store: nil), origin.addingTimeInterval(180))
+        XCTAssertNil(EEWLiveActivityManager.staleDate(for: .init(d: "2|1"), provider: "cwa", store: nil))
     }
 
     func testAlertResourcesAreBundledAndLocalized() throws {
@@ -148,7 +146,7 @@ final class EEWLiveActivityManagerTests: XCTestCase {
         try scheduler.schedule {
             try await updater.update(activityId: "mock", previous: self.state(), activityState: .active,
                                      mode: .alert) { content, alert in
-                XCTAssertTrue(content.waveArrived)
+                XCTAssertEqual(content, self.state())
                 XCTAssertNotNil(alert)
                 submissions += 1
             }
@@ -267,10 +265,8 @@ final class EEWLiveActivityManagerTests: XCTestCase {
         }
     }
 
-    private func state(local: Int? = 3, eta: Date? = nil, arrived: Bool = false) -> Runner.EEWActivityAttributes.ContentState {
-        .init(reportNo: 4, originAt: epoch, magnitude: 6.1, depthKm: 20,
-              epicenter: "Synthetic epicenter", reportMaxIntensity: 5, estimatedLocalIntensity: local,
-              estimatedSArrivalAt: eta, waveArrived: arrived)
+    private func state() -> Runner.EEWActivityAttributes.ContentState {
+        EEWLiveActivityManager.mockReport(serial: 4, origin: epoch)
     }
 }
 #endif

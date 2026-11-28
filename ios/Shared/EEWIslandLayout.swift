@@ -57,59 +57,60 @@ extension EEWIslandFittingView where Smallest == EmptyView {
     }
 }
 
-/// Intrinsic text size determines the badge dimensions, including localized
-/// weak/strong labels. The fitting container selects dense metrics before it
-/// removes the badge; neither variant truncates or scales a classification.
+/// The compact intensity block. Intrinsic text size determines its width,
+/// including localized weak/strong labels; the fitting container selects the
+/// dense metrics before it removes the block, and neither variant truncates or
+/// scales a classification. A township in the nsspe list gets the same white
+/// ring as on the Lock Screen.
 @available(iOS 16.1, *)
 struct EEWIslandIntensityBadge<Label: View>: View {
-    let intensity: Int
+    let intensity: Int?
+    var live = false
     var dense = false
     @ViewBuilder let label: () -> Label
 
     var body: some View {
         label()
-            .font(dense ? .caption2.bold() : .caption.bold())
+            .font(EEWActivityStyle.rounded(dense ? 11 : 14))
             .monospacedDigit()
             .lineLimit(1)
             .fixedSize()
             .padding(.horizontal, dense ? 2 : 4)
-            .padding(.vertical, dense ? 1 : 2)
-            .foregroundStyle(EEWIntensityColor.foreground(for: intensity))
-            .background(EEWIntensityColor.color(for: intensity), in: RoundedRectangle(cornerRadius: 4))
+            .frame(minWidth: dense ? 16 : 22, minHeight: dense ? 16 : 22)
+            .foregroundStyle(EEWIntensityColor.foreground(for: intensity).color)
+            .background(
+                EEWIntensityColor.color(for: intensity),
+                in: RoundedRectangle(cornerRadius: dense ? 5 : 7, style: .continuous)
+            )
+            .modifier(EEWLiveRing(live: live, radius: dense ? 5 : 7, gap: 1.5, width: 1.5))
     }
 }
 
+/// Compact leading: the block and the source text, then the block alone, then
+/// the dense block, then the bare label or a symbol — a partial label never
+/// wins.
 @available(iOS 16.1, *)
-struct EEWIslandIntensityPresentation<Label: View, TestBadge: View>: View {
-    let intensity: Int
+struct EEWIslandIntensityPresentation<Label: View, Source: View>: View {
+    let intensity: Int?
+    var live = false
     let limitedInWidth: Bool
     @ViewBuilder let label: () -> Label
-    @ViewBuilder let testBadge: () -> TestBadge
+    @ViewBuilder let source: () -> Source
 
     private var badge: some View {
-        EEWIslandIntensityBadge(intensity: intensity, label: label)
+        EEWIslandIntensityBadge(intensity: intensity, live: live, label: label)
     }
 
     var body: some View {
         EEWIslandFittingView(limitedInWidth: limitedInWidth) {
-            HStack(spacing: 4) {
-                waveform
+            HStack(spacing: 5) {
                 badge
-                testBadge()
+                source()
             }
         } compact: {
-            if limitedInWidth {
-                badge
-            } else {
-                // Drop the visual TEST decoration before losing the waveform.
-                // The caller retains TEST's spoken hint at every width.
-                HStack(spacing: 4) {
-                    waveform
-                    badge
-                }
-            }
+            badge
         } smallest: {
-            EEWIslandIntensityBadge(intensity: intensity, dense: true, label: label)
+            EEWIslandIntensityBadge(intensity: intensity, live: live, dense: true, label: label)
         } fallback: {
             ViewThatFits {
                 // Never let clipped text win, even after removing the badge.
@@ -121,12 +122,6 @@ struct EEWIslandIntensityPresentation<Label: View, TestBadge: View>: View {
                     .foregroundStyle(.red)
             }
         }
-    }
-
-    private var waveform: some View {
-        Image(systemName: "waveform.path.ecg")
-            .foregroundStyle(.red)
-            .accessibilityHidden(true)
     }
 }
 

@@ -73,10 +73,16 @@ import UserNotifications
     NativeLogPlugin.register(with: registry.registrar(forPlugin: "NativeLogPlugin")!)
     NotificationSettingsLinkPlugin.register(
       with: registry.registrar(forPlugin: "NotificationSettingsLinkPlugin")!)
+    EEWLiveActivityDataPlugin.register(
+      with: registry.registrar(forPlugin: "EEWLiveActivityDataPlugin")!)
     #if DEBUG
     EEWLiveActivityPlugin.register(
       with: registry.registrar(forPlugin: "EEWLiveActivityPlugin")!)
     #endif
+    // A missed `end` push leaves an old EEW on the Lock Screen; end it now.
+    if #available(iOS 16.1, *) {
+      Task { await EEWLiveActivityJanitor.endExpired() }
+    }
 
     // Re-post the launch notification the plugins just missed.
     //

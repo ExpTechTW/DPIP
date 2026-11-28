@@ -56,10 +56,9 @@ final class EEWLiveActivityManager {
             "supported": true,
             "enabled": supported,
             "active": !mockActivities.isEmpty,
-            "reportNo": mockActivities.first?.contentState.reportNo as Any? ?? NSNull(),
-            "waveArrived": mockActivities.first?.contentState.waveArrived ?? false,
-            "generic": mockActivities.first?.contentState.estimatedLocalIntensity == nil
-                && !mockActivities.isEmpty,
+            "reportNo": mockActivities.first.flatMap(Self.payload)?.serial as Any? ?? NSNull(),
+            "waveArrived": mockActivities.first.map { arrivalUpdater.hasArrived($0.id) } ?? false,
+            "generic": mockActivities.first?.attributes.provider == "trem",
         ]
         #if DEBUG
         result["delayedAlertStatus"] = delayedAlert.status.rawValue
@@ -92,42 +91,61 @@ final class EEWLiveActivityManager {
     func start() throws {
         try checkEnabled()
         guard mockActivities.isEmpty else { throw Failure.alreadyActive }
-        let now = Date()
-        let attributes = EEWActivityAttributes(provider: "CWA", eventId: Self.mockEventId)
-        let state = EEWActivityAttributes.ContentState(
-            reportNo: 1,
-            originAt: now,
-            magnitude: 5.7,
-            depthKm: 20,
-            epicenter: "臺東縣近海",
-            reportMaxIntensity: 4,
-            estimatedLocalIntensity: 2,
-            estimatedSArrivalAt: now.addingTimeInterval(25),
-            waveArrived: false
-        )
-        _ = try Activity.request(attributes: attributes, contentState: state, pushType: nil)
+        let attributes = EEWActivityAttributes(provider: "cwa", eventId: Self.mockEventId)
+        try Self.request(attributes, Self.mockReport(serial: 1, origin: Date()))
     }
 
     #if DEBUG
-    /// Exercise the existing fallback UI without any location-derived values.
+    /// A TREM report with no source parameters, local intensity from nsspe:
+    /// 假定震源, the white ring and 未提供, with no location-derived values.
     func startGeneric() throws {
         try checkEnabled()
         guard mockActivities.isEmpty else { throw Failure.alreadyActive }
-        let attributes = EEWActivityAttributes(provider: "CWA", eventId: Self.genericMockEventId)
-        let state = EEWActivityAttributes.ContentState(
-            reportNo: 1,
-            originAt: Date(),
-            magnitude: 5.7,
-            depthKm: 20,
-            epicenter: "臺東縣近海",
-            reportMaxIntensity: 4,
-            estimatedLocalIntensity: nil,
-            estimatedSArrivalAt: nil,
-            waveArrived: false
-        )
-        _ = try Activity.request(attributes: attributes, contentState: state, pushType: nil)
+        let attributes = EEWActivityAttributes(provider: "trem", eventId: Self.genericMockEventId)
+        let origin = Int(Date().timeIntervalSince1970)
+        try Self.request(attributes, .init(d: "1|1|8|\(origin)|23.99|121.60|花蓮縣|1.0|10|2|3||3"))
     }
     #endif
+
+    /// A CWA report off 花蓮 (§2.2), the format a push carries.
+    static func mockReport(serial: Int, origin: Date) -> EEWActivityAttributes.ContentState {
+        let magnitude = [1: "5.7", 2: "5.9", 4: "6.1"][serial] ?? "5.7"
+        let maximum = serial >= 4 ? 5 : 4
+        return .init(d: "1|\(serial)|0|\(Int(origin.timeIntervalSince1970))|23.95|121.71|花蓮縣近海|\(magnitude)|20|\(maximum)")
+    }
+
+    private static func payload(_ activity: Activity<EEWActivityAttributes>) -> EEWPayload? {
+        EEWPayload(activity.contentState.d, provider: activity.attributes.provider)
+    }
+
+    /// The stale-date the server would send (§4): its arrival + 2 s, here from
+    /// the same estimate the widget makes; origin + 180 s without one.
+    static func staleDate(
+        for state: EEWActivityAttributes.ContentState, provider: String,
+        store: EEWLiveActivityStore? = EEWLiveActivityStore()
+    ) -> Date? {
+        guard let payload = EEWPayload(state.d, provider: provider) else { return nil }
+        let estimate = EEWPresentation.localEstimate(
+            for: payload, observer: store?.observer()?.point, table: store?.table())
+        if let arrival = EEWPresentation.arrivalDate(for: payload, estimate: estimate) {
+            return arrival.addingTimeInterval(2)
+        }
+        return payload.origin?.addingTimeInterval(180)
+    }
+
+    private static func request(
+        _ attributes: EEWActivityAttributes, _ state: EEWActivityAttributes.ContentState
+    ) throws {
+        if #available(iOS 16.2, *) {
+            _ = try Activity.request(
+                attributes: attributes,
+                content: ActivityContent(
+                    state: state, staleDate: staleDate(for: state, provider: attributes.provider)),
+                pushType: nil)
+        } else {
+            _ = try Activity.request(attributes: attributes, contentState: state, pushType: nil)
+        }
+    }
 
     func update(reportNo: Int) async throws {
         #if DEBUG
@@ -136,23 +154,18 @@ final class EEWLiveActivityManager {
         try checkEnabled()
         let activity = try current()
         guard activity.attributes.eventId == Self.mockEventId else { throw Failure.invalidTransition }
-        guard !activity.contentState.waveArrived else { throw Failure.invalidTransition }
         guard !arrivalUpdater.hasArrived(activity.id) else { throw Failure.invalidTransition }
         guard reportNo == 2 || reportNo == 4 else { throw Failure.invalidTransition }
-        let previous = activity.contentState
-        guard reportNo > previous.reportNo else { throw Failure.invalidTransition }
-        let state = EEWActivityAttributes.ContentState(
-            reportNo: reportNo,
-            originAt: previous.originAt,
-            magnitude: reportNo == 2 ? 5.9 : 6.1,
-            depthKm: 20,
-            epicenter: "臺東縣近海",
-            reportMaxIntensity: reportNo == 2 ? 4 : 5,
-            estimatedLocalIntensity: 3,
-            estimatedSArrivalAt: Date().addingTimeInterval(reportNo == 2 ? 18 : 10),
-            waveArrived: false
-        )
-        await activity.update(using: state)
+        guard let previous = Self.payload(activity), reportNo > previous.serial ?? 0 else {
+            throw Failure.invalidTransition
+        }
+        let state = Self.mockReport(serial: reportNo, origin: previous.origin ?? Date())
+        if #available(iOS 16.2, *) {
+            await activity.update(ActivityContent(
+                state: state, staleDate: Self.staleDate(for: state, provider: activity.attributes.provider)))
+        } else {
+            await activity.update(using: state)
+        }
     }
 
     func markWaveArrived() async throws {
@@ -172,7 +185,6 @@ final class EEWLiveActivityManager {
         try checkEnabled()
         let activity = try current()
         guard activity.attributes.eventId == Self.mockEventId,
-              !activity.contentState.waveArrived,
               !arrivalUpdater.hasArrived(activity.id) else { throw Failure.invalidTransition }
         let activityId = activity.id
         try delayedAlert.schedule { [weak self] in
@@ -200,8 +212,10 @@ final class EEWLiveActivityManager {
             activityId: activity.id, previous: activity.contentState,
             activityState: activity.activityState, mode: mode
         ) { state, alert in
+            // What the server's stale-date does: mark the content stale now,
+            // which the widget shows as 抵達.
             if #available(iOS 16.2, *) {
-                await activity.update(ActivityContent(state: state, staleDate: nil), alertConfiguration: alert)
+                await activity.update(ActivityContent(state: state, staleDate: Date()), alertConfiguration: alert)
             } else {
                 await activity.update(using: state, alertConfiguration: alert)
             }
@@ -357,23 +371,14 @@ final class EEWMockArrivalUpdater {
         guard Self.canUpdate(activityState) else {
             throw EEWLiveActivityManager.Failure.notActive
         }
-        guard !previous.waveArrived, !hasArrived(activityId) else {
+        guard !hasArrived(activityId) else {
             throw EEWLiveActivityManager.Failure.invalidTransition
         }
         // No await between checking and reserving. Both arrival actions share
         // this guard, so a silent arrival cannot later be upgraded to an alert.
+        // The report itself is unchanged: arrival is the stale-date, which the
+        // caller sets.
         arrivedActivityIds.insert(activityId)
-        let state = EEWActivityAttributes.ContentState(
-            reportNo: previous.reportNo,
-            originAt: previous.originAt,
-            magnitude: previous.magnitude,
-            depthKm: previous.depthKm,
-            epicenter: previous.epicenter,
-            reportMaxIntensity: previous.reportMaxIntensity,
-            estimatedLocalIntensity: previous.estimatedLocalIntensity,
-            estimatedSArrivalAt: previous.estimatedSArrivalAt,
-            waveArrived: true
-        )
-        await send(state, mode.alertConfiguration)
+        await send(previous, mode.alertConfiguration)
     }
 }
