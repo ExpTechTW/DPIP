@@ -2,7 +2,6 @@
 /// current when nothing moves.
 library;
 
-import 'dart:async';
 import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
@@ -32,6 +31,12 @@ import 'package:dpip/core/settings/settings_store.dart';
 /// reporter's one-request-a-minute throttle and never lands beside a move
 /// report; the backend answers two requests inside its window with a 429.
 ///
+/// A location report the server never answered is the same question with a
+/// known answer, so it goes first: the reporter's pending fix is sent before
+/// anything is checked, and its 2xx counts like any other. A report that fails
+/// stays pending in the reporter, which retries it until the server answers —
+/// this class keeps no retry of its own, so nothing is sent twice.
+///
 /// What it remembers lives in settings: a **hash** of the last token a 2xx
 /// answered for (the token itself is already stored once, and need not be
 /// twice), and when that was. Every successful report from the foreground
@@ -44,11 +49,10 @@ class DeviceRegistration {
     required this._token,
     required this._fix,
     required this._report,
+    required this._resend,
     this._nativeLastSuccess,
     DateTime Function()? now,
     this.maxAge = const Duration(hours: 24),
-    this.throttledRetry = const Duration(seconds: 61),
-    this.failedRetry = const Duration(minutes: 5),
   }) : _now = now ?? (() => AppTime.utc);
 
   final SettingsStore _settings;
@@ -58,6 +62,10 @@ class DeviceRegistration {
   final Future<GpsFix?> Function() _fix;
   final Future<ReportOutcome> Function(GpsFix fix) _report;
 
+  /// Sends the reporter's pending fix, if there is one; null when there is
+  /// none.
+  final Future<ReportOutcome?> Function() _resend;
+
   /// When the native background reporter last had a 2xx, in device time.
   final Future<DateTime?> Function()? _nativeLastSuccess;
   final DateTime Function() _now;
@@ -65,15 +73,7 @@ class DeviceRegistration {
   /// How long a report may stand before the device is reported again anyway.
   final Duration maxAge;
 
-  /// The wait before trying again after the throttle refused — just past the
-  /// reporter's window.
-  final Duration throttledRetry;
-
-  /// The wait before trying again after a report failed.
-  final Duration failedRetry;
-
   Future<void>? _running;
-  Timer? _retry;
 
   /// Records a 2xx for the token stored now. Called for every successful
   /// report, from any path in this isolate.
@@ -90,18 +90,33 @@ class DeviceRegistration {
   /// Reports once if the server's record may be out of date. [reason] is for
   /// the log. Concurrent calls share one check; never throws.
   Future<void> ensure(String reason) =>
-      _running ??= _ensure(reason, retrying: false).whenComplete(() {
+      _running ??= _ensure(reason).whenComplete(() {
         _running = null;
       });
 
-  Future<void> _ensure(String reason, {required bool retrying}) async {
+  Future<void> _ensure(String reason) async {
     try {
-      if (!retrying) {
-        _retry?.cancel();
-        _retry = null;
-      }
       final token = _token();
       if (token == null) return;
+      switch (await _resend()) {
+        case null ||
+            ReportOutcome.sent ||
+            ReportOutcome.superseded ||
+            ReportOutcome.rejected:
+          // Nothing pending any more: a 2xx has recorded itself, and the check
+          // below decides the rest.
+          break;
+        case ReportOutcome.throttled ||
+            ReportOutcome.failed ||
+            ReportOutcome.noToken:
+          // Its 2xx, whenever it comes, registers this token as well; a
+          // second report now would only be refused inside the same window.
+          Log.info(
+            'device registration ($reason): a location report is still '
+            'pending — the reporter retries it',
+          );
+          return;
+      }
       final due = await _due(token);
       if (due == null) return;
       final fix = await _fix();
@@ -111,7 +126,7 @@ class DeviceRegistration {
       }
       final outcome = await _report(fix);
       switch (outcome) {
-        case ReportOutcome.sent:
+        case ReportOutcome.sent || ReportOutcome.superseded:
           Log.info('device registration: $due ($reason) — reported');
         case ReportOutcome.noToken:
           return;
@@ -120,28 +135,10 @@ class DeviceRegistration {
           // A new token, or the next launch, is the next attempt.
           Log.warning('device registration: $due ($reason) — rejected');
         case ReportOutcome.throttled || ReportOutcome.failed:
-          if (retrying) {
-            Log.info(
-              'device registration: $due — retry ${outcome.name}, '
-              'waiting for the next launch or resume',
-            );
-            return;
-          }
-          final wait = outcome == ReportOutcome.throttled
-              ? throttledRetry
-              : failedRetry;
           Log.info(
             'device registration: $due ($reason) — ${outcome.name}, '
-            'retrying in ${wait.inSeconds}s',
+            'kept pending for the reporter to retry',
           );
-          _retry = Timer(wait, () {
-            _retry = null;
-            unawaited(
-              _running ??= _ensure(reason, retrying: true).whenComplete(() {
-                _running = null;
-              }),
-            );
-          });
       }
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'device registration');
@@ -198,10 +195,4 @@ class DeviceRegistration {
 
   static String _hash(String token) =>
       sha256.convert(utf8.encode(token)).toString();
-
-  /// Cancels a scheduled retry.
-  void dispose() {
-    _retry?.cancel();
-    _retry = null;
-  }
 }

@@ -18,6 +18,7 @@ import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/endpoint_health.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
+import 'package:dpip/core/network/notify_request_lane.dart';
 import 'package:dpip/core/network/region_selection.dart';
 import 'package:dpip/core/network/status_page_monitor.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
@@ -66,6 +67,7 @@ class SharedDeps {
     required this.locationService,
     required this.deviceLocationReporter,
     this.deviceRegistration,
+    required this.notifyLane,
     required this.backgroundLocation,
     required this.locationMonitor,
     required this.locationMode,
@@ -139,6 +141,11 @@ class SharedDeps {
   /// day. Optional so a test that never reaches the services host need not
   /// build one; bootstrap always does.
   final DeviceRegistration? deviceRegistration;
+
+  /// The one lane every request the notify backend rate-limits per address
+  /// goes through — the location report and the notify settings alike. One
+  /// instance for the app: a second would let two requests share a second.
+  final NotifyRequestLane notifyLane;
 
   /// Native background device-location reporting (terminated/background). The
   /// terminated-state counterpart to [deviceLocationReporter].

@@ -209,8 +209,9 @@ abstract final class SettingKeys {
   static const SettingKey<int> manualLocationWarningDismissedAtMs =
       SettingKey<int>._('location.manualWarningDismissedAt');
 
-  /// Last successful *attempt* to POST `updateDeviceLocation` (UTC millis).
-  /// Foreground reporter skips a new call within 60s — server 429 guard.
+  /// When the foreground reporter last *attempted* `updateDeviceLocation`,
+  /// answered or not (device-clock UTC millis). The next attempt waits until
+  /// 60 s after it — the cool-down after a 429 included.
   static const SettingKey<int> deviceLocationUpdatedAtMs = SettingKey<int>._(
     'location.deviceLocationUpdatedAtMs',
   );
@@ -227,6 +228,14 @@ abstract final class SettingKeys {
   /// failure, so it can say how stale the server's record is.
   static const SettingKey<int> deviceReportedAtMs = SettingKey<int>._(
     'location.deviceReportedAtMs',
+  );
+
+  /// The location report the server has not yet answered with a 2xx, as JSON:
+  /// `{"lat": …, "lng": …, "takenAt": <calibrated UTC millis>}`. Absent when
+  /// there is none; only a 2xx, a refusal for good or a newer background
+  /// report removes it. See `DeviceLocationReporter`.
+  static const SettingKey<String> pendingLocationReport = SettingKey<String>._(
+    'location.pendingReport',
   );
 
   /// The radio `MeshLink` keeps reconnecting to (BLE id), and its name for

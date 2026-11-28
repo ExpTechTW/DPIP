@@ -16,8 +16,8 @@ import 'package:provider/single_child_widget.dart';
 List<SingleChildWidget> notificationProviders(SharedDeps deps) => [
   Provider<NotifyRepository>.value(
     value: NotifyRepositoryImpl(
-      NotifyApi(deps.apiClient),
-      LocationApi(deps.apiClient),
+      NotifyApi(deps.apiClient, deps.notifyLane),
+      LocationApi(deps.apiClient, deps.notifyLane),
       deps.locationService,
       onReported: (fix) =>
           deps.backgroundLocation.recordReport(lat: fix.lat, lng: fix.lng),

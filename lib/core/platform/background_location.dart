@@ -126,6 +126,21 @@ class BackgroundLocationService {
         : DateTime.fromMillisecondsSinceEpoch(latest, isUtc: true);
   }
 
+  /// When the background path itself last had a 2xx, in **device** time, or
+  /// null when it never has or cannot say.
+  ///
+  /// Unlike [lastSuccessAt] it leaves out the report record every path
+  /// writes: a foreground report recorded there, or a heartbeat resending the
+  /// last reported point, put no newer position on the server than a fix
+  /// still waiting to be reported — only the background path's own report of
+  /// a fix it took does.
+  Future<DateTime?> backgroundSuccessAt() async {
+    final at = (await diagnostics())['lastSuccessAt'];
+    return at is int
+        ? DateTime.fromMillisecondsSinceEpoch(at, isUtc: true)
+        : null;
+  }
+
   // The report heartbeat's inputs. Native reports once when the device has had
   // no successful report for about three days, in every mode, and never asks
   // for a fix to do it — so everything it sends is handed over from here:

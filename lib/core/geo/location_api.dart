@@ -1,6 +1,7 @@
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/api_paths.dart';
 import 'package:dpip/core/network/api_region.dart';
+import 'package:dpip/core/network/notify_request_lane.dart';
 
 /// Device-location endpoint on the region-aware [ApiClient].
 ///
@@ -14,10 +15,14 @@ import 'package:dpip/core/network/api_region.dart';
 /// that names the one primary. Dio follows it (the default `followRedirects`),
 /// and the redirect never reaches `validateStatus`, which accepts 2xx and 304
 /// only.
+///
+/// The report goes through the [NotifyRequestLane]: the backend rate-limits it
+/// per address together with the notify routes.
 class LocationApi {
-  const LocationApi(this._client);
+  const LocationApi(this._client, this._lane);
 
   final ApiClient _client;
+  final NotifyRequestLane _lane;
 
   /// Reports the device's coordinates for push targeting; the backend resolves
   /// and returns the township. Triggered by **distance moved**, not by the
@@ -31,8 +36,10 @@ class LocationApi {
     required String version,
     required double lat,
     required double lng,
-  }) => _client.get(
-    ApiTier.coreExclusiveApi,
-    '${ApiPaths.location}$platform/$token/$version/$lat,$lng',
+  }) => _lane.run(
+    () => _client.get(
+      ApiTier.coreExclusiveApi,
+      '${ApiPaths.location}$platform/$token/$version/$lat,$lng',
+    ),
   );
 }

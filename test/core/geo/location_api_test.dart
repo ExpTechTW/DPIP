@@ -13,6 +13,7 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:dpip/core/geo/location_api.dart';
 import 'package:dpip/core/network/api_client.dart';
+import 'package:dpip/core/network/notify_request_lane.dart';
 import 'package:dpip/core/network/region_selection.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -56,8 +57,11 @@ void main() {
     regions = RegionSelection(SettingsStore.inMemory({}));
   });
 
-  LocationApi apiWith(_FakeAdapter adapter) =>
-      LocationApi(ApiClient(Dio()..httpClientAdapter = adapter, regions));
+  LocationApi apiWith(_FakeAdapter adapter, [NotifyRequestLane? lane]) =>
+      LocationApi(
+        ApiClient(Dio()..httpClientAdapter = adapter, regions),
+        lane ?? NotifyRequestLane(),
+      );
 
   test(
     'reports through the core-exclusive tier, not the legacy host',
@@ -108,4 +112,30 @@ void main() {
 
     expect(result, {'township': '信義區'});
   });
+
+  test('the report waits its turn in the notify lane', () async {
+    final lane = _CountingLane();
+    final adapter = _FakeAdapter((_) => _json('{}', 200));
+    await apiWith(adapter, lane).updateDeviceLocation(
+      platform: 1,
+      token: 't',
+      version: '1',
+      lat: 0,
+      lng: 0,
+    );
+
+    expect(lane.runs, 1);
+    expect(adapter.hits, hasLength(1));
+  });
+}
+
+/// Counts the requests that went through it.
+class _CountingLane extends NotifyRequestLane {
+  int runs = 0;
+
+  @override
+  Future<T> run<T>(Future<T> Function() request) {
+    runs++;
+    return super.run(request);
+  }
 }

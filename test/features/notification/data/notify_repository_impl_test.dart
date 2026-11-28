@@ -33,6 +33,7 @@ import 'package:dpip/core/geo/location_api.dart';
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/network/api_client.dart';
+import 'package:dpip/core/network/notify_request_lane.dart';
 import 'package:dpip/core/network/region_selection.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/features/notification/data/notify_api.dart';
@@ -47,7 +48,10 @@ import 'package:package_info_plus/package_info_plus.dart';
 /// shared by [fetch] and [setChannel].
 class _FailingNotifyApi extends NotifyApi {
   _FailingNotifyApi(this.error)
-    : super(ApiClient(Dio(), RegionSelection(SettingsStore.inMemory({}))));
+    : super(
+        ApiClient(Dio(), RegionSelection(SettingsStore.inMemory({}))),
+        NotifyRequestLane(),
+      );
 
   final Object error;
 
@@ -66,7 +70,10 @@ class _FailingNotifyApi extends NotifyApi {
 /// happy path, and the base for the repository's own decode failure below.
 class _OkNotifyApi extends NotifyApi {
   _OkNotifyApi(this.wire)
-    : super(ApiClient(Dio(), RegionSelection(SettingsStore.inMemory({}))));
+    : super(
+        ApiClient(Dio(), RegionSelection(SettingsStore.inMemory({}))),
+        NotifyRequestLane(),
+      );
 
   final List<dynamic> wire;
   final List<String> getCalls = [];
@@ -92,7 +99,10 @@ class _OkNotifyApi extends NotifyApi {
 /// loudly instead of silently reaching the real `ApiClient` given to `super`.
 class _ScriptedNotifyApi extends NotifyApi {
   _ScriptedNotifyApi(this._answers)
-    : super(ApiClient(Dio(), RegionSelection(SettingsStore.inMemory({}))));
+    : super(
+        ApiClient(Dio(), RegionSelection(SettingsStore.inMemory({}))),
+        NotifyRequestLane(),
+      );
 
   final List<Object> _answers;
   int calls = 0;
@@ -117,7 +127,10 @@ class _ScriptedNotifyApi extends NotifyApi {
 /// fail the way a rate-limited backend would.
 class _FakeLocationApi extends LocationApi {
   _FakeLocationApi({this.error})
-    : super(ApiClient(Dio(), RegionSelection(SettingsStore.inMemory({}))));
+    : super(
+        ApiClient(Dio(), RegionSelection(SettingsStore.inMemory({}))),
+        NotifyRequestLane(),
+      );
 
   final Object? error;
   int calls = 0;

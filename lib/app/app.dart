@@ -311,8 +311,9 @@ class _AppServicesHostState extends State<_AppServicesHost>
     // just produced rather than a second cold GPS read. Before arming native
     // reporting, because it is the path that works without "Always": on
     // Android a changed token makes the native side report too, and whichever
-    // lands second inside the server's window is refused — harmlessly, the
-    // first already carried the same token and place.
+    // lands second inside the server's window is refused — harmlessly: the
+    // first already carried the same token and place, and a refused report
+    // from here stays pending and goes again after the cool-down.
     _register('launch');
     await _armBackground();
   }
@@ -372,7 +373,6 @@ class _AppServicesHostState extends State<_AppServicesHost>
     widget.onboarding.removeListener(_onOnboardingChanged);
     widget.locationMode.removeListener(_onLocationModeChanged);
     unawaited(_tokenChanges?.cancel());
-    widget.deviceRegistration?.dispose();
     WidgetsBinding.instance.removeObserver(this);
     widget.widgetLocationCatalogCoordinator.dispose();
     _observer.dispose();

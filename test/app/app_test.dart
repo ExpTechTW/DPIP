@@ -27,6 +27,7 @@ import 'package:dpip/core/meshtastic/mesh_node_store.dart';
 import 'package:dpip/core/meshtastic/mesh_unread.dart';
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/endpoint_health.dart';
+import 'package:dpip/core/network/notify_request_lane.dart';
 import 'package:dpip/core/network/region_selection.dart';
 import 'package:dpip/core/network/status_page_monitor.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
@@ -266,6 +267,7 @@ SharedDeps _deps(SettingsStore settings, {LocationMode? mode}) {
     locationService: location,
     locationMode: locationMode,
     deviceLocationReporter: reporter,
+    notifyLane: NotifyRequestLane(),
     backgroundLocation: BackgroundLocationService(
       platform: 0,
       version: '1',
