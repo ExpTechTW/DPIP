@@ -288,6 +288,59 @@ void main() {
       pinnedReporter.dispose();
     },
   );
+
+  test('pinning a township turns the GPS stream off', () async {
+    final settings = SettingsStore.inMemory({});
+    final mode = LocationMode(settings, _directory());
+    final gps = StreamController<GpsFix>.broadcast();
+    addTearDown(gps.close);
+    final reported = <GpsFix>[];
+    // Ready before and after, as on a device that granted the GPS: no status
+    // change re-subscribes the reporter on the switch's behalf.
+    final pinned = LocationService(
+      _directory(),
+      isAvailable: () async => true,
+      fix: () async => _taipeiFix,
+      status: () async => LocationStatus.ready,
+      manualTown: () => mode.manualTown,
+    );
+    final pinnedReporter = DeviceLocationReporter(
+      positions: () => mode.isManual ? pinned.positionStream() : gps.stream,
+      settings: settings,
+      onMoved: (fix) async {
+        reported.add(fix);
+        return true;
+      },
+    );
+    final monitor = LocationMonitor(
+      location: pinned,
+      reporter: pinnedReporter,
+      regions: regions,
+      mode: mode,
+    )..start();
+    // The GPS stream is open, as on a device that granted the permission.
+    pinnedReporter.start();
+    await pumpEventQueue();
+    expect(gps.hasListener, isTrue);
+
+    await mode.setManual(_directory().byCode(_tainanCode)!);
+    await pumpEventQueue();
+    expect(
+      gps.hasListener,
+      isFalse,
+      reason: 'a pinned township must not keep the GPS on',
+    );
+
+    // A move the GPS would have reported reaches nothing.
+    gps.add(_taipeiFix);
+    await pumpEventQueue();
+    final tainan = _directory().byCode(_tainanCode)!;
+    expect(reported, everyElement((lat: tainan.lat, lng: tainan.lng)));
+    expect(regions.currentCode, _tainanCode);
+
+    monitor.dispose();
+    pinnedReporter.dispose();
+  });
 }
 
 class _ProbeLocation extends LocationService {
