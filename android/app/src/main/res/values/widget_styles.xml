@@ -23,6 +23,32 @@
       produce. `parent=""` because the dotted name would otherwise imply a
       parent style called `Widget`, which does not exist.
     -->
+    <!-- One minute of the rain chart; WidgetRenderer sets its drawable and level. -->
+    <style name="Widget.RainBar" parent="">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:paddingEnd">@dimen/widget_rain_bar_gap</item>
+        <item name="android:scaleType">fitXY</item>
+        <item name="android:src">@drawable/widget_rain_bar</item>
+    </style>
+
+    <!-- A rain chart axis label, aligned to the start of its ten minutes. -->
+    <style name="Widget.RainTick" parent="">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:autoSizeMaxTextSize">@dimen/widget_text_caption2</item>
+        <item name="android:autoSizeMinTextSize">@dimen/widget_text_caption2_min</item>
+        <item name="android:autoSizeStepGranularity">1sp</item>
+        <item name="android:autoSizeTextType">uniform</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:textColor">@color/widget_secondary</item>
+        <item name="android:textSize">@dimen/widget_text_caption2</item>
+    </style>
+
     <style name="Widget.Badge" parent="">
         <item name="android:textColor">@color/widget_notice</item>
         <item name="android:textSize">@dimen/widget_text_caption2</item>

@@ -31,6 +31,13 @@ import java.util.concurrent.Executors
  * * success — including a *superseded* write, which iOS reports the same way: a
  *   newer refresh on this device won the ordering race, which is normal and not
  *   something the app can act on. It is logged, not raised.
+ *
+ * Two calls are protocol, not behaviour, on Android. Dart never publishes a
+ * forecast here (the refresh fetches it for the township it resolved), and it
+ * never clears the current weather (Home invalidation must not erase a snapshot
+ * a home-screen Widget still shows — `home_providers.dart`). Both are accepted
+ * and answered as successes so the shared Dart writer keeps one contract with
+ * iOS, and neither touches the store.
  */
 class WidgetSnapshotChannel(private val context: Context) : MethodChannel.MethodCallHandler {
     private val mainHandler = Handler(Looper.getMainLooper())
@@ -69,51 +76,8 @@ class WidgetSnapshotChannel(private val context: Context) : MethodChannel.Method
             reply(result, error("invalid_kind", call.argument<String>("kind")))
             return
         }
-        val rawSource = call.argument<String>("sourceIdentifier")
-
-        // This channel supports source-scoped clear only for currentWeather.
-        // Forecasts are also stored per source, but clearForecast clears every
-        // source, and the catalog is global. Reject unsupported combinations
-        // before any side effect rather than silently widening a scoped clear.
-        if (rawSource != null && kind != WidgetSnapshotKind.CurrentWeather) {
-            reply(result, error("invalid_payload", "source for ${kind.wire}"))
-            return
-        }
-
-        val address = if (rawSource == null) {
-            null
-        } else {
-            WidgetAddress.fromSourceIdentifier(rawSource)
-                ?: run {
-                    reply(result, error("invalid_payload", "source"))
-                    return
-                }
-        }
-
-        executor.execute {
-            reply(
-                result,
-                guarded("clear kind=${kind.wire}") {
-                    val store = WidgetStore.open(context)
-                    val cleared = when (kind) {
-                        WidgetSnapshotKind.CurrentWeather -> if (address == null) {
-                            store.clearCurrentWeather()
-                        } else {
-                            store.clearCurrentWeatherSource(address)
-                        }
-                        WidgetSnapshotKind.WeatherForecast -> store.clearForecast()
-                        // Clearing the catalog is "there are no saved locations":
-                        // the same code path a publish with an empty list takes,
-                        // so the fence on a removed town is applied here too.
-                        WidgetSnapshotKind.LocationCatalog ->
-                            store.writeCatalog(emptyList(), System.currentTimeMillis())
-                    }
-
-                    WidgetUpdater.updateAll(context)
-                    if (cleared) null else error("write_failed", "clear kind=${kind.wire}")
-                },
-            )
-        }
+        WidgetLog.info(context, "clear ignored kind=${kind.wire}")
+        reply(result, null)
     }
 
     /**
@@ -164,18 +128,14 @@ class WidgetSnapshotChannel(private val context: Context) : MethodChannel.Method
                 }
 
                 val address = snapshot.address ?: return error("invalid_payload", "source")
-                val token = store.beginCurrentWeatherWrite(address)
-                    ?: return error("write_failed", "begin currentWeather")
-                when (store.commitCurrentWeather(token, snapshot, now)) {
+                when (store.commitCurrentWeather(snapshot, now)) {
                     WidgetWriteResult.Written -> {
                         WidgetUpdater.updateAddress(context, address)
                         // Only a source some instance is actually showing earns a
-                        // fetch. The app publishes for its own selected region,
-                        // which often has no Widget on the home screen at all —
-                        // enqueuing for it would spend location, clock and HTTP
-                        // work on a screen that does not exist.
+                        // refresh. The app publishes for its own selected region,
+                        // which often has no Widget on the home screen at all.
                         if (store.hasInstanceFor(address)) {
-                            WidgetRefreshScheduler.scheduleOneTime(context, address)
+                            WidgetRefresh.request(context, WidgetRefresh.Reason.AppPublish, address)
                         } else {
                             WidgetLog.info(
                                 context,
@@ -194,32 +154,7 @@ class WidgetSnapshotChannel(private val context: Context) : MethodChannel.Method
             }
 
             WidgetSnapshotKind.WeatherForecast -> {
-                val forecast = WidgetSnapshotDecoder.decodeForecast(json)
-                    ?: return error("invalid_payload", "forecast")
-                val address = forecast.address ?: return error("invalid_payload", "source")
-                // The deadline has to be fixed in calibrated time now, or not at
-                // all: storing a device-time receipt would let a later refresh's
-                // offset move it. An unanchored clock therefore refuses the write
-                // rather than recording a deadline it cannot vouch for.
-                val receivedCalibrated = WidgetClock.calibratedNowMilliseconds()
-                    ?: return error("write_failed", "clock unavailable")
-                val token = store.beginForecastWrite(address)
-                    ?: return error("write_failed", "begin forecast")
-                val expiresAt = WidgetDeadlines.forecastExpiry(
-                    updateTimeMilliseconds = forecast.updateTime,
-                    receivedCalibratedMilliseconds = receivedCalibrated,
-                )
-                when (store.commitForecast(token, forecast, receivedCalibrated, expiresAt, now)) {
-                    WidgetWriteResult.Written -> {
-                        WidgetUpdater.updateAddress(context, address)
-                        store.setForecastDemand(address, demand = false, updatedAt = now)
-                    }
-                    WidgetWriteResult.Superseded -> WidgetLog.info(
-                        context,
-                        "forecast write superseded source=${address.sourceIdentifier}",
-                    )
-                    WidgetWriteResult.Failed -> return error("write_failed", "forecast")
-                }
+                WidgetLog.info(context, "forecast write ignored")
                 null
             }
 

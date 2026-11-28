@@ -7,7 +7,7 @@ import android.os.Bundle
 import android.util.SizeF
 import androidx.core.os.BundleCompat
 
-/** Launcher content boxes, shared by rendering and source forecast demand.
+/** Launcher content boxes, shared by rendering and the resize forecast check.
  * Options already exclude host padding. Never subtract that padding again.
  * Legacy bounds describe rotations, not a simultaneous min/min rectangle.
  */

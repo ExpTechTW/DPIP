@@ -1,6 +1,10 @@
 package com.exptech.dpip.widget
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.SystemClock
+import android.provider.Settings
+import androidx.core.content.edit
 import java.io.BufferedReader
 import java.net.DatagramPacket
 import java.net.DatagramSocket
@@ -15,6 +19,12 @@ import java.util.TimeZone
 data class WidgetSnapshotTime(
     val calibratedNowUnixMilliseconds: Long,
     val calibratedTimeOffsetMilliseconds: Long,
+)
+
+/** A server instant and the monotonic (`elapsedRealtime`) reading it was taken at. */
+data class ClockAnchor(
+    val serverMilliseconds: Long,
+    val monotonicMilliseconds: Long,
 )
 
 /**
@@ -36,14 +46,9 @@ class CalibratedClock(
     private val wallMilliseconds: () -> Long,
     private val monotonicMilliseconds: () -> Long,
 ) {
-    private data class Anchor(
-        val serverMilliseconds: Long,
-        val monotonicMilliseconds: Long,
-    )
-
     // Publish both readings together: separate volatile fields can mix two syncs.
     @Volatile
-    private var anchor: Anchor? = null
+    private var anchor: ClockAnchor? = null
 
     val hasAnchor: Boolean
         get() = anchor != null
@@ -54,9 +59,11 @@ class CalibratedClock(
         return monotonicMilliseconds() - current.monotonicMilliseconds
     }
 
-    fun install(serverUnixMilliseconds: Long) {
-        anchor = Anchor(serverUnixMilliseconds, monotonicMilliseconds())
-    }
+    /** The anchor as it stands, so it can be kept across process death. */
+    fun anchor(): ClockAnchor? = anchor
+
+    fun install(serverUnixMilliseconds: Long): ClockAnchor =
+        ClockAnchor(serverUnixMilliseconds, monotonicMilliseconds()).also { anchor = it }
 
     /**
      * Anchors at an explicit monotonic reading.
@@ -65,7 +72,7 @@ class CalibratedClock(
      * seconds ago" without making the fake monotonic source stateful.
      */
     internal fun installAt(serverUnixMilliseconds: Long, monotonicMilliseconds: Long) {
-        anchor = Anchor(serverUnixMilliseconds, monotonicMilliseconds)
+        anchor = ClockAnchor(serverUnixMilliseconds, monotonicMilliseconds)
     }
 
     fun invalidate() {
@@ -140,6 +147,28 @@ object WidgetClock {
 
     val hasSynchronized: Boolean get() = clock.hasAnchor
 
+    /** Where the anchor outlives this process; null until [attach]. */
+    @Volatile
+    private var anchors: ClockAnchorStore? = null
+
+    /**
+     * Connects the clock to its persisted anchor, and restores it when this
+     * process has none of its own.
+     *
+     * Called at every entry point that reads calibrated time (a render, the
+     * redraw scheduler, a refresh), because any of them can be the first thing
+     * a freshly started process does. Cheap: the preferences file is cached by
+     * the platform after its first read.
+     */
+    fun attach(context: Context) {
+        val store = ClockAnchorStore.of(context)
+        anchors = store
+        if (clock.hasAnchor) return
+        store.read(SystemClock.elapsedRealtime())?.let {
+            clock.installAt(it.serverMilliseconds, it.monotonicMilliseconds)
+        }
+    }
+
     fun calibratedNowMilliseconds(): Long? = clock.calibratedNowMilliseconds()
 
     fun offsetMilliseconds(): Long? = clock.offsetMilliseconds()
@@ -149,23 +178,39 @@ object WidgetClock {
 
     fun snapshotTime(): WidgetSnapshotTime? = clock.snapshotTime()
 
-    fun invalidate() = clock.invalidate()
+    /** Drops the anchor, here and on disk. */
+    fun invalidate() {
+        clock.invalidate()
+        anchors?.clear()
+    }
 
     /**
      * Anchors the clock without a network exchange.
      *
      * For tests that need "a synchronized process" — the property being tested
      * is what the code does *with* an anchor, not how the anchor was obtained.
+     * [persist] also writes it where the next process would find it.
      */
-    internal fun installForTest(serverUnixMilliseconds: Long, monotonicMilliseconds: Long) {
+    internal fun installForTest(serverUnixMilliseconds: Long, monotonicMilliseconds: Long, persist: Boolean = false) {
         clock.installAt(serverUnixMilliseconds, monotonicMilliseconds)
+        if (persist) anchors?.write(ClockAnchor(serverUnixMilliseconds, monotonicMilliseconds))
+    }
+
+    /** What process death does: the in-memory anchor is gone, the persisted one is not. */
+    internal fun forgetForTest() {
+        clock.invalidate()
+        anchors = null
     }
 
     /**
      * Synchronizes the clock, blocking up to roughly ten seconds.
      *
-     * Never throws: a failure is "no usable calibration", which the caller
-     * answers by keeping the snapshot it already has.
+     * Never throws: a failure is "no new calibration", and an anchor from an
+     * earlier success — this process's own or one restored by [attach] — is
+     * still monotonic and still valid, so the refresh goes on with it. What
+     * must not happen is inventing one: `calibratedNowMilliseconds()` returns
+     * null until an anchor exists at all. Mirrors iOS, where `hasSynchronized`
+     * outlives a failed `synchronize()`.
      *
      * An anchor younger than [resynchronizeAfterMilliseconds] is reused. One
      * worker run refreshes several addresses, and without this each would spend
@@ -177,19 +222,11 @@ object WidgetClock {
         val age = clock.anchorAgeMilliseconds()
         if (age != null && age in 0 until resynchronizeAfterMilliseconds) return true
 
-        for (host in sntpHosts) {
-            sntpTime(host)?.let { clock.install(it); return true }
+        val server = sntpHosts.firstNotNullOfOrNull(::sntpTime) ?: httpHosts.firstNotNullOfOrNull(::httpTime)
+        if (server != null) {
+            anchors?.write(clock.install(server))
+            return true
         }
-        for (host in httpHosts) {
-            httpTime(host)?.let { clock.install(it); return true }
-        }
-
-        // A failure here does not necessarily mean "no usable clock": an anchor
-        // from an earlier success is still monotonic and still valid, so the
-        // refresh may go on with it. What must not happen is inventing one —
-        // `calibratedNowMilliseconds()` returns null until an anchor exists at
-        // all, and every freshness decision refuses to guess. Mirrors iOS, where
-        // `hasSynchronized` outlives a failed `synchronize()`.
         return hasSynchronized
     }
 
@@ -311,5 +348,74 @@ object WidgetClock {
             }
         }
         return null
+    }
+}
+
+/**
+ * The calibrated anchor, kept across process death.
+ *
+ * `SystemClock.elapsedRealtime()` keeps counting from boot whichever process
+ * reads it, so a (server instant, elapsed reading) pair taken by one process
+ * is exactly as true in the next one — until the device reboots and the
+ * elapsed clock restarts. The boot is identified by `Settings.Global.BOOT_COUNT`;
+ * an anchor from another boot, from a device that cannot name its boot, or
+ * older than [maximumAgeMilliseconds] is not restored, and the process is then
+ * as unanchored as it always was without one.
+ *
+ * Without this, every process the system started for the Widget — a delayed
+ * redraw, a clock-change broadcast, a launcher update, the app's own catalog
+ * publish — had no anchor until a network refresh synchronized, and drew every
+ * observation as outdated and every forecast as gone in the meantime.
+ *
+ * Stored in the Widget's own private preferences file, not in a Dart setting:
+ * it is native process state that Dart never reads.
+ */
+internal class ClockAnchorStore(
+    private val preferences: SharedPreferences,
+    private val bootCount: () -> Int?,
+) {
+    fun read(monotonicNowMilliseconds: Long): ClockAnchor? {
+        val boot = bootCount() ?: return null
+        if (preferences.getInt(KEY_BOOT, -1) != boot) return null
+        val server = preferences.getLong(KEY_SERVER, -1L)
+        val monotonic = preferences.getLong(KEY_MONOTONIC, -1L)
+        if (server <= 0 || monotonic < 0) return null
+        val age = monotonicNowMilliseconds - monotonic
+        if (age < 0 || age > maximumAgeMilliseconds) return null
+        return ClockAnchor(server, monotonic)
+    }
+
+    fun write(anchor: ClockAnchor) {
+        val boot = bootCount() ?: return
+        preferences.edit {
+            putInt(KEY_BOOT, boot)
+            putLong(KEY_SERVER, anchor.serverMilliseconds)
+            putLong(KEY_MONOTONIC, anchor.monotonicMilliseconds)
+        }
+    }
+
+    fun clear() {
+        preferences.edit { clear() }
+    }
+
+    companion object {
+        /** A day of monotonic drift is well under a second; older is not reused. */
+        const val maximumAgeMilliseconds = 24L * 60 * 60 * 1_000
+
+        private const val FILE = "dpip_widget_clock"
+        private const val KEY_BOOT = "boot_count"
+        private const val KEY_SERVER = "server_ms"
+        private const val KEY_MONOTONIC = "elapsed_ms"
+
+        fun of(context: Context): ClockAnchorStore {
+            val application = context.applicationContext
+            return ClockAnchorStore(
+                preferences = application.getSharedPreferences(FILE, Context.MODE_PRIVATE),
+                bootCount = {
+                    Settings.Global.getInt(application.contentResolver, Settings.Global.BOOT_COUNT, -1)
+                        .takeIf { it >= 0 }
+                },
+            )
+        }
     }
 }

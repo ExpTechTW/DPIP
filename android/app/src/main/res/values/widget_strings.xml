@@ -17,7 +17,7 @@
   rendered with the system locale, which is why every locale the app ships is
   covered by `values-<locale>/` rather than left to English.
 -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="widget_name">Current Weather</string>
     <string name="widget_description">Shows current weather for the location configured for this widget.</string>
 
@@ -78,4 +78,16 @@
     <string name="widget_compact_location">No location</string>
     <string name="widget_compact_details">Open the app for full weather details</string>
     <string name="widget_compact_attention">Open app</string>
+
+    <!-- The next-hour rain chart; texts are the app's homeRainTrend* and
+         mapTimelineNow, which are not plurals either, so the two minute
+         counts stay strings in every language. -->
+    <string name="widget_rain_title">Next hour precipitation</string>
+    <string name="widget_rain_scattered">Light showers possible</string>
+    <string name="widget_rain_light_sustained">Light rain continuing for the next hour</string>
+    <string name="widget_rain_light_stopping" tools:ignore="PluralsCandidate">Light rain likely to stop in %1$d minutes</string>
+    <string name="widget_rain_heavy_sustained">Heavy rain continuing for the next hour</string>
+    <string name="widget_rain_heavy_stopping" tools:ignore="PluralsCandidate">Heavy rain likely to stop in %1$d minutes</string>
+    <string name="widget_rain_now">Now</string>
+    <string name="widget_rain_minute">%1$d min</string>
 </resources>

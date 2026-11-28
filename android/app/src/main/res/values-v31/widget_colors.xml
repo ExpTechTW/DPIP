@@ -16,4 +16,6 @@
     <color name="widget_secondary">@android:color/system_neutral2_700</color>
     <color name="widget_icon_tint">@android:color/system_neutral2_700</color>
     <color name="widget_notice">@android:color/system_neutral2_700</color>
+    <!-- The rain bars follow the wallpaper's accent, as the app's primary does. -->
+    <color name="widget_rain_bar">@android:color/system_accent1_600</color>
 </resources>

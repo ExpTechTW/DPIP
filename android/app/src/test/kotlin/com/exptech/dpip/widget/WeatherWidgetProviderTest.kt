@@ -62,23 +62,38 @@ class WeatherWidgetProviderTest {
     private fun states(name: String): List<WorkInfo.State> =
         WorkManager.getInstance(context).getWorkInfosForUniqueWork(name).get().map { it.state }
 
+    private fun pending(name: String): List<WorkInfo> =
+        WorkManager.getInstance(context).getWorkInfosForUniqueWork(name).get()
+            .filter { it.state == WorkInfo.State.ENQUEUED || it.state == WorkInfo.State.BLOCKED }
+
+    private fun bindLive(vararg ids: Int) {
+        for (id in ids) {
+            org.robolectric.Shadows.shadowOf(manager()).addBoundWidget(
+                id,
+                android.appwidget.AppWidgetProviderInfo().apply {
+                    provider = android.content.ComponentName(context, WeatherWidgetProvider::class.java)
+                },
+            )
+        }
+    }
+
     @Test
     fun `successful empty reconciliation cancels widget work but not another feature`() {
         val workManager = WorkManager.getInstance(context)
         val other = androidx.work.OneTimeWorkRequestBuilder<WeatherWidgetRefreshWorker>()
             .setInitialDelay(1, java.util.concurrent.TimeUnit.DAYS).build()
         workManager.enqueueUniqueWork("other-feature", androidx.work.ExistingWorkPolicy.KEEP, other)
-        WidgetRefreshScheduler.schedulePeriodic(context)
-        WidgetRefreshScheduler.scheduleOneTime(context, WidgetAddress.Saved("407"))
-        WidgetRefreshScheduler.scheduleLocalRerender(context, 60_000)
+        WidgetRefresh.schedulePeriodic(context)
+        WidgetRefresh.request(context, WidgetRefresh.Reason.Update, WidgetAddress.Saved("407"))
+        WidgetRefresh.scheduleLocalRerender(context, 60_000)
 
-        WidgetUpdater.reconcile(context)
+        WidgetRefresh.reconcile(context, WidgetRefresh.Reason.Restored)
 
         for (name in listOf(
-            WidgetRefreshScheduler.periodicWorkName,
-            WidgetRefreshScheduler.sourceWorkName(WidgetAddress.Saved("407")),
-            WidgetRefreshScheduler.localRerenderWorkName,
-        )) assertTrue("$name must be cancelled", states(name).none { it == WorkInfo.State.ENQUEUED })
+            WidgetRefresh.periodicWorkName,
+            WidgetRefresh.refreshWorkName,
+            WidgetRefresh.localRerenderWorkName,
+        )) assertTrue("$name must be cancelled", pending(name).isEmpty())
         assertEquals(listOf(WorkInfo.State.ENQUEUED), states("other-feature"))
     }
 
@@ -95,33 +110,33 @@ class WeatherWidgetProviderTest {
                     "BEGIN SELECT RAISE(ABORT, 'temporary delete failure'); END",
             )
             try {
-                WidgetUpdater.reconcile(context)
+                WidgetRefresh.reconcile(context, WidgetRefresh.Reason.Restored)
                 assertEquals(setOf(11, 12), store.readInstances().map { it.appWidgetId }.toSet())
-                assertTrue(states(WidgetRefreshScheduler.periodicWorkName).contains(WorkInfo.State.ENQUEUED))
-                assertTrue(states(WidgetRefreshScheduler.sourceWorkName(address)).isEmpty())
+                assertTrue(states(WidgetRefresh.periodicWorkName).contains(WorkInfo.State.ENQUEUED))
+                assertTrue("untrusted rows must not be fetched", states(WidgetRefresh.refreshWorkName).isEmpty())
             } finally {
                 database.execSQL("DROP TRIGGER refuse_delete")
             }
         }
-        WidgetUpdater.reconcile(context)
+        WidgetRefresh.reconcile(context, WidgetRefresh.Reason.Restored)
         assertTrue(store.readInstances().isEmpty())
-        assertTrue(states(WidgetRefreshScheduler.periodicWorkName).none { it == WorkInfo.State.ENQUEUED })
+        assertTrue(pending(WidgetRefresh.periodicWorkName).isEmpty())
     }
 
     @Test
     fun `failed delete authority reads do not cancel work for surviving widgets`() {
         val address = WidgetAddress.Saved("407")
         store.writeInstance(11, address, "407", 1L)
-        WidgetRefreshScheduler.schedulePeriodic(context)
-        WidgetRefreshScheduler.scheduleOneTime(context, address)
+        WidgetRefresh.schedulePeriodic(context)
+        WidgetRefresh.request(context, WidgetRefresh.Reason.Update, address)
         SQLiteDatabase.openDatabase(
             context.getDatabasePath(WidgetStore.DATABASE_NAME).path, null, SQLiteDatabase.OPEN_READWRITE,
         ).use { database ->
             database.execSQL("ALTER TABLE widget_instances RENAME TO unavailable_instances")
             try {
                 provider.onDeleted(context, intArrayOf(11))
-                assertTrue(states(WidgetRefreshScheduler.periodicWorkName).contains(WorkInfo.State.ENQUEUED))
-                assertTrue(states(WidgetRefreshScheduler.sourceWorkName(address)).contains(WorkInfo.State.ENQUEUED))
+                assertTrue(states(WidgetRefresh.periodicWorkName).contains(WorkInfo.State.ENQUEUED))
+                assertTrue(states(WidgetRefresh.refreshWorkName).contains(WorkInfo.State.ENQUEUED))
             } finally {
                 database.execSQL("ALTER TABLE unavailable_instances RENAME TO widget_instances")
             }
@@ -130,81 +145,68 @@ class WeatherWidgetProviderTest {
     }
 
     @Test
-    fun `cold reconcile requests each surviving source once without replacing pending recovery`() {
-        val saved = WidgetAddress.Saved("407")
-        val current = WidgetAddress.CurrentLocation
-        val removed = WidgetAddress.Saved("100")
-        store.writeInstance(11, saved, "407", 1L)
-        store.writeInstance(12, saved, "407", 1L)
-        store.writeInstance(13, current, null, 1L)
-        store.writeInstance(99, removed, "100", 1L)
-        for (id in listOf(11, 12, 13)) {
-            org.robolectric.Shadows.shadowOf(manager()).addBoundWidget(
-                id,
-                android.appwidget.AppWidgetProviderInfo().apply {
-                    provider = android.content.ComponentName(context, WeatherWidgetProvider::class.java)
-                },
-            )
-        }
-        WidgetRefreshScheduler.schedulePeriodic(context)
-        WidgetRefreshScheduler.scheduleOneTime(context, removed)
+    fun `cold reconcile asks once for the survivors and keeps the periodic clock`() {
+        store.writeInstance(11, WidgetAddress.Saved("407"), "407", 1L)
+        store.writeInstance(12, WidgetAddress.Saved("407"), "407", 1L)
+        store.writeInstance(13, WidgetAddress.CurrentLocation, null, 1L)
+        store.writeInstance(99, WidgetAddress.Saved("100"), "100", 1L)
+        bindLive(11, 12, 13)
+        WidgetRefresh.schedulePeriodic(context)
         val workManager = WorkManager.getInstance(context)
-        val periodicId = workManager.getWorkInfosForUniqueWork(WidgetRefreshScheduler.periodicWorkName).get().single().id
+        val periodicId = workManager.getWorkInfosForUniqueWork(WidgetRefresh.periodicWorkName).get().single().id
         // Simulate the native store being reopened in a cold process. The
         // periodic request already exists and UPDATE must not restart its clock.
         WidgetStore.resetForTest()
         store = WidgetStore.open(context)
 
-        WidgetUpdater.reconcile(context)
+        WidgetRefresh.reconcile(context, WidgetRefresh.Reason.Boot)
 
-        val firstIds = listOf(saved, current).map { address ->
-            val work = workManager.getWorkInfosForUniqueWork(WidgetRefreshScheduler.sourceWorkName(address)).get()
-            assertEquals("one request per surviving source", 1, work.size)
-            assertEquals(WorkInfo.State.ENQUEUED, work.single().state)
-            assertEquals(androidx.work.NetworkType.CONNECTED, work.single().constraints.requiredNetworkType)
-            work.single().id
-        }
-        assertTrue(states(WidgetRefreshScheduler.sourceWorkName(removed)).none { it == WorkInfo.State.ENQUEUED })
+        val chain = workManager.getWorkInfosForUniqueWork(WidgetRefresh.refreshWorkName).get()
+        assertEquals("one request covers every surviving source", 1, chain.size)
+        assertEquals(androidx.work.NetworkType.CONNECTED, chain.single().constraints.requiredNetworkType)
         assertNull(store.readInstance(99))
-        WidgetUpdater.reconcile(context)
-        assertEquals(periodicId, workManager.getWorkInfosForUniqueWork(WidgetRefreshScheduler.periodicWorkName).get().single().id)
-        assertEquals(firstIds, listOf(saved, current).map { address ->
-            workManager.getWorkInfosForUniqueWork(WidgetRefreshScheduler.sourceWorkName(address)).get().single().id
-        })
-        assertTrue(states(WidgetRefreshScheduler.allSourcesWorkName).isEmpty())
+        assertEquals(listOf(WidgetAddress.Saved("407"), WidgetAddress.CurrentLocation), store.usedAddresses())
+
+        // A second reconcile appends behind the first rather than replacing it.
+        WidgetRefresh.reconcile(context, WidgetRefresh.Reason.Boot)
+        assertEquals(periodicId, workManager.getWorkInfosForUniqueWork(WidgetRefresh.periodicWorkName).get().single().id)
+        val after = workManager.getWorkInfosForUniqueWork(WidgetRefresh.refreshWorkName).get()
+        assertEquals(WorkInfo.State.ENQUEUED, after.single { it.id == chain.single().id }.state)
+        assertEquals(2, after.size)
     }
 
     @Test
     fun `reconcile read failure preserves scheduled recovery and durable choices`() {
         val address = WidgetAddress.Saved("407")
         store.writeInstance(11, address, "407", 1L)
-        WidgetRefreshScheduler.schedulePeriodic(context)
-        WidgetRefreshScheduler.scheduleOneTime(context, address)
-        WidgetRefreshScheduler.scheduleLocalRerender(context, 60_000)
+        WidgetRefresh.schedulePeriodic(context)
+        WidgetRefresh.request(context, WidgetRefresh.Reason.Update, address)
+        WidgetRefresh.scheduleLocalRerender(context, 60_000)
         val workManager = WorkManager.getInstance(context)
-        val periodicId = workManager.getWorkInfosForUniqueWork(WidgetRefreshScheduler.periodicWorkName).get().single().id
+        val periodicId = workManager.getWorkInfosForUniqueWork(WidgetRefresh.periodicWorkName).get().single().id
         SQLiteDatabase.openDatabase(
             context.getDatabasePath(WidgetStore.DATABASE_NAME).path, null, SQLiteDatabase.OPEN_READWRITE,
         ).use { database ->
             database.execSQL("ALTER TABLE widget_instances RENAME TO unavailable_instances")
             try {
-                repeat(3) { WidgetUpdater.reconcile(context, keepIds = setOf(11)) }
+                repeat(3) { WidgetRefresh.reconcile(context, WidgetRefresh.Reason.Restored, keepIds = setOf(11)) }
                 assertEquals(
                     periodicId,
-                    workManager.getWorkInfosForUniqueWork(WidgetRefreshScheduler.periodicWorkName).get().single().id,
+                    workManager.getWorkInfosForUniqueWork(WidgetRefresh.periodicWorkName).get().single().id,
                 )
                 for (name in listOf(
-                    WidgetRefreshScheduler.periodicWorkName,
-                    WidgetRefreshScheduler.sourceWorkName(address),
-                    WidgetRefreshScheduler.localRerenderWorkName,
+                    WidgetRefresh.periodicWorkName,
+                    WidgetRefresh.refreshWorkName,
+                    WidgetRefresh.localRerenderWorkName,
                 )) assertTrue("$name must survive failed authority reads", states(name).contains(WorkInfo.State.ENQUEUED))
+                assertEquals("a failed read asks for nothing", 1, states(WidgetRefresh.refreshWorkName).size)
             } finally {
                 database.execSQL("ALTER TABLE unavailable_instances RENAME TO widget_instances")
             }
         }
         assertEquals(address, store.readInstance(11)?.address)
-        WidgetUpdater.reconcile(context, keepIds = setOf(11))
-        assertTrue(states(WidgetRefreshScheduler.sourceWorkName(address)).contains(WorkInfo.State.ENQUEUED))
+        WidgetRefresh.reconcile(context, WidgetRefresh.Reason.Restored, keepIds = setOf(11))
+        assertTrue(states(WidgetRefresh.refreshWorkName).contains(WorkInfo.State.ENQUEUED))
     }
 
     @Test
@@ -218,7 +220,7 @@ class WeatherWidgetProviderTest {
         assertEquals(WidgetRefreshFeedback.Queued, store.readRefreshFeedback(address, System.currentTimeMillis())?.state)
         assertNull(store.readRefreshFeedback(WidgetAddress.Saved("100"), System.currentTimeMillis()))
         val work = WorkManager.getInstance(context)
-            .getWorkInfosForUniqueWork(WidgetRefreshScheduler.sourceWorkName(address)).get().single()
+            .getWorkInfosForUniqueWork(WidgetRefresh.refreshWorkName).get().single()
         assertTrue(store.writeRefreshFeedback(address, work.id.toString(), WidgetRefreshFeedback.Running, System.currentTimeMillis()))
     }
 
@@ -263,88 +265,56 @@ class WeatherWidgetProviderTest {
     @Test
     fun `deleting the last instance cancels every kind of work`() {
         store.writeInstance(11, WidgetAddress.Saved("407"), "407", 1L)
-        WidgetRefreshScheduler.schedulePeriodic(context)
-        WidgetRefreshScheduler.scheduleOneTime(context, WidgetAddress.Saved("407"))
-        WidgetRefreshScheduler.scheduleLocalRerender(context, 60_000)
+        WidgetRefresh.schedulePeriodic(context)
+        WidgetRefresh.request(context, WidgetRefresh.Reason.Update, WidgetAddress.Saved("407"))
+        WidgetRefresh.scheduleLocalRerender(context, 60_000)
 
         provider.onDeleted(context, intArrayOf(11))
 
         assertNull(store.readInstance(11))
-        assertTrue(
-            "the periodic work should be cancelled: ${states(WidgetRefreshScheduler.periodicWorkName)}",
-            states(WidgetRefreshScheduler.periodicWorkName).none { it == WorkInfo.State.ENQUEUED },
-        )
-        assertTrue(
-            "the local redraw should be cancelled: " +
-                "${states(WidgetRefreshScheduler.localRerenderWorkName)}",
-            states(WidgetRefreshScheduler.localRerenderWorkName)
-                .none { it == WorkInfo.State.ENQUEUED },
-        )
-        assertTrue(
-            "the one-time work should be cancelled: " +
-                "${states(WidgetRefreshScheduler.sourceWorkName(WidgetAddress.Saved("407")))}",
-            states(WidgetRefreshScheduler.sourceWorkName(WidgetAddress.Saved("407")))
-                .none { it == WorkInfo.State.ENQUEUED },
-        )
+        for (name in listOf(
+            WidgetRefresh.periodicWorkName,
+            WidgetRefresh.localRerenderWorkName,
+            WidgetRefresh.refreshWorkName,
+        )) assertTrue("$name should be cancelled: ${states(name)}", pending(name).isEmpty())
     }
 
     @Test
     fun `deleting one of two instances leaves the other's work running`() {
         store.writeInstance(11, WidgetAddress.Saved("407"), "407", 1L)
         store.writeInstance(12, WidgetAddress.Saved("100"), "100", 1L)
-        WidgetRefreshScheduler.schedulePeriodic(context)
+        WidgetRefresh.schedulePeriodic(context)
+        WidgetRefresh.request(context, WidgetRefresh.Reason.Update)
 
         provider.onDeleted(context, intArrayOf(11))
 
         assertNotNull(store.readInstance(12))
-        assertTrue(states(WidgetRefreshScheduler.periodicWorkName).contains(WorkInfo.State.ENQUEUED))
-    }
-
-    @Test
-    fun `deleting the last instance of one source cancels only that source`() {
-        store.writeInstance(11, WidgetAddress.Saved("407"), "407", 1L)
-        store.writeInstance(12, WidgetAddress.Saved("100"), "100", 1L)
-        WidgetRefreshScheduler.scheduleOneTime(context, WidgetAddress.Saved("407"))
-        WidgetRefreshScheduler.scheduleOneTime(context, WidgetAddress.Saved("100"))
-
-        provider.onDeleted(context, intArrayOf(11))
-
-        assertTrue(
-            "the removed source's request must be cancelled: " +
-                "${states(WidgetRefreshScheduler.sourceWorkName(WidgetAddress.Saved("407")))}",
-            states(WidgetRefreshScheduler.sourceWorkName(WidgetAddress.Saved("407")))
-                .none { it == WorkInfo.State.ENQUEUED },
-        )
-        assertTrue(
-            "the surviving source must keep its request",
-            states(WidgetRefreshScheduler.sourceWorkName(WidgetAddress.Saved("100")))
-                .contains(WorkInfo.State.ENQUEUED),
-        )
+        assertTrue(states(WidgetRefresh.periodicWorkName).contains(WorkInfo.State.ENQUEUED))
+        assertTrue(states(WidgetRefresh.refreshWorkName).contains(WorkInfo.State.ENQUEUED))
     }
 
     @Test
     fun `an update with no instances schedules nothing`() {
         provider.onUpdate(context, manager(), intArrayOf())
 
-        assertEquals(0, states(WidgetRefreshScheduler.periodicWorkName).size)
+        assertEquals(0, states(WidgetRefresh.periodicWorkName).size)
+        assertEquals(0, states(WidgetRefresh.refreshWorkName).size)
     }
 
     @Test
-    fun `an update with an instance renders it and asks for its source`() {
+    fun `an update with an instance renders it and asks for a refresh`() {
         store.writeInstance(11, WidgetAddress.Saved("407"), "407", 1L)
 
         provider.onUpdate(context, manager(), intArrayOf(11))
 
-        assertTrue(states(WidgetRefreshScheduler.periodicWorkName).contains(WorkInfo.State.ENQUEUED))
-        assertTrue(
-            states(WidgetRefreshScheduler.sourceWorkName(WidgetAddress.Saved("407")))
-                .contains(WorkInfo.State.ENQUEUED),
-        )
+        assertTrue(states(WidgetRefresh.periodicWorkName).contains(WorkInfo.State.ENQUEUED))
+        assertTrue(states(WidgetRefresh.refreshWorkName).contains(WorkInfo.State.ENQUEUED))
     }
 
     @Test
-    fun `the update-now tap enqueues only its own instance's source`() {
+    fun `the update-now tap asks only for its own instance's source`() {
         store.writeInstance(11, WidgetAddress.Saved("407"), "407", 1L)
+        store.writeInstance(12, WidgetAddress.Saved("100"), "100", 1L)
 
         provider.onReceive(
             context,
@@ -354,11 +324,9 @@ class WeatherWidgetProviderTest {
             },
         )
 
-        assertTrue(
-            states(WidgetRefreshScheduler.sourceWorkName(WidgetAddress.Saved("407")))
-                .contains(WorkInfo.State.ENQUEUED),
-        )
-        assertEquals(0, states(WidgetRefreshScheduler.sourceWorkName(WidgetAddress.Saved("100"))).size)
+        assertEquals(listOf(WorkInfo.State.ENQUEUED), states(WidgetRefresh.refreshWorkName))
+        assertNotNull(store.readRefreshFeedback(WidgetAddress.Saved("407"), System.currentTimeMillis()))
+        assertNull(store.readRefreshFeedback(WidgetAddress.Saved("100"), System.currentTimeMillis()))
     }
 
     @Test
@@ -371,18 +339,16 @@ class WeatherWidgetProviderTest {
             },
         )
 
-        assertEquals(0, states(WidgetRefreshScheduler.allSourcesWorkName).size)
+        assertEquals(0, states(WidgetRefresh.refreshWorkName).size)
     }
 
     @Test
     fun `enabling schedules the periodic refresh and disabling cancels it`() {
         provider.onEnabled(context)
-        assertTrue(states(WidgetRefreshScheduler.periodicWorkName).contains(WorkInfo.State.ENQUEUED))
+        assertTrue(states(WidgetRefresh.periodicWorkName).contains(WorkInfo.State.ENQUEUED))
 
         provider.onDisabled(context)
-        assertTrue(
-            states(WidgetRefreshScheduler.periodicWorkName).none { it == WorkInfo.State.ENQUEUED },
-        )
+        assertTrue(pending(WidgetRefresh.periodicWorkName).isEmpty())
     }
 
     @Test

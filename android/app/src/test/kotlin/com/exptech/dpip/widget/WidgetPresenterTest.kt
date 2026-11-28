@@ -128,7 +128,7 @@ class WidgetPresenterTest {
     @Test
     fun `staleness is measured from the injected calibrated instant`() {
         val observation = atTaipei(14, 0) / 1_000
-        val deadline = observation * 1_000 + 30 * 60 * 1_000
+        val deadline = observation * 1_000 + 60 * 60 * 1_000
 
         assertTrue(
             present(
@@ -298,7 +298,7 @@ class WidgetPresenterTest {
             address = WidgetAddress.CurrentLocation,
             stored = stored(snapshot(observation, source = "current-location")),
             locationDegradation = WidgetLocationDegradation.Permission,
-            calibratedNowMilliseconds = observation * 1_000 + 31 * 60 * 1_000,
+            calibratedNowMilliseconds = observation * 1_000 + 61 * 60 * 1_000,
         )
         assertEquals("OUTDATED", presentation.badgeText)
     }
@@ -391,7 +391,7 @@ class WidgetPresenterTest {
             val fresh = present(sizeClass = size, stored = stored(snapshot()), forecast = forecast())
             assertTrue(fresh.copy(refreshFeedback = WidgetRefreshFeedback.Failed).showRefresh)
             val stale = present(sizeClass = size, stored = stored(snapshot()), forecast = forecast(),
-                calibratedNowMilliseconds = atTaipei(14, 30))
+                calibratedNowMilliseconds = atTaipei(15, 0))
             assertTrue(stale.isStale)
             assertTrue(stale.showRefresh)
         }
@@ -449,13 +449,13 @@ class WidgetPresenterTest {
             for (size in WidgetSizeClass.entries) {
                 for (entry in listOf(null, stored(snapshot(source = "current-location")))) {
                     // A usable forecast and a fresh observation must not hide a location retry.
-                    for (now in listOf(atTaipei(14, 20), atTaipei(14, 30), null)) {
+                    for (now in listOf(atTaipei(14, 20), atTaipei(15, 0), null)) {
                         val retry = present(sizeClass = size, address = WidgetAddress.CurrentLocation,
                             stored = entry, forecast = forecast(source = "current-location"),
                             locationDegradation = degradation, calibratedNowMilliseconds = now)
                         assertEquals(WidgetDisplayState.LocationUnavailable, retry.state)
                         assertEquals(entry != null, retry.hasObservation)
-                        assertEquals(entry != null && (now == null || now >= atTaipei(14, 30)), retry.isStale)
+                        assertEquals(entry != null && (now == null || now >= atTaipei(15, 0)), retry.isStale)
                         assertEquals(
                             if (retry.isStale) "OUTDATED"
                             else if (degradation == WidgetLocationDegradation.UnresolvedTownship) "OUTSIDE"

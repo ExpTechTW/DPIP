@@ -59,4 +59,14 @@
     <string name="widget_compact_location">暂无定位</string>
     <string name="widget_compact_details">打开 App 查看完整天气信息</string>
     <string name="widget_compact_attention">打开 App</string>
+
+    <!-- The next-hour rain chart; texts are the app's homeRainTrend* and mapTimelineNow. -->
+    <string name="widget_rain_title">近 1 小时降水趋势</string>
+    <string name="widget_rain_scattered">可能会有零星降雨</string>
+    <string name="widget_rain_light_sustained">未来 1 小时会有持续小雨</string>
+    <string name="widget_rain_light_stopping">预计 %1$d 分钟后停止下小雨</string>
+    <string name="widget_rain_heavy_sustained">未来 1 小时会有持续大雨</string>
+    <string name="widget_rain_heavy_stopping">预计 %1$d 分钟后停止下大雨</string>
+    <string name="widget_rain_now">现在</string>
+    <string name="widget_rain_minute">%1$d分</string>
 </resources>

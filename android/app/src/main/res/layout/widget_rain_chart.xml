@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The next hour's rain, one bar per minute — the home sheet's trend card
+  (`home_rain_trend_section.dart`) as a launcher can draw it.
+
+  `RemoteViews` cannot host a chart, so each minute is an ImageView holding a
+  bottom-anchored clip drawable whose level `WidgetRenderer` sets
+  (`setImageLevel`): the height is the share of the 35 mm ceiling, the colour
+  comes from `@color/widget_rain_bar` and so follows the night theme in the
+  launcher's own process, and nothing is rasterised in this one. A minute the
+  forecast does not cover gets the grey no-data bar instead.
+
+  Included, `gone`, beside every forecast row: the renderer shows either the
+  hourly row or this, never both.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_rain_chart"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/widget_medium_section_gap"
+    android:focusable="true"
+    android:gravity="center_vertical"
+    android:importantForAccessibility="yes"
+    android:orientation="vertical"
+    android:visibility="gone">
+
+    <TextView
+        android:id="@+id/widget_rain_summary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:autoSizeMaxTextSize="@dimen/widget_text_caption"
+        android:autoSizeMinTextSize="@dimen/widget_text_caption2_min"
+        android:autoSizeStepGranularity="1sp"
+        android:autoSizeTextType="uniform"
+        android:ellipsize="end"
+        android:importantForAccessibility="no"
+        android:includeFontPadding="false"
+        android:maxLines="1"
+        android:textColor="@color/widget_on_surface"
+        android:textSize="@dimen/widget_text_caption" />
+
+    <LinearLayout
+        android:id="@+id/widget_rain_bars"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/widget_rain_chart_height"
+        android:layout_marginTop="@dimen/widget_spacing_xs"
+        android:importantForAccessibility="noHideDescendants"
+        android:orientation="horizontal">
+        <ImageView
+            android:id="@+id/widget_rain_bar_00"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_01"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_02"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_03"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_04"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_05"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_06"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_07"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_08"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_09"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_10"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_11"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_12"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_13"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_14"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_15"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_16"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_17"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_18"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_19"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_20"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_21"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_22"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_23"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_24"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_25"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_26"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_27"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_28"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_29"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_30"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_31"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_32"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_33"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_34"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_35"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_36"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_37"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_38"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_39"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_40"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_41"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_42"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_43"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_44"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_45"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_46"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_47"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_48"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_49"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_50"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_51"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_52"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_53"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_54"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_55"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_56"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_57"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_58"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+        <ImageView
+            android:id="@+id/widget_rain_bar_59"
+            style="@style/Widget.RainBar"
+            android:importantForAccessibility="no" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:baselineAligned="false"
+        android:importantForAccessibility="noHideDescendants"
+        android:orientation="horizontal">
+        <TextView
+            android:id="@+id/widget_rain_tick_0"
+            style="@style/Widget.RainTick" />
+        <TextView
+            android:id="@+id/widget_rain_tick_1"
+            style="@style/Widget.RainTick" />
+        <TextView
+            android:id="@+id/widget_rain_tick_2"
+            style="@style/Widget.RainTick" />
+        <TextView
+            android:id="@+id/widget_rain_tick_3"
+            style="@style/Widget.RainTick" />
+        <TextView
+            android:id="@+id/widget_rain_tick_4"
+            style="@style/Widget.RainTick" />
+        <TextView
+            android:id="@+id/widget_rain_tick_5"
+            style="@style/Widget.RainTick" />
+    </LinearLayout>
+
+</LinearLayout>

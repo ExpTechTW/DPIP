@@ -55,4 +55,14 @@
     <string name="widget_compact_location">ไม่มีพิกัด</string>
     <string name="widget_compact_details">เปิดแอปเพื่อดูข้อมูลสภาพอากาศทั้งหมด</string>
     <string name="widget_compact_attention">เปิดแอป</string>
+
+    <!-- The next-hour rain chart; texts are the app's homeRainTrend* and mapTimelineNow. -->
+    <string name="widget_rain_title">ฝนชั่วโมงถัดไป</string>
+    <string name="widget_rain_scattered">อาจมีฝนตกประปราย</string>
+    <string name="widget_rain_light_sustained">ฝนตกเล็กน้อยต่อเนื่องตลอดชั่วโมงหน้า</string>
+    <string name="widget_rain_light_stopping">คาดว่าฝนจะหยุดในอีก %1$d นาที</string>
+    <string name="widget_rain_heavy_sustained">ฝนตกหนักต่อเนื่องตลอดชั่วโมงหน้า</string>
+    <string name="widget_rain_heavy_stopping">คาดว่าฝนตกหนักจะหยุดในอีก %1$d นาที</string>
+    <string name="widget_rain_now">ตอนนี้</string>
+    <string name="widget_rain_minute">%1$d นาที</string>
 </resources>

@@ -55,4 +55,14 @@
     <string name="widget_compact_location">Tanpa lokasi</string>
     <string name="widget_compact_details">Buka aplikasi untuk informasi cuaca lengkap</string>
     <string name="widget_compact_attention">Buka app</string>
+
+    <!-- The next-hour rain chart; texts are the app's homeRainTrend* and mapTimelineNow. -->
+    <string name="widget_rain_title">Hujan 1 jam ke depan</string>
+    <string name="widget_rain_scattered">Kemungkinan hujan ringan</string>
+    <string name="widget_rain_light_sustained">Hujan ringan berlanjut selama 1 jam ke depan</string>
+    <string name="widget_rain_light_stopping">Hujan ringan diperkirakan berhenti dalam %1$d menit</string>
+    <string name="widget_rain_heavy_sustained">Hujan deras berlanjut selama 1 jam ke depan</string>
+    <string name="widget_rain_heavy_stopping">Hujan deras diperkirakan berhenti dalam %1$d menit</string>
+    <string name="widget_rain_now">Sekarang</string>
+    <string name="widget_rain_minute">%1$d mnt</string>
 </resources>

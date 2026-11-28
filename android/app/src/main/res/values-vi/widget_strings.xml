@@ -55,4 +55,14 @@
     <string name="widget_compact_location">Mất vị trí</string>
     <string name="widget_compact_details">Mở ứng dụng để xem đầy đủ thông tin thời tiết</string>
     <string name="widget_compact_attention">Mở ứng dụng</string>
+
+    <!-- The next-hour rain chart; texts are the app's homeRainTrend* and mapTimelineNow. -->
+    <string name="widget_rain_title">Mưa 1 giờ tới</string>
+    <string name="widget_rain_scattered">Có thể có mưa rào nhẹ</string>
+    <string name="widget_rain_light_sustained">Mưa nhỏ tiếp diễn trong 1 giờ tới</string>
+    <string name="widget_rain_light_stopping">Mưa nhỏ có thể tạnh trong %1$d phút nữa</string>
+    <string name="widget_rain_heavy_sustained">Mưa lớn tiếp diễn trong 1 giờ tới</string>
+    <string name="widget_rain_heavy_stopping">Mưa lớn có thể tạnh trong %1$d phút nữa</string>
+    <string name="widget_rain_now">Bây giờ</string>
+    <string name="widget_rain_minute">%1$d phút</string>
 </resources>

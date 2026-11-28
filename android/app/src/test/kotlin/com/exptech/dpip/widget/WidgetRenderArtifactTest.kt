@@ -66,7 +66,6 @@ class WidgetRenderArtifactTest {
         )
         store.writeInstance(instanceId, WidgetAddress.Saved("407"), "407", 1L)
         store.commitCurrentWeather(
-            store.beginCurrentWeatherWrite(WidgetAddress.Saved("407"))!!,
             CurrentWeatherSnapshot(
                 schemaVersion = 7,
                 sourceIdentifier = "region:407",
@@ -90,7 +89,6 @@ class WidgetRenderArtifactTest {
             writtenAt = 1L,
         )
         store.commitForecast(
-            token = store.beginForecastWrite(WidgetAddress.Saved("407"))!!,
             forecast = ForecastSnapshot(
                 schemaVersion = 1,
                 sourceIdentifier = "region:407",
@@ -297,7 +295,6 @@ class WidgetRenderArtifactTest {
             Triple("missing", null, null),
         )) {
             store.commitCurrentWeather(
-                store.beginCurrentWeatherWrite(address)!!,
                 stored.snapshot.copy(humidity = humidity, rain = rain),
                 writtenAt = 1L,
             )
@@ -307,7 +304,7 @@ class WidgetRenderArtifactTest {
 
     @Test
     @Config(sdk = [31, 35])
-    fun `exact launcher boxes drive child layouts and shared forecast demand`() {
+    fun `exact launcher boxes drive child layouts and the resize forecast check`() {
         val boxes = arrayListOf(android.util.SizeF(130f, 220f), android.util.SizeF(269f, 117f),
             android.util.SizeF(320f, 172f), android.util.SizeF(320f, 344f))
         WidgetUpdater.optionsProvider = { _, _ -> Bundle().apply {
@@ -315,8 +312,9 @@ class WidgetRenderArtifactTest {
             putInt(android.appwidget.AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH, 110)
             putInt(android.appwidget.AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, 110)
         } }
-        assertTrue("medium child must have its source forecast fetched",
-            WidgetUpdater.needsForecast(context, WidgetAddress.Saved("407")))
+        val manager = android.appwidget.AppWidgetManager.getInstance(context)
+        fun largest() = WidgetSizes.largestClass(context, WidgetUpdater.optionsProvider(manager, instanceId))
+        assertTrue("a wide child must count as forecast-drawing", largest() != WidgetSizeClass.Small)
         val remote = WidgetUpdater.render(context, android.appwidget.AppWidgetManager.getInstance(context), instanceId)
         for (box in boxes) {
             // Invoke the framework's host selection, not our own map lookup.
@@ -342,10 +340,11 @@ class WidgetRenderArtifactTest {
             view.draw(Canvas(bitmap))
             write("exact-${box.width.toInt()}x${box.height.toInt()}", bitmap)
         }
-        // Resizing down removes demand through the same authority, without stale size caching.
+        // Resizing down is read through the same authority, without stale size caching.
         boxes.clear()
         boxes.add(android.util.SizeF(130f, 455f))
-        assertTrue(!WidgetUpdater.needsForecast(context, WidgetAddress.Saved("407")))
+        assertEquals(WidgetSizeClass.Small, largest())
+        assertTrue(!WidgetUpdater.needsForecast(context, instanceId))
         write("narrow-tall-balanced", render(130, 455))
         val view = WidgetRenderer.render(context, WidgetUpdater.presentation(context, instanceId, 130, 455), instanceId)
             .apply(context, FrameLayout(context))

@@ -47,10 +47,10 @@ class WidgetDeadlinesTest {
     )
 
     @Test
-    fun `staleness is thirty minutes after the observation, in calibrated time`() {
+    fun `staleness is an hour after the observation, in calibrated time`() {
         val observation = atTaipei(14, 0) / 1_000
         assertEquals(
-            observation * 1_000 + 30 * 60 * 1_000,
+            observation * 1_000 + 60 * 60 * 1_000,
             WidgetDeadlines.staleness(snapshot(observation)),
         )
     }
@@ -121,7 +121,7 @@ class WidgetDeadlinesTest {
     @Test
     fun `the next change is the earliest boundary still in the future`() {
         val observation = atTaipei(14, 0) / 1_000
-        // The transition is twenty minutes away; staleness is thirty.
+        // The transition is twenty minutes away; staleness is an hour.
         val entry = snapshot(observation, nextTransitionSeconds = observation + 20 * 60)
 
         assertEquals(
@@ -130,27 +130,44 @@ class WidgetDeadlinesTest {
         )
         // Past the transition, staleness is the next thing to happen.
         assertEquals(
-            observation * 1_000 + 30 * 60 * 1_000,
+            observation * 1_000 + 60 * 60 * 1_000,
             WidgetDeadlines.nextChange(entry, null, atTaipei(14, 21)),
         )
         // Past both, nothing will change on its own.
-        assertNull(WidgetDeadlines.nextChange(entry, null, atTaipei(14, 31)))
+        assertNull(WidgetDeadlines.nextChange(entry, null, atTaipei(15, 1)))
     }
 
     @Test
     fun `forecast expiry is scheduled after an already stale observation`() {
         val observation = atTaipei(14, 0) / 1_000
-        val forecast = storedForecast(atTaipei(15, 0))
-        // Staleness is 14:30 and the forecast expires at 15:00, so staleness wins.
+        val forecast = storedForecast(atTaipei(15, 30))
+        // Staleness is 15:00 and the forecast expires at 15:30, so staleness wins.
         assertEquals(
-            observation * 1_000 + 30 * 60 * 1_000,
+            observation * 1_000 + 60 * 60 * 1_000,
             WidgetDeadlines.nextChange(snapshot(observation), forecast, atTaipei(14, 0)),
         )
         // Once the observation is stale, the forecast expiry is the next change.
         assertEquals(
-            atTaipei(15, 0),
-            WidgetDeadlines.nextChange(snapshot(observation), forecast, atTaipei(14, 31)),
+            atTaipei(15, 30),
+            WidgetDeadlines.nextChange(snapshot(observation), forecast, atTaipei(15, 1)),
         )
+    }
+
+    @Test
+    fun `only ageing data is a reason to fetch, not the sun`() {
+        val observation = atTaipei(14, 0) / 1_000
+        val entry = snapshot(observation, nextTransitionSeconds = atTaipei(14, 20) / 1_000)
+
+        // The day/night flip is the next change, but not the next refetch.
+        assertEquals(atTaipei(14, 20), WidgetDeadlines.nextChange(entry, null, atTaipei(14, 0)))
+        assertEquals(atTaipei(15, 0), WidgetDeadlines.nextRefetch(entry, null, atTaipei(14, 0)))
+        // An expiring forecast is one.
+        assertEquals(
+            atTaipei(14, 40),
+            WidgetDeadlines.nextRefetch(entry, storedForecast(atTaipei(14, 40)), atTaipei(14, 0)),
+        )
+        // Past both, there is nothing left to fetch for on schedule.
+        assertNull(WidgetDeadlines.nextRefetch(entry, storedForecast(atTaipei(14, 40)), atTaipei(15, 0)))
     }
 
     @Test

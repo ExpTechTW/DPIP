@@ -330,6 +330,9 @@
         android:baselineAligned="false"
         android:orientation="horizontal" />
 
+    <!-- The next hour's rain, shown instead of the hourly row when it rains. -->
+    <include layout="@layout/widget_rain_chart" />
+
     <!-- ======================================= -->
     <!-- DETAILS: the large layout's first row   -->
     <!-- ======================================= -->

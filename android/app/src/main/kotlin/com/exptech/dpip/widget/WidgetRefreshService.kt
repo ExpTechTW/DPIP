@@ -9,15 +9,6 @@ enum class WidgetRefreshResult {
     NoObservation,
     Unavailable,
     Failed,
-
-    /**
-     * The run was stopped before it could land anything.
-     *
-     * Its own result, not `Superseded`: nothing was attempted, so there is no
-     * ordering to report — and the worker must not treat it as a transient
-     * failure worth retrying, because the replacement run is the retry.
-     */
-    Cancelled,
 }
 
 /** Where an address's query point comes from, or why it has none. */
@@ -32,43 +23,30 @@ sealed interface LocationResolution {
 }
 
 /**
- * One refresh of one address: reserve, calibrate, resolve, fetch, order, commit.
+ * One refresh of one address: acquire, calibrate, resolve, fetch, commit.
  *
  * The shape is iOS's `CurrentWeatherWidgetRefreshPipeline` plus the resolution
  * in front of it, with three rules that are the difference between a correct
  * widget and a subtly wrong one:
  *
- * * **The write token is reserved first, before any other work.** `beginWrite`
- *   is the first statement, ahead of the clock's UDP exchange, the location fix
- *   and the HTTP fetch. Reserving later — as the first version did, after the
- *   clock — left a window in which a `clear`, a reconfigure or a *newer*
- *   refresh for the same address could complete, and this refresh would then
- *   hold a *higher* generation and be accepted on arrival, resurrecting data
- *   that had been cleared or overwriting a township the device had moved to.
- *   The token is the refresh's identity; it has to exist before the refresh can
- *   be overtaken.
- * * **The forecast refresh is bound to the same identity.** Its token is
- *   reserved in the same breath, so a clear that lands during the current-
- *   weather fetch fences both, and a forecast for a township the user has left
- *   cannot be committed after the current weather has refused to move. Whether
- *   the ticket is spent is decided *after* the position resolves, because only
- *   then is the township known.
+ * * **The acquisition number is taken first**, ahead of the clock exchange, the
+ *   location fix and the fetch. It is the refresh's place in line against a
+ *   snapshot the app publishes meanwhile (see `WidgetStore`); taken after the
+ *   fix, a position from before a move could outrank the township the app has
+ *   since published.
  * * **The clock does not wait for the position.** A device that grants only
- *   foreground location still has a fresh observation published by the app, and
- *   the screen can only judge it fresh if the process holds a calibrated anchor.
- *   Calibrating after the position meant a degraded fix returned first and every
- *   screen then said "outdated" for ever.
- * * **A stopped run lands nothing.** The optional `isCancelled` signal is
- *   checked before each expensive step and again inside the commit's own
- *   transaction, so a run whose replacement `REPLACE` already queued cannot
- *   fetch, commit, clear the new demand or re-arm the schedule.
+ *   foreground location still has a fresh observation published by the app,
+ *   and the screen can only judge it fresh if the process holds a calibrated
+ *   anchor. Calibrating after the position meant a degraded fix returned first
+ *   and every screen then said "outdated" for ever.
+ * * **The forecast is decided after the position resolves.** A cached forecast
+ *   can look usable — matching township, inside its deadline — and still belong
+ *   to the township the device has just left; only the resolved township can
+ *   answer whether it is the right one.
  *
  * Dependencies are injected so the ordering is testable with a controllable
- * fetcher: `WidgetRefreshServiceTest` holds one refresh inside its fetch, clears
- * the cache underneath it, and asserts the commit is refused.
- *
- * Blocking by design: it runs on a WorkManager worker thread (or the channel's
- * IO thread), never on the main thread.
+ * fetcher. Blocking by design: it runs on a WorkManager worker thread, never on
+ * the main thread.
  */
 class WidgetRefreshService(
     private val context: Context,
@@ -79,71 +57,30 @@ class WidgetRefreshService(
     private val fetchWeather: (Double, Double) -> RemoteCurrentWeather?,
     private val fetchForecast: (String) -> RemoteForecast,
     private val nowMilliseconds: () -> Long,
+    /**
+     * The next hour's rain for a township, decoded against the calibrated
+     * instant it is given (a dry hour starts at its minute). Throws on any
+     * failure, a malformed response included.
+     */
+    private val fetchRainTrend: (String, Long) -> RainHourTrend = { _, _ -> throw WidgetHttpException("no rain source") },
     /** The trusted clock, read at commit time so a receipt is dated when it arrives. */
     private val calibratedNowMilliseconds: () -> Long? = { WidgetClock.calibratedNowMilliseconds() },
 ) {
-    fun refresh(
-        address: WidgetAddress,
-        includeForecast: Boolean,
-        /**
-         * The forecast-demand version observed before this run started, if any.
-         *
-         * Passed through to the commit, which clears the demand only while the
-         * version still matches: a resize that raised a newer demand while this
-         * fetch was in flight must not be answered by it.
-         */
-        answeredDemandVersion: Long? = null,
-        /**
-         * Whether the run that owns this refresh has already been stopped.
-         *
-         * Cancelling a `WorkInfo` — which is what `ExistingWorkPolicy.REPLACE`
-         * does to the run it replaces — does not interrupt a blocking worker, so
-         * a run can be stopped while it is parked inside its own fetch. Without
-         * this signal that run would still commit, clear the *replacement's*
-         * forecast demand and re-arm the schedule. Checked before every
-         * expensive step and again inside the commit's own transaction, so a
-         * stopped run leaves nothing behind for the run that replaced it.
-         */
-        isCancelled: () -> Boolean = { false },
-    ): WidgetRefreshResult {
-        if (isCancelled()) return WidgetRefreshResult.Cancelled
-
-        // ── The refresh's identity, reserved before anything can overtake it ──
-        //
-        // Both tickets in one transaction: two reservations would leave a window
-        // in which a `clearForecast` fences the first token but not the second,
-        // and this refresh would then hold a fresh forecast ticket for a response
-        // it had already begun fetching.
-        val tokens = store.beginRefreshWrites(address, includeForecast)
-        if (tokens == null) {
-            WidgetLog.error(context, "refresh rejected source=${address.sourceIdentifier} reason=no-token")
+    fun refresh(address: WidgetAddress): WidgetRefreshResult {
+        val acquisition = store.beginAcquisition(address)
+        if (acquisition == null) {
+            WidgetLog.error(context, "refresh rejected source=${address.sourceIdentifier} reason=no-acquisition")
             return WidgetRefreshResult.Failed
         }
-        val currentToken = tokens.currentWeather
-        val forecastToken = tokens.forecast
 
         // ── Calibration, before the position ──
         //
-        // The clock must not depend on a background fix. A device that grants
-        // only foreground location still has a fresh observation published by
-        // the app, and the screen can only say whether it is fresh if the clock
-        // is anchored. Calibrating *after* the position meant a degraded fix
-        // returned before the exchange had run, so the process held no anchor
-        // and every screen it drew called the observation outdated for ever.
-        if (!synchronizeClock()) {
-            WidgetLog.warning(context, "clock unavailable source=${address.sourceIdentifier}")
-            return WidgetRefreshResult.Unavailable
-        }
-        val time = snapshotTime()
-            ?: return WidgetRefreshResult.Unavailable
-
-        if (isCancelled()) {
-            WidgetLog.info(
-                context,
-                "refresh stopped source=${address.sourceIdentifier} before its position",
-            )
-            return WidgetRefreshResult.Cancelled
-        }
+        // A failure is not a reason to stop: an anchor from an earlier sync —
+        // this process's or the one restored from disk — still answers, and
+        // with none at all the observation is still fetched and committed
+        // (below) rather than thrown away.
+        val calibrated = synchronizeClock()
+        if (!calibrated) WidgetLog.warning(context, "clock unavailable source=${address.sourceIdentifier}")
 
         // ── The query point ──
         val location = when (val resolution = resolveAddress(address)) {
@@ -157,17 +94,9 @@ class WidgetRefreshService(
             }
 
             is LocationResolution.Degraded -> {
-                // Recorded immediately as well as at commit time, so a refresh
-                // that dies before its commit still leaves the reason on screen.
-                // Carries this acquisition's generation, so an older refresh
-                // finishing later cannot put the warning back after a newer one
-                // succeeded — nor clear a newer revocation (see the store).
-                store.writeLocationState(
-                    address = address,
-                    degradation = resolution.degradation,
-                    generation = currentToken.generation,
-                    updatedAt = nowMilliseconds(),
-                )
+                // Recorded now, so the reason is on screen even though nothing
+                // is committed; the cached observation stays.
+                store.writeLocationState(address, resolution.degradation, nowMilliseconds())
                 WidgetLog.warning(
                     context,
                     "position degraded source=${address.sourceIdentifier} " +
@@ -177,20 +106,9 @@ class WidgetRefreshService(
             }
 
             LocationResolution.Unavailable -> {
-                WidgetLog.warning(
-                    context,
-                    "position unavailable source=${address.sourceIdentifier}",
-                )
+                WidgetLog.warning(context, "position unavailable source=${address.sourceIdentifier}")
                 return WidgetRefreshResult.Unavailable
             }
-        }
-
-        if (isCancelled()) {
-            WidgetLog.info(
-                context,
-                "refresh stopped source=${address.sourceIdentifier} before its weather fetch",
-            )
-            return WidgetRefreshResult.Cancelled
         }
 
         // ── The observation ──
@@ -206,21 +124,14 @@ class WidgetRefreshService(
             return WidgetRefreshResult.Failed
         } ?: return WidgetRefreshResult.NoObservation
 
-        // The stop can land while the fetch is in flight, and a blocking fetch is
-        // not interrupted by it: check again before doing anything with the answer.
-        if (isCancelled()) {
-            WidgetLog.info(
-                context,
-                "refresh stopped source=${address.sourceIdentifier} after its fetch",
-            )
-            return WidgetRefreshResult.Cancelled
-        }
-
-        val snapshot = snapshot(observation, location, time)
+        // With no anchor at all the observation's own server instant stands in
+        // for "now": it decides only the day/night glyph, and the screen still
+        // calls the reading unverified until a clock is anchored.
+        val time = snapshotTime() ?: WidgetSnapshotTime(observation.time * 1_000, 0)
         val committed = store.commitCurrentWeather(
-            token = currentToken,
-            snapshot = snapshot,
+            snapshot = snapshot(observation, location, time),
             writtenAt = nowMilliseconds(),
+            acquisition = acquisition,
             // Only a commit that lands may declare the position trustworthy:
             // clearing it as soon as a fix was obtained left a widget claiming a
             // current position whose observation had never been stored.
@@ -229,90 +140,38 @@ class WidgetRefreshService(
             } else {
                 LocationStateWrite.Keep
             },
-            // Re-checked *inside* the transaction, not merely before entering it:
-            // a stop that lands after the check but before the write must still
-            // not produce a snapshot the replacement run is about to supersede.
-            isStillValid = { !isCancelled() },
         )
-
         if (committed != WidgetWriteResult.Written) {
             WidgetLog.info(
                 context,
-                "write not committed source=${address.sourceIdentifier} " +
-                    "result=${committed.name.lowercase()}",
+                "write not committed source=${address.sourceIdentifier} result=${committed.name.lowercase()}",
             )
-            return when (committed) {
-                WidgetWriteResult.Failed -> WidgetRefreshResult.Failed
-                WidgetWriteResult.Superseded -> WidgetRefreshResult.Superseded
-                WidgetWriteResult.Written -> WidgetRefreshResult.Refreshed
-            }
+            return if (committed == WidgetWriteResult.Failed) WidgetRefreshResult.Failed else WidgetRefreshResult.Superseded
         }
 
-        if (forecastToken != null) {
-            refreshForecast(location, forecastToken, answeredDemandVersion, isCancelled)
-        }
-        return WidgetRefreshResult.Refreshed
+        refreshForecast(location)
+        refreshRain(location)
+        // Committed, but with no anchor the screen cannot call it fresh: a
+        // bounded retry is the quickest way to an anchor.
+        return if (calibrated) WidgetRefreshResult.Refreshed else WidgetRefreshResult.Failed
     }
 
     /**
-     * The forecast for a township, committed under the token reserved at the
-     * start of the same refresh.
+     * The forecast for the township this round resolved to.
      *
-     * A forecast failure never downgrades the current-weather result: the
-     * observation is already committed, and the layout hides a forecast it
-     * cannot trust while continuing to show the observation.
-     *
-     * The decision to fetch at all is made **here**, after the position
-     * resolved, and not before the tickets were reserved. A cached forecast can
-     * look perfectly usable — matching township, inside its deadline — and still
-     * belong to the township the device has just left. The cache only knew the
-     * township of the *previous* observation, so asking it whether "the"
-     * forecast is usable answers a question about A while this refresh is about
-     * B, and B is then left with no forecast until the next period. The ticket
-     * is reserved before the position so that a `clear` cannot slip between the
-     * two; whether it is spent is decided once the township is known.
+     * Fetched for every address, whatever size its instances are: a forecast
+     * lives for at most an hour, and having it already is what lets a resize to
+     * a wider cell draw it at once. A forecast failure never downgrades the
+     * current-weather result — the observation is already committed, and the
+     * layout hides a forecast it cannot trust while continuing to show it.
      */
-    private fun refreshForecast(
-        location: ResolvedWeatherLocation,
-        token: WidgetWriteToken,
-        answeredDemandVersion: Long?,
-        isCancelled: () -> Boolean,
-    ) {
-        // A forecast for the township this round resolved to, still inside its
-        // recorded deadline, is already what the widget needs.
+    private fun refreshForecast(location: ResolvedWeatherLocation) {
         val cached = store.readForecast(location.address)
-        if (cached != null && cached.forecast.regionCode == location.regionCode) {
-            val calibratedNow = calibratedNowMilliseconds()
-            if (calibratedNow != null && calibratedNow < cached.expiresAtMilliseconds) {
-                WidgetLog.debug(
-                    context,
-                    "forecast kept region=${location.regionCode}",
-                )
-                // The cache *is* the answer to the demand this run was dispatched
-                // for, so retire it here. `commitForecast` is the only other place
-                // that clears it and this return never reaches it; left raised, the
-                // flag survives every later options change and keeps reserving a
-                // ticket for a forecast that is already stored.
-                //
-                // Not guarded by `isCancelled`, unlike the commit: what answers
-                // the demand here is the stored forecast, which this run neither
-                // produced nor can lose. A stopped run leaves it just as answered.
-                if (answeredDemandVersion != null) {
-                    store.clearAnsweredForecastDemand(
-                        address = location.address,
-                        answeredDemandVersion = answeredDemandVersion,
-                        updatedAt = nowMilliseconds(),
-                    )
-                }
-                return
-            }
-        }
-
-        if (isCancelled()) {
-            WidgetLog.info(
-                context,
-                "refresh stopped source=${token.sourceIdentifier} before its forecast",
-            )
+        val calibratedNow = calibratedNowMilliseconds()
+        if (cached != null && cached.forecast.regionCode == location.regionCode &&
+            calibratedNow != null && calibratedNow < cached.expiresAtMilliseconds
+        ) {
+            WidgetLog.debug(context, "forecast kept region=${location.regionCode}")
             return
         }
 
@@ -327,50 +186,50 @@ class WidgetRefreshService(
         }
         if (remote.points.isEmpty()) return
 
-        // The stop can land while this fetch is in flight too.
-        if (isCancelled()) {
-            WidgetLog.info(
-                context,
-                "refresh stopped source=${token.sourceIdentifier} after its forecast fetch",
-            )
-            return
-        }
-
         val receivedAt = nowMilliseconds()
         // Read *after* the response, not before the request: the receipt is when
         // the answer arrived, and a fetch that crosses a Taipei hour would
         // otherwise be dated to a moment that has already expired.
-        val receivedCalibrated = calibratedNowMilliseconds()
-            ?: return
-        val snapshot = ForecastSnapshot(
-            schemaVersion = WidgetSnapshotDecoder.forecastSchemaVersion,
-            sourceIdentifier = token.sourceIdentifier,
-            regionCode = location.regionCode,
-            updateTime = remote.updateTime,
-            receivedAt = receivedAt,
-            points = remote.points,
-        )
-        // The receipt is fixed in *calibrated* time now, and so is the deadline
-        // derived from it. A later refresh's offset must never be applied to this
-        // historical receipt: doing so is what let an expired forecast come back
-        // after the device clock moved.
-        val expiresAt = WidgetDeadlines.forecastExpiry(
-            updateTimeMilliseconds = remote.updateTime,
-            receivedCalibratedMilliseconds = receivedCalibrated,
-        )
-        // The demand is cleared by the commit itself, in the same transaction
-        // and only if its version still matches — see `WidgetStore.commitForecast`.
-        // `isStillValid` is what stops a *stopped* run clearing the demand the
-        // run that replaced it is about to answer.
+        val receivedCalibrated = calibratedNowMilliseconds() ?: return
+        // The deadline is fixed in calibrated time now. A later refresh's offset
+        // must never be applied to this historical receipt: doing so is what let
+        // an expired forecast come back after the device clock moved.
         store.commitForecast(
-            token = token,
-            forecast = snapshot,
+            forecast = ForecastSnapshot(
+                schemaVersion = WidgetSnapshotDecoder.forecastSchemaVersion,
+                sourceIdentifier = location.address.sourceIdentifier,
+                regionCode = location.regionCode,
+                updateTime = remote.updateTime,
+                receivedAt = receivedAt,
+                points = remote.points,
+            ),
             receivedCalibratedMilliseconds = receivedCalibrated,
-            expiresAtMilliseconds = expiresAt,
+            expiresAtMilliseconds = WidgetDeadlines.forecastExpiry(
+                updateTimeMilliseconds = remote.updateTime,
+                receivedCalibratedMilliseconds = receivedCalibrated,
+            ),
             writtenAt = receivedAt,
-            answeredDemandVersion = answeredDemandVersion,
-            isStillValid = { !isCancelled() },
         )
+    }
+
+    /**
+     * The next hour's rain for the township this round resolved to.
+     *
+     * Fetched on every refresh that landed its observation: it is a nowcast,
+     * and an hour-old one is the chart the presenter refuses to draw. A failure
+     * keeps the previous trend, which the presenter draws only while its own
+     * hour lasts and only under an observation for the same township; a
+     * malformed response is a failure too, never a dry hour.
+     */
+    private fun refreshRain(location: ResolvedWeatherLocation) {
+        val calibratedNow = calibratedNowMilliseconds() ?: return
+        val trend = try {
+            fetchRainTrend(location.regionCode, calibratedNow)
+        } catch (error: Exception) {
+            WidgetLog.warning(context, "rain failed region=${location.regionCode} error=${error.logName()}")
+            return
+        }
+        store.commitRainTrend(location.regionCode, trend, nowMilliseconds())
     }
 
     /** Builds the schema-v7 snapshot, identically to the iOS factory. */
@@ -426,6 +285,7 @@ class WidgetRefreshService(
          */
         fun create(context: Context): WidgetRefreshService {
             val applicationContext = context.applicationContext
+            WidgetClock.attach(applicationContext)
             val store = WidgetStore.open(applicationContext)
             return WidgetRefreshService(
                 context = applicationContext,
@@ -437,6 +297,7 @@ class WidgetRefreshService(
                     WidgetHttp.fetchCurrentWeather(latitude, longitude)
                 },
                 fetchForecast = { regionCode -> WidgetHttp.fetchForecast(regionCode) },
+                fetchRainTrend = { regionCode, calibratedNow -> WidgetHttp.fetchRainTrend(regionCode, calibratedNow) },
                 nowMilliseconds = { System.currentTimeMillis() },
             )
         }

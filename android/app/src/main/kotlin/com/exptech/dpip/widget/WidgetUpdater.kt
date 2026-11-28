@@ -4,77 +4,102 @@ import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
 import android.os.Bundle
+import android.util.SizeF
 import android.widget.RemoteViews
 import com.exptech.dpip.R
 
 /**
  * Turns cached state into launcher layouts for each actual content box.
- * Rendering and forecast demand use the same size authority [WidgetSizes].
+ * Rendering and the resize check use the same size authority [WidgetSizes].
  */
 object WidgetUpdater {
 
+    /**
+     * Re-renders every instance the launcher has.
+     *
+     * The one render that knows every instance, so it is the one that decides
+     * whether the rain chart's five-minute redraw keeps running
+     * ([WidgetRainTicker]); a partial render can only start it.
+     */
     fun updateAll(context: Context) {
         val manager = managerOrNull(context) ?: return
-        for (id in liveAppWidgetIds(context, manager)) updateInstance(context, manager, id)
+        var chart = false
+        for (id in liveAppWidgetIds(context, manager)) chart = updateInstance(context, manager, id) or chart
+        if (chart) WidgetRainTicker.arm(context) else WidgetRainTicker.cancel(context)
     }
 
     fun updateInstance(context: Context, appWidgetId: Int) {
-        updateInstance(context, managerOrNull(context) ?: return, appWidgetId)
+        if (updateInstance(context, managerOrNull(context) ?: return, appWidgetId)) WidgetRainTicker.arm(context)
+    }
+
+    /** Re-renders every instance of one address from the cache. */
+    fun updateAddress(context: Context, address: WidgetAddress) {
+        val manager = managerOrNull(context) ?: return
+        var chart = false
+        for (instance in WidgetStore.open(context).readInstances()) {
+            if (instance.address.sourceIdentifier == address.sourceIdentifier) {
+                chart = updateInstance(context, manager, instance.appWidgetId) or chart
+            }
+        }
+        if (chart) WidgetRainTicker.arm(context)
     }
 
     /**
      * `AppWidgetManager` when the device has one.
      *
      * `getInstance` is documented to return null without `FEATURE_APP_WIDGETS` —
-     * Android TV, Automotive, some work profiles — and Kotlin turns that into an
-     * NPE at the assignment, not at the call that needed it. Every entry point
-     * here is reached from a Flutter channel task or a `BroadcastReceiver`, where
-     * an escaping throw costs more than the redraw: the channel's reply is the
-     * future Dart's publish chain is waiting on. Nothing to draw on such a device
-     * is the correct outcome, so this answers null and the callers return.
+     * Android TV, Automotive, some work profiles. Nothing to draw on such a
+     * device is the correct outcome, so this answers null and the callers return.
      */
     private fun managerOrNull(context: Context): AppWidgetManager? =
         AppWidgetManager.getInstance(context)
 
+    /** Submits one instance's views; true when any of its boxes drew a rain chart. */
     private fun updateInstance(
         context: Context,
         manager: AppWidgetManager,
         appWidgetId: Int,
-    ) {
-        try {
-            manager.updateAppWidget(appWidgetId, render(context, manager, appWidgetId))
+    ): Boolean {
+        return try {
+            val (views, chart) = build(context, manager, appWidgetId)
+            manager.updateAppWidget(appWidgetId, views)
+            chart
         } catch (error: Exception) {
             // A launcher that has already removed the instance throws here; that
             // is not a failure worth propagating into a worker result.
-            WidgetLog.warning(
-                context,
-                "update failed id=$appWidgetId error=${error.logName()}",
-            )
+            WidgetLog.warning(context, "update failed id=$appWidgetId error=${error.logName()}")
+            false
         }
     }
 
-    /** The `RemoteViews` for an instance, from the cache only — no network. */
-    fun render(context: Context, manager: AppWidgetManager, appWidgetId: Int): RemoteViews {
+    /**
+     * The `RemoteViews` for an instance, from the cache only — no network.
+     *
+     * The store is read once per instance; each launcher box then only lays the
+     * same data out at its own size, all against one calibrated instant.
+     */
+    fun render(context: Context, manager: AppWidgetManager, appWidgetId: Int): RemoteViews =
+        build(context, manager, appWidgetId).first
+
+    private fun build(context: Context, manager: AppWidgetManager, appWidgetId: Int): Pair<RemoteViews, Boolean> {
         val options = optionsOf(manager, appWidgetId)
-        val boxes = WidgetSizes.boxes(options)
-        fun child(size: android.util.SizeF) = WidgetRenderer.render(
-            context, presentation(context, appWidgetId, size.width.toInt(), size.height.toInt()), appWidgetId,
-        )
-        if (android.os.Build.VERSION.SDK_INT >= 31) {
-            return RemoteViews(boxes.associateWith(::child))
+        val data = InstanceData.load(context, appWidgetId)
+        var chart = false
+        fun child(size: SizeF): RemoteViews {
+            val presentation = data.present(size.width.toInt(), size.height.toInt())
+            if (presentation.rainChart != null) chart = true
+            return WidgetRenderer.render(context, presentation, appWidgetId)
         }
-        if (boxes.size == 1) return child(boxes.first())
-        // Each rotation by name. Recovering the two from `boxes` by width cannot
-        // tell them apart when a launcher reports one width for both — see
-        // WidgetSizes.RotationBoxes.
-        val rotations = WidgetSizes.rotationBoxes(options)
-        return RemoteViews(child(rotations.landscape), child(rotations.portrait))
-    }
-
-    fun sizeClass(context: Context, appWidgetId: Int): WidgetSizeClass {
-        val manager = managerOrNull(context)
-            ?: return WidgetSizes.largestClass(context, Bundle())
-        return WidgetSizes.largestClass(context, optionsOf(manager, appWidgetId))
+        val boxes = WidgetSizes.boxes(options)
+        val views = when {
+            android.os.Build.VERSION.SDK_INT >= 31 -> RemoteViews(boxes.associateWith(::child))
+            boxes.size == 1 -> child(boxes.first())
+            // Each rotation by name. Recovering the two from `boxes` by width
+            // cannot tell them apart when a launcher reports one width for both
+            // — see WidgetSizes.RotationBoxes.
+            else -> WidgetSizes.rotationBoxes(options).let { RemoteViews(child(it.landscape), child(it.portrait)) }
+        }
+        return views to chart
     }
 
     fun presentation(
@@ -82,85 +107,100 @@ object WidgetUpdater {
         appWidgetId: Int,
         widthDp: Int,
         heightDp: Int,
-    ): WidgetPresentation {
-        val store = WidgetStore.open(context)
-        val fontScale = context.resources.configuration.fontScale
-        val sizeClass = WidgetPresenter.sizeClass(widthDp, heightDp, fontScale)
-        val instance = store.readInstance(appWidgetId)
+    ): WidgetPresentation = InstanceData.load(context, appWidgetId).present(widthDp, heightDp)
 
-        if (instance == null) {
+    /**
+     * Everything one instance's presentation reads, read once.
+     *
+     * The centroid comes from the catalog for a saved town and from the
+     * township directory for a Current Location (the snapshot names the
+     * township but does not carry its coordinates).
+     */
+    private class InstanceData(
+        private val context: Context,
+        private val address: WidgetAddress?,
+        private val locationName: String?,
+        private val stored: StoredCurrentWeather?,
+        private val forecast: StoredForecast?,
+        private val degradation: WidgetLocationDegradation?,
+        private val isCatalogMember: Boolean,
+        private val latitude: Double?,
+        private val longitude: Double?,
+        private val feedback: WidgetRefreshFeedback?,
+        private val calibratedNowMilliseconds: Long?,
+        private val rain: StoredRainTrend? = null,
+    ) {
+        private val strings = WidgetUpdater.strings(context)
+        private val fontScale = context.resources.configuration.fontScale
+
+        fun present(widthDp: Int, heightDp: Int): WidgetPresentation {
+            val sizeClass = WidgetPresenter.sizeClass(widthDp, heightDp, fontScale)
             return WidgetPresenter.present(
                 sizeClass = sizeClass,
-                strings = strings(context),
-                address = null,
-                locationName = null,
-                stored = null,
-                forecast = null,
-                locationDegradation = null,
-                isCatalogMember = false,
-                calibratedNowMilliseconds = WidgetClock.calibratedNowMilliseconds(),
-                latitude = null,
-                longitude = null,
+                strings = strings,
+                address = address,
+                locationName = locationName,
+                stored = stored,
+                forecast = if (sizeClass == WidgetSizeClass.Small) null else forecast,
+                locationDegradation = degradation,
+                isCatalogMember = isCatalogMember,
+                calibratedNowMilliseconds = calibratedNowMilliseconds,
+                latitude = latitude,
+                longitude = longitude,
                 availableWidthDp = widthDp,
                 availableHeightDp = heightDp,
                 fontScale = fontScale,
-            )
+                rain = rain,
+            ).copy(refreshFeedback = feedback)
         }
 
-        val address = instance.address
-        val catalogLookup = (address as? WidgetAddress.Saved)
-            ?.let { store.lookupCatalogLocation(it.regionCode) }
-        val catalogLocation = (catalogLookup as? WidgetCatalogLookup.Found)?.location
+        companion object {
+            fun load(context: Context, appWidgetId: Int): InstanceData {
+                val store = WidgetStore.open(context)
+                // The one trusted instant every box of this render reasons from,
+                // from the monotonic anchor rather than the wall clock — restored
+                // from disk when this process has just started.
+                WidgetClock.attach(context)
+                val calibratedNow = WidgetClock.calibratedNowMilliseconds()
+                val address = store.readInstance(appWidgetId)?.address
+                    ?: return InstanceData(
+                        context, null, null, null, null, null,
+                        isCatalogMember = false, latitude = null, longitude = null,
+                        feedback = null, calibratedNowMilliseconds = calibratedNow,
+                    )
 
-        val stored = store.readCurrentWeather(address)
-        val regionCode = stored?.snapshot?.regionCode ?: catalogLocation?.regionCode
-
-        // The centroid comes from the catalog for a saved town and from the
-        // township directory for a Current Location (the snapshot names the
-        // township but does not carry its coordinates).
-        val catalogCentroid = catalogLocation?.takeIf { it.regionCode == regionCode }
-        val township = if (catalogCentroid == null) {
-            regionCode?.let { townshipResolver(context)?.township(it) }
-        } else {
-            null
+                val catalogLookup = (address as? WidgetAddress.Saved)
+                    ?.let { store.lookupCatalogLocation(it.regionCode) }
+                val catalogLocation = (catalogLookup as? WidgetCatalogLookup.Found)?.location
+                val stored = store.readCurrentWeather(address)
+                val regionCode = stored?.snapshot?.regionCode ?: catalogLocation?.regionCode
+                val catalogCentroid = catalogLocation?.takeIf { it.regionCode == regionCode }
+                val township = if (catalogCentroid == null) {
+                    regionCode?.let { townshipResolver(context)?.township(it) }
+                } else {
+                    null
+                }
+                return InstanceData(
+                    context = context,
+                    address = address,
+                    locationName = stored?.snapshot?.regionName ?: catalogLocation?.displayName,
+                    stored = stored,
+                    forecast = store.readForecast(address),
+                    // A degradation is only meaningful for a position the app
+                    // resolves itself; a saved town has no fix to distrust.
+                    degradation = if (address is WidgetAddress.CurrentLocation) store.readLocationState(address) else null,
+                    // Only a catalog that was *read* and does not contain this
+                    // town means the user deleted it. A failed read keeps the
+                    // Widget presentable, and keeps the refresh that recovers it.
+                    isCatalogMember = catalogLookup !is WidgetCatalogLookup.Absent,
+                    latitude = catalogCentroid?.latitude ?: township?.latitude,
+                    longitude = catalogCentroid?.longitude ?: township?.longitude,
+                    feedback = store.readRefreshFeedback(address, System.currentTimeMillis())?.state,
+                    calibratedNowMilliseconds = calibratedNow,
+                    rain = stored?.snapshot?.regionCode?.let(store::readRainTrend),
+                )
+            }
         }
-        val latitude = catalogCentroid?.latitude ?: township?.latitude
-        val longitude = catalogCentroid?.longitude ?: township?.longitude
-
-        val locationName = stored?.snapshot?.regionName
-            ?: catalogLocation?.displayName
-
-        val presentation = WidgetPresenter.present(
-            sizeClass = sizeClass,
-            strings = strings(context),
-            address = address,
-            locationName = locationName,
-            stored = stored,
-            forecast = if (sizeClass == WidgetSizeClass.Small) null else store.readForecast(address),
-            // A degradation is only meaningful for a position the app resolves
-            // itself; a saved town has no fix to distrust.
-            locationDegradation = if (address is WidgetAddress.CurrentLocation) {
-                store.readLocationState(address)
-            } else {
-                null
-            },
-            // Only a catalog that was *read* and does not contain this town means
-            // the user deleted it. A failed read says nothing about membership, so
-            // it keeps the Widget presentable — and keeps the refresh button that
-            // recovers it — rather than demanding a reconfigure for a town that is
-            // very probably still saved.
-            isCatalogMember = catalogLookup !is WidgetCatalogLookup.Absent,
-            // The one trusted instant the presentation is allowed to reason
-            // from, from the monotonic anchor rather than the wall clock.
-            calibratedNowMilliseconds = WidgetClock.calibratedNowMilliseconds(),
-            latitude = latitude,
-            longitude = longitude,
-            availableWidthDp = widthDp,
-            availableHeightDp = heightDp,
-            fontScale = fontScale,
-        )
-        val feedback = store.readRefreshFeedback(address, System.currentTimeMillis())
-        return presentation.copy(refreshFeedback = feedback?.state)
     }
 
     fun strings(context: Context) = WidgetStrings(
@@ -180,113 +220,50 @@ object WidgetUpdater {
         locationDisabled = context.getString(R.string.widget_location_disabled),
         locationUnavailable = context.getString(R.string.widget_location_unavailable),
         locationOutside = context.getString(R.string.widget_location_outside),
+        rainScattered = context.getString(R.string.widget_rain_scattered),
+        rainLightSustained = context.getString(R.string.widget_rain_light_sustained),
+        rainLightStopping = context.getString(R.string.widget_rain_light_stopping),
+        rainHeavySustained = context.getString(R.string.widget_rain_heavy_sustained),
+        rainHeavyStopping = context.getString(R.string.widget_rain_heavy_stopping),
+        rainNow = context.getString(R.string.widget_rain_now),
+        rainMinute = context.getString(R.string.widget_rain_minute),
     )
 
-    /** Every address some instance is showing, in first-seen order. */
-    fun addresses(context: Context): List<WidgetAddress> =
-        WidgetStore.open(context).usedAddresses()
-
     /**
-     * Whether any instance for [address] is large enough to draw a forecast.
+     * Whether [appWidgetId] now draws a forecast the cache cannot give it.
      *
-     * Asked per address rather than per instance because the fetch is shared:
-     * a source with one compact and one wide instance is fetched once, and it
-     * needs the forecast because the wide one will draw it. A compact-only
-     * address never fetches one.
+     * Asked after a resize: a forecast is fetched with every refresh, but an
+     * instance that grew into a forecast-drawing size between refreshes should
+     * not wait a whole period for one.
      */
-    fun needsForecast(context: Context, address: WidgetAddress): Boolean {
+    fun needsForecast(context: Context, appWidgetId: Int): Boolean {
+        val manager = managerOrNull(context) ?: return false
+        if (WidgetSizes.largestClass(context, optionsOf(manager, appWidgetId)) == WidgetSizeClass.Small) return false
+        WidgetClock.attach(context)
         val store = WidgetStore.open(context)
-        return store.readInstances()
-            .filter { it.address.sourceIdentifier == address.sourceIdentifier }
-            .any { sizeClass(context, it.appWidgetId) != WidgetSizeClass.Small }
+        val address = store.readInstance(appWidgetId)?.address ?: return false
+        return !hasUsableForecast(store, address)
     }
 
     /**
-     * Records whether [address] wants a forecast it does not have, and answers
-     * whether it does.
-     *
-     * Called wherever an instance's size can change — a new instance, a resize, a
-     * reconfigure — **and on every refresh**, so the answer is re-derived each
-     * time rather than remembered once. "Has no forecast" is not the question: a
-     * stored forecast can be expired, can belong to the township the device has
-     * since left, or can carry no deadline this process is able to verify. Each
-     * of those means a fetch is wanted, and asking only about absence is what
-     * left a medium widget showing a forecast from the previous hour forever.
+     * Whether the cached forecast is one this Widget may keep showing: it
+     * belongs to the township the address shows now, and a trusted clock says
+     * its recorded deadline has not passed.
      */
-    fun refreshForecastDemand(context: Context, address: WidgetAddress): Boolean {
-        val store = WidgetStore.open(context)
-        val wanted = needsForecast(context, address) && !hasUsableForecast(context, store, address)
-        if (wanted) {
-            store.setForecastDemand(address, demand = true, updatedAt = System.currentTimeMillis())
-        }
-        return wanted || store.hasForecastDemand(address)
-    }
-
-    /**
-     * Whether a refresh for [address] should reserve a forecast ticket at all.
-     *
-     * Deliberately **not** "is the cached forecast unusable": a wide instance
-     * always reserves, because whether the cached forecast is the one *this
-     * round's* township needs can only be answered after the position resolves.
-     * The cache can only name the township of the previous observation, so a
-     * device walking from A to B holds a fresh A forecast that any check against
-     * A would call usable — and B would then wait a whole period. The reservation
-     * is made here; whether it is spent is decided after the resolve, in
-     * `WidgetRefreshService`.
-     *
-     * The durable demand still counts: a resize can raise it while a compact run
-     * is already in flight, and that run has no ticket to spend.
-     */
-    fun wantsForecast(context: Context, address: WidgetAddress): Boolean {
-        val store = WidgetStore.open(context)
-        return needsForecast(context, address) || store.hasForecastDemand(address)
-    }
-
-    /**
-     * Whether the cached forecast is one this Widget may keep showing.
-     *
-     * Three ways to fail, all of which mean "fetch again":
-     *
-     * * it belongs to a different township than the address resolves to now — a
-     *   Current Location that moved, or a saved town whose code was reused;
-     * * its recorded deadline has passed (or has not been reached yet, which is a
-     *   clock this process cannot vouch for);
-     * * there is no trusted clock at all, so freshness cannot be established.
-     */
-    fun hasUsableForecast(
-        context: Context,
-        store: WidgetStore,
-        address: WidgetAddress,
-    ): Boolean {
+    fun hasUsableForecast(store: WidgetStore, address: WidgetAddress): Boolean {
         val forecast = store.readForecast(address) ?: return false
-        val currentRegion = currentRegionCode(store, address) ?: return false
+        val currentRegion = when (address) {
+            is WidgetAddress.Saved -> address.regionCode
+            WidgetAddress.CurrentLocation -> store.readCurrentWeather(address)?.snapshot?.regionCode
+        } ?: return false
         if (forecast.regionCode != currentRegion) return false
         val calibratedNow = WidgetClock.calibratedNowMilliseconds() ?: return false
         return calibratedNow < forecast.expiresAtMilliseconds
     }
 
-    /** The township the address would query now, or null when it cannot be said. */
-    fun currentRegionCode(store: WidgetStore, address: WidgetAddress): String? = when (address) {
-        is WidgetAddress.Saved -> address.regionCode
-        WidgetAddress.CurrentLocation -> store.readCurrentWeather(address)?.snapshot?.regionCode
-    }
-
-    /** Re-renders every instance of one address from the cache. */
-    fun updateAddress(context: Context, address: WidgetAddress) {
-        val manager = managerOrNull(context) ?: return
-        for (instance in WidgetStore.open(context).readInstances()) {
-            if (instance.address.sourceIdentifier == address.sourceIdentifier) {
-                updateInstance(context, manager, instance.appWidgetId)
-            }
-        }
-    }
-
     /**
-     * The ids the launcher actually still has for this Widget.
-     *
-     * Empty on a device with no `AppWidgetManager` at all, which is the same
-     * answer as a device that has one and holds no instances — see
-     * [managerOrNull].
+     * The ids the launcher actually still has for this Widget. Empty on a device
+     * with no `AppWidgetManager` at all — see [managerOrNull].
      */
     fun liveAppWidgetIds(
         context: Context,
@@ -296,87 +273,21 @@ object WidgetUpdater {
     ) ?: IntArray(0)
 
     /**
-     * Brings the stored instances and the scheduled work back in line.
-     *
-     * Four things, in order:
-     *
-     * 1. **Drop rows the launcher no longer has.** A restore, a force-stop or a
-     *    launcher crash leaves rows for instances that are gone; they keep a
-     *    source "in use" forever, so the Widget keeps polling for a home screen
-     *    that does not exist. Reconciling against `AppWidgetManager` is the only
-     *    authority on which instances are live — with one exception, [keepIds],
-     *    because a restore creates rows for ids the manager may not report yet,
-     *    and dropping those would delete exactly what was just restored.
-     * 2. **Schedule or cancel the periodic work** from the surviving rows.
-     * 3. **Request recovery once per surviving source**, keeping unfinished work,
-     *    unless the calling background worker is already about to refresh them.
-     * 4. **Redraw** whatever remains.
-     *
-     * Doing it from the instance table rather than an in-memory counter is what
-     * makes it correct after a process death, when there is no counter.
-     */
-    fun reconcile(
-        context: Context,
-        keepIds: Set<Int> = emptySet(),
-        requestRecovery: Boolean = true,
-    ): WidgetInstanceReadResult {
-        val store = WidgetStore.open(context)
-        val live = liveAppWidgetIds(context).toSet() + keepIds
-        val result = store.reconcileInstances(live)
-        if (result is WidgetInstanceReadResult.Failed) {
-            // Unavailability says nothing about ownership. Keep (or establish)
-            // the bounded periodic recovery path, never spin in the receiver.
-            WidgetLog.warning(context, "reconcile failed; retaining periodic recovery")
-            WidgetRefreshScheduler.schedulePeriodic(context)
-            return result
-        }
-        result as WidgetInstanceReadResult.Read
-        if (result.dropped.isNotEmpty()) {
-            WidgetLog.info(context, "reconcile dropped ${result.dropped.size} stale instances")
-        }
-
-        if (result.instances.isEmpty()) {
-            WidgetRefreshScheduler.cancelAll(context)
-        } else {
-            WidgetRefreshScheduler.schedulePeriodic(context)
-            val addresses = result.instances.map { it.address }.distinct()
-            for (address in result.dropped.distinct()) {
-                if (address !in addresses) WidgetRefreshScheduler.cancelSource(context, address)
-            }
-            if (requestRecovery) {
-                for (address in addresses) {
-                    WidgetRefreshScheduler.scheduleRecovery(context, address)
-                }
-            }
-        }
-        updateAll(context)
-        return result
-    }
-
-    /**
      * How an instance's measured size is read.
      *
      * A seam for tests only: `AppWidgetManager.getAppWidgetOptions` is answered
-     * by the system service, so under a JVM runner it always comes back empty and
-     * every instance would look like the default size. Production never replaces
-     * this.
+     * by the system service, so under a JVM runner it always comes back empty.
      */
-    internal var optionsProvider: (AppWidgetManager, Int) -> Bundle = { manager, id ->
-        try {
-            manager.getAppWidgetOptions(id)
-        } catch (_: Exception) {
-            Bundle()
-        }
-    }
+    internal var optionsProvider: (AppWidgetManager, Int) -> Bundle = ::systemOptions
 
     internal fun resetOptionsProvider() {
-        optionsProvider = { manager, id ->
-            try {
-                manager.getAppWidgetOptions(id)
-            } catch (_: Exception) {
-                Bundle()
-            }
-        }
+        optionsProvider = ::systemOptions
+    }
+
+    private fun systemOptions(manager: AppWidgetManager, appWidgetId: Int): Bundle = try {
+        manager.getAppWidgetOptions(appWidgetId)
+    } catch (_: Exception) {
+        Bundle()
     }
 
     private fun optionsOf(manager: AppWidgetManager, appWidgetId: Int): Bundle =
