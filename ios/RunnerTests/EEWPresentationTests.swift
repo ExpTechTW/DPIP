@@ -150,6 +150,47 @@ final class EEWPresentationTests: XCTestCase {
         }
     }
 
+    /// Every eew.* key carries every language the widget catalog ships. A key
+    /// missing one of them rendered as the key itself under that language
+    /// (all of them did under Japanese); languages the catalog has no entry
+    /// for at all fall back to English, the development region.
+    func testEveryLiveActivityStringHasEveryCatalogLanguage() throws {
+        let catalogURL = URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appendingPathComponent("DPIPWidgets/Localizable.xcstrings")
+        let catalog = try XCTUnwrap(
+            JSONSerialization.jsonObject(with: Data(contentsOf: catalogURL)) as? [String: Any])
+        XCTAssertEqual(catalog["sourceLanguage"] as? String, "en")
+        let strings = try XCTUnwrap(catalog["strings"] as? [String: [String: Any]])
+        let languages = Set(strings.values.flatMap { (($0["localizations"] as? [String: Any]) ?? [:]).keys })
+        XCTAssertEqual(languages, ["en", "ja", "ko", "zh-Hans", "zh-Hant"])
+
+        let keys = strings.keys.filter { $0.hasPrefix("eew.") }
+        XCTAssertFalse(keys.isEmpty)
+        for key in keys {
+            let localizations = try XCTUnwrap(strings[key]?["localizations"] as? [String: Any], key)
+            XCTAssertEqual(Set(localizations.keys), languages, key)
+            var specifiers: Set<[String]> = []
+            for (language, localization) in localizations {
+                let unit = try XCTUnwrap(
+                    (localization as? [String: Any])?["stringUnit"] as? [String: Any], "\(key) \(language)")
+                XCTAssertEqual(unit["state"] as? String, "translated", "\(key) \(language)")
+                let value = try XCTUnwrap(unit["value"] as? String, "\(key) \(language)")
+                XCTAssertFalse(value.isEmpty, "\(key) \(language)")
+                specifiers.insert(Self.formatSpecifiers(value))
+            }
+            // String(format:) with a mismatched translation reads garbage.
+            XCTAssertEqual(specifiers.count, 1, "Format specifiers differ across languages: \(key)")
+        }
+    }
+
+    private static func formatSpecifiers(_ format: String) -> [String] {
+        let pattern = try! NSRegularExpression(pattern: "%(?:\\d+\\$)?[-+ 0#]*\\d*(?:\\.\\d+)?(?:l{0,2}|h{0,2})[@dDiuUxXoOfFeEgGcCsSp%]")
+        let range = NSRange(format.startIndex..., in: format)
+        return pattern.matches(in: format, range: range).map { (format as NSString).substring(with: $0.range) }
+    }
+
     @MainActor
     func testLargeTypeStillDegradesWithoutOverflow() {
         for size in [DynamicTypeSize.xxxLarge, .accessibility3] {

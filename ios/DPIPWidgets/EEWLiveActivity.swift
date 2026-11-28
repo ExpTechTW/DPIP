@@ -79,7 +79,7 @@ private struct EEWEventHeading: View {
                 .accessibilityHidden(true)
             // A single text flow shares compression instead of truncating title/source separately.
             Text(
-                "\(Text("eew.title").fontWeight(.semibold))\(Text(verbatim: " · " + provider).foregroundColor(.secondary))"
+                "\(Text(eew: "eew.title").fontWeight(.semibold))\(Text(verbatim: " · " + provider).foregroundColor(.secondary))"
             )
             .layoutPriority(1)
         }
@@ -89,7 +89,7 @@ private struct EEWEventHeading: View {
         // The Island leading region must retain both title and source at large text sizes.
         .minimumScaleFactor(0.6)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(Text(verbatim: NSLocalizedString("eew.title", comment: "EEW title") + " " + provider))
+        .accessibilityLabel(Text(verbatim: EEWText.string("eew.title") + " " + provider))
     }
 }
 
@@ -105,7 +105,7 @@ private struct EEWPrimarySummary: View {
 
         HStack(alignment: .top, spacing: 16) {
             VStack(alignment: .center, spacing: 4) {
-                Text(LocalizedStringKey(EEWPresentation.intensityLabel(for: state)))
+                Text(eew: EEWPresentation.intensityLabel(for: state))
                     .font(.caption)
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
@@ -118,11 +118,11 @@ private struct EEWPrimarySummary: View {
             }
             .frame(maxWidth: .infinity, alignment: .center)
             .accessibilityElement(children: .ignore)
-            .accessibilityLabel(Text(LocalizedStringKey(EEWPresentation.intensityLabel(for: state))))
+            .accessibilityLabel(Text(eew: EEWPresentation.intensityLabel(for: state)))
             .accessibilityValue(EEWIntensityValue.text(intensity, spoken: true))
 
             VStack(alignment: .center, spacing: 4) {
-                Text("eew.arrival.estimated")
+                Text(eew: "eew.arrival.estimated")
                     .font(.caption)
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
@@ -185,7 +185,7 @@ private struct EEWEventDetailText {
 
     var spoken: String {
         String(
-            format: NSLocalizedString("eew.details.spoken.format", comment: "Spoken earthquake details"),
+            format: EEWText.string("eew.details.spoken.format"),
             state.epicenter, state.magnitude, state.depthKm)
     }
 
@@ -197,7 +197,7 @@ private struct EEWEventDetailText {
         epicenterMagnitude + " · "
             + String(
                 format: "%@ %.0f km",
-                NSLocalizedString("eew.depth", comment: "Earthquake depth"), state.depthKm)
+                EEWText.string("eew.depth"), state.depthKm)
     }
 }
 
@@ -206,7 +206,7 @@ private struct EEWTestBadge: View {
     var body: some View {
         // All Phase 1 activities are mock data, including non-DEBUG builds.
         // Keep the marker until a production contract explicitly identifies tests.
-        Text("eew.test.short")
+        Text(eew: "eew.test.short")
             .font(.caption2.bold())
             .foregroundStyle(.gray)
             .padding(.horizontal, 4)
@@ -214,7 +214,7 @@ private struct EEWTestBadge: View {
             .background(.gray.opacity(0.15), in: Capsule())
             .lineLimit(1)
             .fixedSize()
-            .accessibilityLabel(Text("eew.test.spoken"))
+            .accessibilityLabel(Text(eew: "eew.test.spoken"))
     }
 }
 
@@ -223,7 +223,7 @@ private struct EEWReportNumber: View {
     let number: Int
 
     var body: some View {
-        Text(String(format: NSLocalizedString("eew.report.format", comment: "EEW report number"), number))
+        Text(String(format: EEWText.string("eew.report.format"), number))
             .monospacedDigit()
             .lineLimit(1)
             // Preserve the complete report ordinal in the Island at large text sizes.
@@ -248,9 +248,9 @@ private struct EEWIntensityValue: View {
     static func text(_ intensity: Int, compact: Bool = false, spoken: Bool = false) -> Text {
         let content = EEWPresentation.intensityText(intensity, compact: compact, spoken: spoken)
         if let level = content.level {
-            return Text(String(format: NSLocalizedString(content.key, comment: "Intensity level"), level))
+            return Text(String(format: EEWText.string(content.key), level))
         }
-        return Text(LocalizedStringKey(content.key))
+        return Text(eew: content.key)
     }
 }
 
@@ -262,7 +262,7 @@ private struct EEWArrivalView: View {
     var body: some View {
         switch EEWPresentation.arrival(for: state) {
         case .arrived:
-            Text("eew.arrived.short")
+            Text(eew: "eew.arrived.short")
                 .font(.system(size: 42, weight: .bold))
                 .foregroundStyle(.primary)
                 .lineLimit(1)
@@ -273,7 +273,7 @@ private struct EEWArrivalView: View {
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
         case .unavailable:
-            Text("eew.unavailable")
+            Text(eew: "eew.unavailable")
                 .font(.system(size: 42, weight: .bold))
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
@@ -302,7 +302,7 @@ private struct EEWCountdown: View {
             .monospacedDigit()
             .multilineTextAlignment(.center)
             .foregroundStyle(island ? Color.white : Color.primary)
-            .accessibilityLabel(Text("eew.arrival.estimated"))
+            .accessibilityLabel(Text(eew: "eew.arrival.estimated"))
             .accessibilityValue(timer)
     }
 }
@@ -324,9 +324,9 @@ private struct EEWCompactIntensity: View {
         .font(.caption.bold())
         .foregroundStyle(.white)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(Text(LocalizedStringKey(EEWPresentation.intensityLabel(for: state))))
+        .accessibilityLabel(Text(eew: EEWPresentation.intensityLabel(for: state)))
         .accessibilityValue(EEWIntensityValue.text(EEWPresentation.intensity(for: state), spoken: true))
-        .accessibilityHint(Text("eew.test.spoken"))
+        .accessibilityHint(Text(eew: "eew.test.spoken"))
     }
 }
 
@@ -349,9 +349,9 @@ private struct EEWCompactArrival: View {
     @ViewBuilder private var arrival: some View {
         switch EEWPresentation.arrival(for: state) {
         case .arrived:
-            Text("eew.arrived.short")
-                .accessibilityLabel(Text("eew.arrival.estimated"))
-                .accessibilityValue(Text("eew.arrived.short"))
+            Text(eew: "eew.arrived.short")
+                .accessibilityLabel(Text(eew: "eew.arrival.estimated"))
+                .accessibilityValue(Text(eew: "eew.arrived.short"))
         case .countdown(let arrival):
             EEWIslandTimerEnvelope(sample: EEWPresentation.islandTimerSample(for: state, now: .now)) {
                 EEWCountdown(arrival: arrival, island: true)
@@ -379,13 +379,13 @@ private struct EEWIslandArrivalSymbol: View {
                 case .countdown(let arrival):
                     EEWCountdown(arrival: arrival, island: true)
                 case .arrived:
-                    Text("eew.arrived.short")
-                        .accessibilityLabel(Text("eew.arrival.estimated"))
-                        .accessibilityValue(Text("eew.arrived.short"))
+                    Text(eew: "eew.arrived.short")
+                        .accessibilityLabel(Text(eew: "eew.arrival.estimated"))
+                        .accessibilityValue(Text(eew: "eew.arrived.short"))
                 case .unavailable:
-                    Text("eew.unavailable")
-                        .accessibilityLabel(Text("eew.arrival.estimated"))
-                        .accessibilityValue(Text("eew.unavailable"))
+                    Text(eew: "eew.unavailable")
+                        .accessibilityLabel(Text(eew: "eew.arrival.estimated"))
+                        .accessibilityValue(Text(eew: "eew.unavailable"))
                 }
             }
     }
@@ -417,15 +417,15 @@ private struct EEWMinimalView: View {
         .accessibilityRepresentation {
             HStack {
                 EEWIntensityValue.text(EEWPresentation.intensity(for: state), spoken: true)
-                    .accessibilityLabel(Text(LocalizedStringKey(EEWPresentation.intensityLabel(for: state))))
+                    .accessibilityLabel(Text(eew: EEWPresentation.intensityLabel(for: state)))
                     .accessibilityValue(EEWIntensityValue.text(EEWPresentation.intensity(for: state), spoken: true))
                 arrival
             }
             .accessibilityElement(children: .combine)
-            .accessibilityHint(Text("eew.test.spoken"))
+            .accessibilityHint(Text(eew: "eew.test.spoken"))
         }
         .accessibilityElement(children: .combine)
-        .accessibilityHint(Text("eew.test.spoken"))
+        .accessibilityHint(Text(eew: "eew.test.spoken"))
     }
 
     @ViewBuilder private var arrival: some View {
@@ -440,8 +440,8 @@ private struct EEWMinimalView: View {
         case .unavailable:
             Image(systemName: "waveform.path.ecg")
                 .foregroundStyle(.red)
-                .accessibilityLabel(Text("eew.arrival.estimated"))
-                .accessibilityValue(Text("eew.unavailable"))
+                .accessibilityLabel(Text(eew: "eew.arrival.estimated"))
+                .accessibilityValue(Text(eew: "eew.unavailable"))
         }
     }
 }

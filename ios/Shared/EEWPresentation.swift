@@ -72,6 +72,34 @@ enum EEWPresentation {
     }
 }
 
+/// Live Activity text, looked up so that a missing translation shows English
+/// rather than the key itself.
+///
+/// Foundation does not fall back per key: once it picks a language for the
+/// bundle (ja, because the weather strings have ja), a key with no ja entry
+/// comes back as the key. That is how every eew.* string rendered as
+/// `eew.title`-style keys under Japanese. A language the catalog has no entry
+/// for at all (th, vi, id, …) already falls back to English through the
+/// development region; this covers the other case.
+@available(iOS 16.1, *)
+enum EEWText {
+    static func string(_ key: String, bundle: Bundle = .main) -> String {
+        let value = bundle.localizedString(forKey: key, value: nil, table: nil)
+        guard value == key,
+              let path = bundle.path(forResource: "en", ofType: "lproj"),
+              let english = Bundle(path: path) else { return value }
+        return english.localizedString(forKey: key, value: nil, table: nil)
+    }
+}
+
+@available(iOS 16.1, *)
+extension Text {
+    /// A catalog string, never the raw key (see `EEWText`).
+    init(eew key: String) {
+        self.init(verbatim: EEWText.string(key))
+    }
+}
+
 @available(iOS 16.1, *)
 enum EEWIntensityColor {
     static func foreground(for intensity: Int) -> Color {
