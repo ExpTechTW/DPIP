@@ -191,4 +191,82 @@ void main() {
       await expectLater(service.drainBreadcrumbs(), completes);
     },
   );
+
+  group('report heartbeat inputs', () {
+    BackgroundLocationService service() => BackgroundLocationService(
+      platform: 0,
+      version: '1.2.3',
+      channel: channel,
+    );
+
+    test('hand native the identity, the pinned point and every 2xx', () async {
+      final native = service();
+
+      expect(await native.setReportIdentity('tok'), isTrue);
+      expect(await native.setManualPoint(lat: 23.97, lng: 121.6), isTrue);
+      expect(await native.clearManualPoint(), isTrue);
+      expect(await native.recordReport(lat: 25.03, lng: 121.52), isTrue);
+
+      expect(calls.map((call) => call.method), [
+        'setReportIdentity',
+        'setManualPoint',
+        'clearManualPoint',
+        'recordReport',
+      ]);
+      expect(calls[0].arguments, {
+        'platform': 0,
+        'token': 'tok',
+        'version': '1.2.3',
+      });
+      expect(calls[1].arguments, {'lat': 23.97, 'lng': 121.6});
+      expect(calls[2].arguments, isNull);
+      expect(calls[3].arguments, {'lat': 25.03, 'lng': 121.52});
+    });
+
+    test('are quiet no-ops where the platform has no heartbeat yet', () async {
+      // iOS until phase 2: its plugin answers "not implemented", which
+      // reaches Dart as MissingPluginException.
+      messenger.setMockMethodCallHandler(channel, null);
+      final native = service();
+
+      expect(await native.setReportIdentity('tok'), isFalse);
+      expect(await native.setManualPoint(lat: 1, lng: 2), isFalse);
+      expect(await native.clearManualPoint(), isFalse);
+      expect(await native.recordReport(lat: 1, lng: 2), isFalse);
+    });
+
+    test('a platform failure is logged, never thrown', () async {
+      messenger.setMockMethodCallHandler(
+        channel,
+        (_) async => throw PlatformException(code: 'bad_args'),
+      );
+
+      expect(await service().recordReport(lat: 1, lng: 2), isFalse);
+    });
+  });
+
+  test(
+    'lastSuccessAt is the later of the background success and the record',
+    () async {
+      var answer = <String, Object?>{'lastSuccessAt': 2000, 'reportedAt': 5000};
+      messenger.setMockMethodCallHandler(channel, (_) async => answer);
+      final native = BackgroundLocationService(
+        platform: 0,
+        version: '1',
+        channel: channel,
+      );
+
+      expect(
+        await native.lastSuccessAt(),
+        DateTime.fromMillisecondsSinceEpoch(5000, isUtc: true),
+      );
+      answer = {'lastSuccessAt': 7000, 'reportedAt': 5000};
+      expect(
+        await native.lastSuccessAt(),
+        DateTime.fromMillisecondsSinceEpoch(7000, isUtc: true),
+      );
+      answer = {'lastSuccessAt': null};
+      expect(await native.lastSuccessAt(), isNull);
+    },
+  );
 }

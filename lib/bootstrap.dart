@@ -57,6 +57,7 @@ import 'package:dpip/core/realtime/realtime_service.dart';
 import 'package:dpip/core/realtime/server_clock.dart';
 import 'package:dpip/core/geo/location_monitor.dart';
 import 'package:dpip/core/geo/location_service.dart';
+import 'package:dpip/core/geo/report_heartbeat_sync.dart';
 import 'package:dpip/core/geo/town_boundaries.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/settings/experimental_settings.dart';
@@ -375,13 +376,23 @@ Future<void> bootstrap() async {
   final appVersion = await appVersionFuture;
   final versionMs = Log.sinceStartMs - versionStart;
   final reportPlatform = Platform.isIOS ? 1 : 0;
+  // Terminated/background counterpart: native reports on significant moves.
+  final backgroundLocation = BackgroundLocationService(
+    platform: reportPlatform,
+    version: appVersion,
+  );
   // Late because the two refer to each other: the registration reports through
   // the reporter, and the reporter tells the registration about every 2xx.
   late final DeviceRegistration deviceRegistration;
   final deviceLocationReporter = DeviceLocationReporter(
     positions: () => locationService.positionStream(),
     settings: settings,
-    onReported: () => deviceRegistration.recordSuccess(),
+    // Native keeps the device's one "last successful report" record, which
+    // the report heartbeat ages; every foreground 2xx counts toward it.
+    onReported: (fix) async {
+      await deviceRegistration.recordSuccess();
+      await backgroundLocation.recordReport(lat: fix.lat, lng: fix.lng);
+    },
     onMoved: (fix) async {
       final token = notificationService.token;
       if (token == null) return false;
@@ -395,11 +406,6 @@ Future<void> bootstrap() async {
       return true;
     },
   );
-  // Terminated/background counterpart: native reports on significant moves.
-  final backgroundLocation = BackgroundLocationService(
-    platform: reportPlatform,
-    version: appVersion,
-  );
   // Replay whatever the native side recorded while there was no Dart to hear
   // it. A background wake runs with no Flutter isolate at all, so nothing that
   // path does can reach `Log` as it happens — which is why "it never reports"
@@ -407,6 +413,17 @@ Future<void> bootstrap() async {
   // breadcrumbs across process deaths; this is where they enter the log the
   // user can actually send. Unawaited: a diagnostic must never delay a launch.
   unawaited(backgroundLocation.drainBreadcrumbs());
+  // The native report heartbeat (a daily job, in every mode) reports a device
+  // that has had no successful report for about three days. It never takes a
+  // fix, so the token and a pinned township's point are handed to it here,
+  // before onboarding: neither sends anything by itself.
+  ReportHeartbeatSync(
+    native: backgroundLocation,
+    mode: locationMode,
+    manualFix: locationService.manualFix,
+    token: () => notificationService.token,
+    tokenChanges: notificationService.tokenChanges,
+  ).start();
 
   // The backend learns the push token only from a location report, and every
   // report above waits for a move. This reports once more when the token

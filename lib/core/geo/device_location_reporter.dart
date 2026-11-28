@@ -55,8 +55,9 @@ class DeviceLocationReporter {
   final SettingsStore _settings;
   final DateTime Function() _now;
 
-  /// Called after every report the server answered with a 2xx.
-  final Future<void> Function()? _onReported;
+  /// Called after every report the server answered with a 2xx, with the fix
+  /// it sent.
+  final Future<void> Function(GpsFix fix)? _onReported;
 
   /// The request before this one; the next waits for it.
   Future<void> _queue = Future<void>.value();
@@ -211,7 +212,7 @@ class DeviceLocationReporter {
       return _isFinal(error) ? ReportOutcome.rejected : ReportOutcome.failed;
     }
     try {
-      await _onReported?.call();
+      await _onReported?.call(fix);
     } catch (error, stackTrace) {
       Log.handle(error, stackTrace, 'updateDeviceLocation: onReported');
     }

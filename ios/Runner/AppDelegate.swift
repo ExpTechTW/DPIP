@@ -12,6 +12,9 @@ import UserNotifications
     // Flutter engine is created, and a relaunch for a finished location-report
     // transfer may never create one.
     LocationReportSender.shared.launch()
+    // Before launch finishes, as BGTaskScheduler requires — a background
+    // launch for the heartbeat's own task has to find its handler here.
+    ReportHeartbeat.shared.launch()
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 

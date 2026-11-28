@@ -364,10 +364,12 @@ void main() {
         final locationApi = _FakeLocationApi(
           error: _dio(DioExceptionType.badResponse, status: 429),
         );
+        var reported = 0;
         final repo = NotifyRepositoryImpl(
           api,
           locationApi,
           _locationServiceWithFix((lat: 24.1, lng: 120.7)),
+          onReported: (_) async => reported++,
         );
 
         Result<NotifySettings>? result;
@@ -385,6 +387,8 @@ void main() {
           ),
         );
         expect(locationApi.calls, 1);
+        // A 429 is not a success, so the native record is left alone.
+        expect(reported, 0);
         // No second cool-down, no retry: registration failing is terminal.
         expect(api.calls, 1);
       });
@@ -398,10 +402,12 @@ void main() {
         const [2, 1, 0, 2, 1, 0, 1, 1, 0],
       ]);
       final locationApi = _FakeLocationApi();
+      final reported = <GpsFix>[];
       final repo = NotifyRepositoryImpl(
         api,
         locationApi,
         _locationServiceWithFix((lat: 24.1, lng: 120.7)),
+        onReported: (fix) async => reported.add(fix),
       );
 
       Result<NotifySettings>? result;
@@ -414,6 +420,9 @@ void main() {
 
       expect(result?.valueOrNull?.optionOf(NotifyChannel.eew), 2);
       expect(locationApi.calls, 1);
+      // The registration's 2xx counts toward the native report record, with
+      // the point it sent.
+      expect(reported, [(lat: 24.1, lng: 120.7)]);
       expect(locationApi.lastArgs, (
         platform: 0,
         token: 'push-token',

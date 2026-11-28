@@ -263,12 +263,14 @@ void main() {
       var t = DateTime.utc(2024, 1, 1);
       Object? failure;
       var token = true;
-      var reported = 0;
+      // Every 2xx is handed on with the fix it sent — the native report
+      // heartbeat resends exactly that point.
+      final reported = <GpsFix>[];
       final reporter = DeviceLocationReporter(
         positions: () => const Stream.empty(),
         settings: await settings(),
         now: () => t,
-        onReported: () async => reported++,
+        onReported: (sent) async => reported.add(sent),
         onMoved: (fix) async {
           final error = failure;
           if (error != null) throw error;
@@ -282,7 +284,7 @@ void main() {
       }
 
       expect(await reporter.reportNow(fix), ReportOutcome.sent);
-      expect(reported, 1);
+      expect(reported, [fix]);
       expect(await reporter.reportNow(fix), ReportOutcome.throttled);
 
       token = false;
@@ -306,7 +308,7 @@ void main() {
       expect(await next(), ReportOutcome.failed);
       failure = StateError('boom');
       expect(await next(), ReportOutcome.failed);
-      expect(reported, 1);
+      expect(reported, [fix]);
     });
 
     test('a report and a move arriving together send one request', () async {
