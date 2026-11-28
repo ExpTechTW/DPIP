@@ -4,7 +4,6 @@ library;
 
 import 'package:dpip/core/realtime/app_time.dart';
 import 'package:dpip/features/events/domain/event_card.dart';
-import 'package:dpip/features/events/domain/event_hazard.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:intl/intl.dart';
 
@@ -59,18 +58,35 @@ enum EventCardStatus {
   /// Whether [card] shows how long it is in force: its state and its end
   /// time.
   ///
-  /// An earthquake has no lifetime a reader can act on — it is over by the
-  /// time it is reported, and its end time only bounds how long the server
-  /// lists it — so "in effect", "ended" and "no end time yet" would say
-  /// nothing true about it. The same goes for the two tsunami types that only
-  /// inform: `tsunami_note`, the sea-level remark on an earthquake report, and
-  /// `tsunami.info`, whose end time is its last report plus a day, with
-  /// nothing ever lifted. A tsunami warning keeps them: one in force and one
-  /// lifted are different things.
+  /// Only where the upstream source itself gives the time range: the CWA
+  /// heavy-rain advisories (`validTime.endTime`), the NCDR CAP alerts
+  /// (`expires`), and a tsunami warning, open until it is lifted. Every other
+  /// type's end time is a display period the server chose — a day after an
+  /// earthquake report, an observation plus a cool-down for the meteor alerts,
+  /// a manual announcement's deadline — so "in effect", "ended" and "no end
+  /// time yet" would say nothing true about it. An allow-list, so a type added
+  /// later shows none until it is known to carry a real range; the table is
+  /// dpip-server-go's api.md §2, "結束時間的來源".
   static bool showsLifetime(EventCard card) =>
-      card.hazard != EventHazard.earthquake &&
-      card.type != 'tsunami_note' &&
-      card.type != 'tsunami.info';
+      _typesWithLifetime.contains(card.type);
+
+  static const Set<String> _typesWithLifetime = {
+    // CWA advisories: validTime.endTime.
+    'heavy-rain',
+    'extremely-heavy-rain',
+    'torrential-rain',
+    'extremely-torrential-rain',
+    // NCDR CAP: expires.
+    'thunderstorm',
+    'debrisFlowLandSlide',
+    'roadClose',
+    'floodSensor',
+    'workSchlClos',
+    'barrierLake',
+    'reservoirDischarge',
+    // Open until lifted, then ended.
+    'tsunami.warning',
+  };
 
   /// The state's label.
   String label(AppLocalizations l10n) => switch (this) {

@@ -197,6 +197,74 @@ void main() {
     }
   });
 
+  testWidgets('only types the upstream gives a time range show a state', (
+    tester,
+  ) async {
+    // The server's own display periods: no state, whatever the end time says.
+    for (final (type, hazard) in [
+      ('heavy_rain.short', EventHazard.heavyRain),
+      ('heavy_rain.short_extreme', EventHazard.heavyRain),
+      ('wind.strong', EventHazard.wind),
+      ('wind.damaging', EventHazard.wind),
+      ('thunderstorm.lightning', EventHazard.thunderstorm),
+      ('river_rise.watch', EventHazard.riverRise),
+      ('river_rise.warning', EventHazard.riverRise),
+      ('fog.visibility', EventHazard.fog),
+      ('seawave', EventHazard.swell),
+      ('announcement', EventHazard.announcement),
+      ('some.future_type', EventHazard.unknown),
+    ]) {
+      await _pump(
+        tester,
+        eventCard(
+          type: type,
+          hazard: hazard,
+          title: 'Display period',
+          send: now.subtract(const Duration(hours: 1)),
+          expires: now.add(const Duration(hours: 2)),
+        ),
+      );
+      expect(find.text('Display period'), findsOneWidget);
+      expect(find.text(_l10n.eventStatusActive), findsNothing, reason: type);
+    }
+
+    // Upstream ranges: CWA advisories, NCDR CAP alerts.
+    for (final (type, hazard) in [
+      ('extremely-torrential-rain', EventHazard.heavyRain),
+      ('thunderstorm', EventHazard.thunderstorm),
+      ('reservoirDischarge', EventHazard.damRelease),
+      ('workSchlClos', EventHazard.closure),
+    ]) {
+      await _pump(
+        tester,
+        eventCard(
+          type: type,
+          hazard: hazard,
+          title: 'Upstream range',
+          send: now.subtract(const Duration(hours: 1)),
+          expires: now.add(const Duration(hours: 2)),
+        ),
+      );
+      expect(find.text(_l10n.eventStatusActive), findsOneWidget, reason: type);
+    }
+  });
+
+  testWidgets('a cancellation still reads "cancelled" outside the list', (
+    tester,
+  ) async {
+    await _pump(
+      tester,
+      eventCard(
+        kind: EventReportKind.cancel,
+        type: 'wind.strong',
+        hazard: EventHazard.wind,
+        send: now.subtract(const Duration(minutes: 10)),
+        expires: now.subtract(const Duration(minutes: 10)),
+      ),
+    );
+    expect(find.text(_l10n.eventStatusCancelled), findsOneWidget);
+  });
+
   testWidgets('a cancelled earthquake still reads "cancelled"', (tester) async {
     await _pump(
       tester,
