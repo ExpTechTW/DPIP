@@ -4,6 +4,7 @@ library;
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/api_paths.dart';
 import 'package:dpip/core/network/api_region.dart';
+import 'package:dpip/core/network/notify_request_lane.dart';
 
 /// The `notify` endpoints, migrated from the legacy `api-1` host to
 /// `api.core-tnn1` ([ApiTier.coreExclusiveApi]). Both return the settings as a
@@ -19,28 +20,34 @@ import 'package:dpip/core/network/api_region.dart';
 /// redirect (its default `followRedirects`), so no request here ever sees the
 /// 307 itself, and it never reaches `validateStatus`, which accepts 2xx and 304
 /// only.
+///
+/// Every request goes through the [NotifyRequestLane]: the backend rate-limits
+/// these routes per address together with the location report.
 class NotifyApi {
-  const NotifyApi(this._client);
+  const NotifyApi(this._client, this._lane);
 
   final ApiClient _client;
+  final NotifyRequestLane _lane;
 
   /// The device's current settings.
   ///
   /// `GET https://api.core-tnn1.exptech.dev/api/v2/notify/{token}`
-  Future<List<dynamic>> getNotify(String token) async =>
-      (await _client.get(ApiTier.coreExclusiveApi, '${ApiPaths.notify}$token'))
-          as List<dynamic>;
+  Future<List<dynamic>> getNotify(String token) => _lane.run(
+    () async => (await _client.get(
+      ApiTier.coreExclusiveApi,
+      '${ApiPaths.notify}$token',
+    )) as List<dynamic>,
+  );
 
   /// Sets one [channel] to option [status]; the server returns the full updated
   /// settings.
   ///
   /// `GET https://api.core-tnn1.exptech.dev/api/v2/notify/{token}/{channel}/{status}`
-  Future<List<dynamic>> setNotify(
-    String token,
-    int channel,
-    int status,
-  ) async => (await _client.get(
-    ApiTier.coreExclusiveApi,
-    '${ApiPaths.notify}$token/$channel/$status',
-  )) as List<dynamic>;
+  Future<List<dynamic>> setNotify(String token, int channel, int status) =>
+      _lane.run(
+        () async => (await _client.get(
+          ApiTier.coreExclusiveApi,
+          '${ApiPaths.notify}$token/$channel/$status',
+        )) as List<dynamic>,
+      );
 }

@@ -8,12 +8,16 @@
 /// single host, no region failover) — that host shows up in every URL these
 /// tests record, so a change that accidentally moved this API to a
 /// region-selected tier would also show up here as a different host.
+///
+/// Every request goes through the [NotifyRequestLane] it is given: the backend
+/// rate-limits these routes per address together with the location report.
 library;
 
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:dpip/core/network/api_client.dart';
+import 'package:dpip/core/network/notify_request_lane.dart';
 import 'package:dpip/core/network/region_selection.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/features/notification/data/notify_api.dart';
@@ -46,11 +50,26 @@ class _RecordingAdapter implements HttpClientAdapter {
   void close({bool force = false}) {}
 }
 
+/// Counts the requests that went through it.
+class _CountingLane extends NotifyRequestLane {
+  _CountingLane() : super(spacing: Duration.zero);
+
+  int runs = 0;
+
+  @override
+  Future<T> run<T>(Future<T> Function() request) {
+    runs++;
+    return super.run(request);
+  }
+}
+
 void main() {
   late RegionSelection regions;
+  late _CountingLane lane;
 
   setUp(() {
     regions = RegionSelection(SettingsStore.inMemory({}));
+    lane = _CountingLane();
   });
 
   test(
@@ -59,6 +78,7 @@ void main() {
       final adapter = _RecordingAdapter();
       final api = NotifyApi(
         ApiClient(Dio()..httpClientAdapter = adapter, regions),
+        lane,
       );
 
       final result = await api.getNotify('push-token-1');
@@ -67,6 +87,7 @@ void main() {
         'https://api.core-tnn1.exptech.dev/api/v2/notify/push-token-1',
       ]);
       expect(result, [2, 1, 0, 2, 1, 0, 1, 1, 0]);
+      expect(lane.runs, 1);
     },
   );
 
@@ -76,6 +97,7 @@ void main() {
       final adapter = _RecordingAdapter(body: '[0,0,0,0,0,0,0,0,0]');
       final api = NotifyApi(
         ApiClient(Dio()..httpClientAdapter = adapter, regions),
+        lane,
       );
 
       final result = await api.setNotify('push-token-1', 4, 1);
@@ -84,6 +106,7 @@ void main() {
         'https://api.core-tnn1.exptech.dev/api/v2/notify/push-token-1/4/1',
       ]);
       expect(result, [0, 0, 0, 0, 0, 0, 0, 0, 0]);
+      expect(lane.runs, 1);
     },
   );
 }

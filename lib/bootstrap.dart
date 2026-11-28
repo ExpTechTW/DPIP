@@ -28,6 +28,7 @@ import 'package:dpip/core/platform/network_changes.dart';
 import 'package:dpip/core/platform/widget_location_catalog_coordinator.dart';
 import 'package:dpip/core/platform/widget_snapshot_writer.dart';
 import 'package:dpip/core/network/dio_client.dart';
+import 'package:dpip/core/network/notify_request_lane.dart';
 import 'package:dpip/core/network/endpoint_health.dart';
 import 'package:dpip/core/network/etag_cache_store.dart';
 import 'package:dpip/core/network/network_usage_store.dart';
@@ -369,9 +370,14 @@ Future<void> bootstrap() async {
 
   // Distance-triggered device-location report: on each meaningful move, POST the
   // coordinates for push targeting (platform + push token + app version). Started
-  // after the first frame once GPS permission is granted; a null token (not yet
-  // registered) simply skips — it self-heals on the next move.
-  final locationApi = LocationApi(apiClient);
+  // after the first frame once GPS permission is granted; a fix it cannot send
+  // yet (no push token, a 429, no network) stays pending until the server takes
+  // it — see [DeviceLocationReporter].
+  //
+  // Every request the notify backend rate-limits per address shares one lane:
+  // the location report, the registration riding on it, the notify settings.
+  final notifyLane = NotifyRequestLane();
+  final locationApi = LocationApi(apiClient, notifyLane);
   final versionStart = Log.sinceStartMs;
   final appVersion = await appVersionFuture;
   final versionMs = Log.sinceStartMs - versionStart;
@@ -392,6 +398,15 @@ Future<void> bootstrap() async {
     onReported: (fix) async {
       await deviceRegistration.recordSuccess();
       await backgroundLocation.recordReport(lat: fix.lat, lng: fix.lng);
+    },
+    // A pending fix older than the background path's own last report is not
+    // sent. Its own only: the record every path writes counts the 2xx above
+    // and the heartbeat's resend, neither of which is newer than the fix.
+    nativeLastSuccess: backgroundLocation.backgroundSuccessAt,
+    // While a township is pinned by hand it is the only place reported.
+    pinned: () async {
+      final town = locationMode.manualTown;
+      return town == null ? null : locationService.manualFix(town);
     },
     onMoved: (fix) async {
       final token = notificationService.token;
@@ -436,6 +451,7 @@ Future<void> bootstrap() async {
     // live one — the township is all the server needs.
     fix: locationService.currentFix,
     report: deviceLocationReporter.reportNow,
+    resend: deviceLocationReporter.retryPending,
     nativeLastSuccess: backgroundLocation.lastSuccessAt,
   );
 
@@ -494,6 +510,7 @@ Future<void> bootstrap() async {
     locationMode: locationMode,
     deviceLocationReporter: deviceLocationReporter,
     deviceRegistration: deviceRegistration,
+    notifyLane: notifyLane,
     backgroundLocation: backgroundLocation,
     locationMonitor: locationMonitor,
     permissionHealth: permissionHealth,

@@ -16,6 +16,8 @@ void main() {
   late List<ReportOutcome> outcomes;
   late DateTime now;
   late DateTime? nativeSuccess;
+  late ReportOutcome? pendingOutcome;
+  late int resent;
   late DeviceRegistration registration;
 
   setUp(() {
@@ -26,6 +28,8 @@ void main() {
     outcomes = [];
     now = DateTime.utc(2026, 10, 16, 12);
     nativeSuccess = null;
+    pendingOutcome = null;
+    resent = 0;
     registration = DeviceRegistration(
       settings: settings,
       token: () => token,
@@ -39,12 +43,19 @@ void main() {
         if (outcome == ReportOutcome.sent) await registration.recordSuccess();
         return outcome;
       },
+      // Plays the reporter's pending fix: null is "nothing pending".
+      resend: () async {
+        final outcome = pendingOutcome;
+        if (outcome == null) return null;
+        resent++;
+        pendingOutcome = null;
+        if (outcome == ReportOutcome.sent) await registration.recordSuccess();
+        return outcome;
+      },
       nativeLastSuccess: () async => nativeSuccess,
       now: () => now,
     );
   });
-
-  tearDown(() => registration.dispose());
 
   test('an unregistered token is reported once', () async {
     await registration.ensure('launch');
@@ -121,47 +132,38 @@ void main() {
     expect(reported, hasLength(1));
   });
 
-  test('a throttled report is retried once, after the window', () {
+  test('a pending location report goes first, and its 2xx registers', () async {
+    pendingOutcome = ReportOutcome.sent;
+    await registration.ensure('resume');
+    expect(resent, 1);
+    // The token is now registered: no second report.
+    expect(reported, isEmpty);
+    expect(settings.getString(SettingKeys.registeredTokenHash), isNotNull);
+  });
+
+  test('a pending report still waiting is left to the reporter', () async {
+    for (final waiting in [
+      ReportOutcome.throttled,
+      ReportOutcome.failed,
+      ReportOutcome.noToken,
+    ]) {
+      pendingOutcome = waiting;
+      await registration.ensure('resume');
+      expect(reported, isEmpty, reason: waiting.name);
+    }
+  });
+
+  test('a failed report schedules nothing of its own', () {
+    // Retrying is the reporter's: the fix stays pending there.
     fakeAsync((async) {
-      outcomes = [ReportOutcome.throttled, ReportOutcome.throttled];
+      outcomes = [ReportOutcome.failed, ReportOutcome.throttled];
       registration.ensure('launch');
       async.flushMicrotasks();
       expect(reported, hasLength(1));
 
-      async.elapse(const Duration(seconds: 61));
-      expect(reported, hasLength(2));
-
-      // The retry does not schedule another: the next launch or resume will.
-      async.elapse(const Duration(minutes: 10));
-      expect(reported, hasLength(2));
-    });
-  });
-
-  test('a failed report is retried later, and then registers', () {
-    fakeAsync((async) {
-      outcomes = [ReportOutcome.failed];
-      registration.ensure('launch');
-      async.flushMicrotasks();
-      async.elapse(const Duration(minutes: 4));
+      async.elapse(const Duration(hours: 1));
       expect(reported, hasLength(1));
-
-      async.elapse(const Duration(minutes: 1));
-      expect(reported, hasLength(2));
-      expect(settings.getString(SettingKeys.registeredTokenHash), isNotNull);
-    });
-  });
-
-  test('a new trigger replaces a scheduled retry', () {
-    fakeAsync((async) {
-      outcomes = [ReportOutcome.failed];
-      registration.ensure('launch');
-      async.flushMicrotasks();
-      registration.ensure('resume');
-      async.flushMicrotasks();
-      expect(reported, hasLength(2));
-
-      async.elapse(const Duration(minutes: 10));
-      expect(reported, hasLength(2));
+      expect(settings.getString(SettingKeys.registeredTokenHash), isNull);
     });
   });
 }

@@ -21,6 +21,7 @@ import 'package:dpip/core/geo/town_boundaries.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/network/api_client.dart';
 import 'package:dpip/core/network/endpoint_health.dart';
+import 'package:dpip/core/network/notify_request_lane.dart';
 import 'package:dpip/core/network/region_selection.dart';
 import 'package:dpip/core/network/status_page_monitor.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
@@ -763,6 +764,7 @@ SharedDeps _deps({required bool complete, TownDirectory? directory}) {
       settings: settings,
       now: () => DateTime.utc(2026, 1, 15),
     ),
+    notifyLane: NotifyRequestLane(),
     backgroundLocation: BackgroundLocationService(
       platform: 0,
       version: '1',

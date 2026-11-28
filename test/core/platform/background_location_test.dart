@@ -269,4 +269,27 @@ void main() {
       expect(await native.lastSuccessAt(), isNull);
     },
   );
+
+  test(
+    'backgroundSuccessAt is the background path\'s own success alone',
+    () async {
+      // The record every path writes counts the foreground's own 2xx and the
+      // heartbeat's resend; neither put a newer position on the server than
+      // a fix the foreground still has pending.
+      var answer = <String, Object?>{'lastSuccessAt': 2000, 'reportedAt': 5000};
+      messenger.setMockMethodCallHandler(channel, (_) async => answer);
+      final native = BackgroundLocationService(
+        platform: 0,
+        version: '1',
+        channel: channel,
+      );
+
+      expect(
+        await native.backgroundSuccessAt(),
+        DateTime.fromMillisecondsSinceEpoch(2000, isUtc: true),
+      );
+      answer = {'reportedAt': 5000};
+      expect(await native.backgroundSuccessAt(), isNull);
+    },
+  );
 }

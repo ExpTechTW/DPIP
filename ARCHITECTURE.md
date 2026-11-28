@@ -317,7 +317,14 @@ neither a failover nor a region switch downloads the map again. And
 notify/location run as a **hot standby**: one core region is primary and the
 other answers `307` naming it — the primary has moved between regions, and
 tnn1, the host the app asks, has been the one redirecting — so they stay
-`coreExclusiveApi` and rely on Dio following the redirect.
+`coreExclusiveApi` and rely on Dio following the redirect. The backend also
+rate-limits them **per client address**, one limiter for `/v2/location` and the
+`/v2/notify` routes together (one request a second, twenty a minute), so every
+one of them goes through the single `NotifyRequestLane`
+(`core/network/notify_request_lane.dart`, `SharedDeps.notifyLane`): one
+request in flight, each starting at least 1.1 s after the previous one ended.
+`LocationApi` and `NotifyApi` take the lane in their constructors, so no caller
+can reach those routes around it.
 
 ## Data & errors
 
@@ -478,7 +485,16 @@ push token registers through the location feature
 (`/v2/location`, `DeviceLocationReporter` in `core/geo/`) on meaningful moves,
 and `DeviceRegistration` reports once more whenever the stored token changes
 and once a day without a successful report — a device that never moves would
-otherwise never tell the server its new token.
+otherwise never tell the server its new token. A fix the reporter decided to
+send is **pending until a 2xx** (`SettingKeys.pendingLocationReport`): kept
+through a 429, a 5xx, a timeout or a restart, replaced by a newer fix, retried
+on a timer and on every launch and resume, and dropped only by a refusal for
+good or a newer report from the native background path itself. A change of
+placement (a township pinned by hand, or back to the GPS) becomes the pending
+fix through `reportWhenAllowed`, and while a township is pinned, what is
+pending and sent is that township's point, never a GPS fix. The
+distance-filtered stream does not offer the same place twice, so a dropped fix
+used to leave alerts targeted at the township the device had left.
 
 **Report heartbeat.** The backend counts a device as active from these
 reports, and a township pinned by hand, or a phone that never moves, sends
