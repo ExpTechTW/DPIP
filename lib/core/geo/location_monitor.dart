@@ -81,13 +81,14 @@ class LocationMonitor extends ChangeNotifier with WidgetsBindingObserver {
   /// even when a report went out a moment ago ([DeviceLocationReporter
   /// .reportWhenAllowed]).
   Future<void> _onModeChanged() async {
-    // A pinned location needs no permission, so the reporter may not be
-    // running yet (the user denied the GPS and then pinned a township).
-    if (_location.isManual) {
-      _reporter.start();
-    } else {
-      _reporter.restart();
-    }
+    // Either way the reporter's stream must become the new source's. A GPS
+    // stream still open when a township is pinned would keep the GPS on and
+    // feed its fixes to the reporter, so it is re-subscribed rather than left
+    // as it is. restart() does nothing while stopped, so start() covers the
+    // user who pinned a township without ever granting the GPS.
+    _reporter
+      ..restart()
+      ..start();
     final town = await _location.currentTown();
     _publishedCode = town?.code;
     _regions.setCurrentCode(town?.code);
