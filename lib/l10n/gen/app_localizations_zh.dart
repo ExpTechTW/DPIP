@@ -675,21 +675,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get feedReplaying => '重播中';
 
   @override
-  String get replayEewWaiting => '目前重播時間尚無速報資料';
-
-  @override
-  String get replayEewRetrying => '速報資料載入失敗，正在重試';
-
-  @override
-  String get replayEewUnavailable => '速報資料暫時無法取得';
-
-  @override
-  String get replayEewNone => '此次重播未偵測到速報資料';
-
-  @override
-  String get replayEewNoneDetail => '已取樣事件開始、中段與結束';
-
-  @override
   String get mapLayerStyleBd => 'Dvorak BD';
 
   @override
@@ -901,6 +886,21 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get moonPhaseWaningGibbous => '虧凸月';
+
+  @override
+  String get replayEewWaiting => '目前重播時間尚無速報資料';
+
+  @override
+  String get replayEewRetrying => '速報資料載入失敗，正在重試';
+
+  @override
+  String get replayEewUnavailable => '速報資料暫時無法取得';
+
+  @override
+  String get replayEewNone => '此次重播未偵測到速報資料';
+
+  @override
+  String get replayEewNoneDetail => '已取樣事件開始、中段與結束';
 
   @override
   String get reportFilterIntensityInfoModernTitle => '新制（2020 起）';
@@ -4174,21 +4174,6 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get feedReplaying => '重播中';
 
   @override
-  String get replayEewWaiting => '当前重播时间暂无速报资料';
-
-  @override
-  String get replayEewRetrying => '速报资料载入失败，正在重试';
-
-  @override
-  String get replayEewUnavailable => '速报资料暂时无法取得';
-
-  @override
-  String get replayEewNone => '此次重播未检测到速报资料';
-
-  @override
-  String get replayEewNoneDetail => '已取样事件开始、中段与结束';
-
-  @override
   String get mapLayerStyleBd => 'Dvorak BD';
 
   @override
@@ -4400,6 +4385,21 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get moonPhaseWaningGibbous => '虧凸月';
+
+  @override
+  String get replayEewWaiting => '当前重播时间暂无速报资料';
+
+  @override
+  String get replayEewRetrying => '速报资料载入失败，正在重试';
+
+  @override
+  String get replayEewUnavailable => '速报资料暂时无法取得';
+
+  @override
+  String get replayEewNone => '此次重播未检测到速报资料';
+
+  @override
+  String get replayEewNoneDetail => '已取样事件开始、中段与结束';
 
   @override
   String get reportFilterIntensityInfoModernTitle => '新制（2020 起）';
@@ -7672,21 +7672,6 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get feedReplaying => '重播中';
 
   @override
-  String get replayEewWaiting => '目前重播時間尚無速報資料';
-
-  @override
-  String get replayEewRetrying => '速報資料載入失敗，正在重試';
-
-  @override
-  String get replayEewUnavailable => '速報資料暫時無法取得';
-
-  @override
-  String get replayEewNone => '此次重播未偵測到速報資料';
-
-  @override
-  String get replayEewNoneDetail => '已取樣事件開始、中段與結束';
-
-  @override
   String get mapLayerStyleBd => 'Dvorak BD';
 
   @override
@@ -7898,6 +7883,21 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get moonPhaseWaningGibbous => '虧凸月';
+
+  @override
+  String get replayEewWaiting => '目前重播時間尚無速報資料';
+
+  @override
+  String get replayEewRetrying => '速報資料載入失敗，正在重試';
+
+  @override
+  String get replayEewUnavailable => '速報資料暫時無法取得';
+
+  @override
+  String get replayEewNone => '此次重播未偵測到速報資料';
+
+  @override
+  String get replayEewNoneDetail => '已取樣事件開始、中段與結束';
 
   @override
   String get reportFilterIntensityInfoModernTitle => '新制（2020 起）';
@@ -11171,21 +11171,6 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get feedReplaying => '重播中';
 
   @override
-  String get replayEewWaiting => '目前重播時間尚無速報資料';
-
-  @override
-  String get replayEewRetrying => '速報資料載入失敗，正在重試';
-
-  @override
-  String get replayEewUnavailable => '速報資料暫時無法取得';
-
-  @override
-  String get replayEewNone => '此次重播未偵測到速報資料';
-
-  @override
-  String get replayEewNoneDetail => '已取樣事件開始、中段與結束';
-
-  @override
   String get mapLayerStyleBd => 'Dvorak BD';
 
   @override
@@ -11397,6 +11382,21 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get moonPhaseWaningGibbous => '虧凸月';
+
+  @override
+  String get replayEewWaiting => '目前重播時間尚無速報資料';
+
+  @override
+  String get replayEewRetrying => '速報資料載入失敗，正在重試';
+
+  @override
+  String get replayEewUnavailable => '速報資料暫時無法取得';
+
+  @override
+  String get replayEewNone => '此次重播未偵測到速報資料';
+
+  @override
+  String get replayEewNoneDetail => '已取樣事件開始、中段與結束';
 
   @override
   String get reportFilterIntensityInfoModernTitle => '新制（2020 起）';

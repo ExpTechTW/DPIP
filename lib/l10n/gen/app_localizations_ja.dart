@@ -679,21 +679,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get feedReplaying => '再生中';
 
   @override
-  String get replayEewWaiting => 'この時点の速報はまだありません';
-
-  @override
-  String get replayEewRetrying => '速報データを読み込めませんでした。再試行中';
-
-  @override
-  String get replayEewUnavailable => '速報データを一時的に取得できません';
-
-  @override
-  String get replayEewNone => 'このリプレイでは速報を検出できませんでした';
-
-  @override
-  String get replayEewNoneDetail => 'イベントの開始・中間・終了をサンプリング済み';
-
-  @override
   String get mapLayerStyleBd => 'Dvorak BD';
 
   @override
@@ -906,6 +891,21 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get moonPhaseWaningGibbous => '下弦の月(虧)';
+
+  @override
+  String get replayEewWaiting => 'この時点の速報はまだありません';
+
+  @override
+  String get replayEewRetrying => '速報データを読み込めませんでした。再試行中';
+
+  @override
+  String get replayEewUnavailable => '速報データを一時的に取得できません';
+
+  @override
+  String get replayEewNone => 'このリプレイでは速報を検出できませんでした';
+
+  @override
+  String get replayEewNoneDetail => 'イベントの開始・中間・終了をサンプリング済み';
 
   @override
   String get reportFilterIntensityInfoModernTitle => '新制（2020 年以降）';

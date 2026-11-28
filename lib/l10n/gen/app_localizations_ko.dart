@@ -678,21 +678,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get feedReplaying => '재생 중';
 
   @override
-  String get replayEewWaiting => '이 시점의 속보가 아직 없습니다';
-
-  @override
-  String get replayEewRetrying => '속보 데이터를 불러오지 못했습니다. 다시 시도 중';
-
-  @override
-  String get replayEewUnavailable => '속보 데이터를 일시적으로 가져올 수 없습니다';
-
-  @override
-  String get replayEewNone => '이 재생에서 속보를 찾지 못했습니다';
-
-  @override
-  String get replayEewNoneDetail => '이벤트의 시작·중간·끝을 샘플링했습니다';
-
-  @override
   String get mapLayerStyleBd => 'Dvorak BD';
 
   @override
@@ -905,6 +890,21 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get moonPhaseWaningGibbous => '하현망월';
+
+  @override
+  String get replayEewWaiting => '이 시점의 속보가 아직 없습니다';
+
+  @override
+  String get replayEewRetrying => '속보 데이터를 불러오지 못했습니다. 다시 시도 중';
+
+  @override
+  String get replayEewUnavailable => '속보 데이터를 일시적으로 가져올 수 없습니다';
+
+  @override
+  String get replayEewNone => '이 재생에서 속보를 찾지 못했습니다';
+
+  @override
+  String get replayEewNoneDetail => '이벤트의 시작·중간·끝을 샘플링했습니다';
 
   @override
   String get reportFilterIntensityInfoModernTitle => '신제(2020년 이후)';
