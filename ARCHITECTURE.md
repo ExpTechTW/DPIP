@@ -324,7 +324,11 @@ one of them goes through the single `NotifyRequestLane`
 (`core/network/notify_request_lane.dart`, `SharedDeps.notifyLane`): one
 request in flight, each starting at least 1.1 s after the previous one ended.
 `LocationApi` and `NotifyApi` take the lane in their constructors, so no caller
-can reach those routes around it.
+can reach those routes around it. The Live Activity token report is
+`NotifyRequestPriority.deferred`: it goes behind every location, registration
+or settings request waiting in the lane, and behind one still being prepared —
+a registration check, or the launch's location work, holds deferred requests
+until it has queued its own (`holdDeferred`).
 
 ## Data & errors
 
