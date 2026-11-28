@@ -238,6 +238,18 @@ abstract final class SettingKeys {
     'location.pendingReport',
   );
 
+  /// SHA-256 of the last (push token, push-to-start token, Live Activities
+  /// switch) triple the notify backend answered with a 2xx — or refused for
+  /// good. A hash, so neither token is stored again. A triple that differs, or
+  /// an answer older than six hours, is pending. See `LiveActivityRegistration`.
+  static const SettingKey<String> liveActivityReportedHash =
+      SettingKey<String>._('notification.liveActivityReportedHash');
+
+  /// When that answer came (calibrated UTC millis).
+  static const SettingKey<int> liveActivityReportedAtMs = SettingKey<int>._(
+    'notification.liveActivityReportedAtMs',
+  );
+
   /// The radio `MeshLink` keeps reconnecting to (BLE id), and its name for
   /// display. Their presence *is* the intent to stay connected — removed by
   /// `MeshLink.detach()`, which is the only thing that stops reconnection.

@@ -50,4 +50,25 @@ class NotifyApi {
           '${ApiPaths.notify}$token/$channel/$status',
         )) as List<dynamic>,
       );
+
+  /// Reports this device's Live Activity push-to-start token and whether Live
+  /// Activities are switched on for the app. iOS 18 and later only; the server
+  /// answers 204 and keeps both for this device's township — nothing starts a
+  /// Live Activity from them yet.
+  ///
+  /// [NotifyRequestPriority.deferred]: it goes behind every location report
+  /// and settings request that is waiting.
+  ///
+  /// `GET https://api.core-tnn1.exptech.dev/api/v2/notify/{token}/liveactivity/{pushToStartToken}/{0|1}`
+  Future<void> reportLiveActivity(
+    String token,
+    String pushToStartToken,
+    bool enabled,
+  ) => _lane.run(() async {
+    await _client.get(
+      ApiTier.coreExclusiveApi,
+      '${ApiPaths.notify}$token/liveactivity/$pushToStartToken/'
+      '${enabled ? 1 : 0}',
+    );
+  }, priority: NotifyRequestPriority.deferred);
 }

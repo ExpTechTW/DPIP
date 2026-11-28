@@ -1,6 +1,7 @@
 import 'package:dpip/core/geo/device_location_reporter.dart';
 import 'package:dpip/core/geo/device_registration.dart';
 import 'package:dpip/core/geo/location_mode.dart';
+import 'package:dpip/core/notifications/live_activity_registration.dart';
 import 'package:dpip/core/geo/location_monitor.dart';
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/geo/town_boundaries.dart';
@@ -67,6 +68,7 @@ class SharedDeps {
     required this.locationService,
     required this.deviceLocationReporter,
     this.deviceRegistration,
+    this.liveActivityRegistration,
     required this.notifyLane,
     required this.backgroundLocation,
     required this.locationMonitor,
@@ -141,6 +143,10 @@ class SharedDeps {
   /// day. Optional so a test that never reaches the services host need not
   /// build one; bootstrap always does.
   final DeviceRegistration? deviceRegistration;
+
+  /// Reports the Live Activity push-to-start token (iOS only; null elsewhere,
+  /// and in tests that never reach the services host).
+  final LiveActivityRegistration? liveActivityRegistration;
 
   /// The one lane every request the notify backend rate-limits per address
   /// goes through — the location report and the notify settings alike. One

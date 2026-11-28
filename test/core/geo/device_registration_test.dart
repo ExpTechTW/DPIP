@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:dpip/core/geo/device_location_reporter.dart';
 import 'package:dpip/core/geo/device_registration.dart';
 import 'package:dpip/core/geo/location_service.dart' show GpsFix;
+import 'package:dpip/core/network/notify_request_lane.dart';
 import 'package:dpip/core/settings/setting_keys.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:fake_async/fake_async.dart';
@@ -18,6 +21,7 @@ void main() {
   late DateTime? nativeSuccess;
   late ReportOutcome? pendingOutcome;
   late int resent;
+  late NotifyRequestLane lane;
   late DeviceRegistration registration;
 
   setUp(() {
@@ -30,6 +34,7 @@ void main() {
     nativeSuccess = null;
     pendingOutcome = null;
     resent = 0;
+    lane = NotifyRequestLane(spacing: Duration.zero);
     registration = DeviceRegistration(
       settings: settings,
       token: () => token,
@@ -52,6 +57,7 @@ void main() {
         if (outcome == ReportOutcome.sent) await registration.recordSuccess();
         return outcome;
       },
+      lane: lane,
       nativeLastSuccess: () async => nativeSuccess,
       now: () => now,
     );
@@ -165,5 +171,53 @@ void main() {
       expect(reported, hasLength(1));
       expect(settings.getString(SettingKeys.registeredTokenHash), isNull);
     });
+  });
+
+  test(
+    'registered: only for the token stored now, and only after a 2xx',
+    () async {
+      expect(registration.registered, isFalse);
+      outcomes = [ReportOutcome.failed];
+      await registration.ensure('launch');
+      expect(registration.registered, isFalse);
+
+      await registration.ensure('resume');
+      expect(registration.registered, isTrue);
+      token = 'token-b';
+      expect(registration.registered, isFalse);
+      token = null;
+      expect(registration.registered, isFalse);
+    },
+  );
+
+  test('deferred requests wait until the check is done', () async {
+    final fixReady = Completer<GpsFix?>();
+    final order = <String>[];
+    final slow = DeviceRegistration(
+      settings: settings,
+      token: () => token,
+      fix: () => fixReady.future,
+      report: (f) => lane.run(() async {
+        order.add('location');
+        return ReportOutcome.sent;
+      }),
+      resend: () async => null,
+      lane: lane,
+      now: () => now,
+    );
+
+    final check = slow.ensure('resume');
+    // Queued while the check still waits for its fix, on an idle lane.
+    final liveActivity = lane.run(
+      () async => order.add('live activity'),
+      priority: NotifyRequestPriority.deferred,
+    );
+    await pumpEventQueue();
+    expect(order, isEmpty);
+
+    fixReady.complete((lat: 25.03, lng: 121.56));
+    await check;
+    await liveActivity;
+    expect(order, ['location', 'live activity']);
   });
 }

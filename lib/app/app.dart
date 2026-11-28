@@ -11,7 +11,9 @@ import 'package:dpip/core/geo/location_mode.dart';
 import 'package:dpip/core/geo/location_monitor.dart';
 import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/logging/log.dart';
+import 'package:dpip/core/network/notify_request_lane.dart';
 import 'package:dpip/core/network/status_page_monitor.dart';
+import 'package:dpip/core/notifications/live_activity_registration.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/notifications/notification_taps.dart';
 import 'package:dpip/core/permissions/permission_health.dart';
@@ -61,6 +63,8 @@ class DpipApp extends StatelessWidget {
         widgetLocationCatalogCoordinator: deps.widgetLocationCatalogCoordinator,
         deviceLocationReporter: deps.deviceLocationReporter,
         deviceRegistration: deps.deviceRegistration,
+        liveActivityRegistration: deps.liveActivityRegistration,
+        notifyLane: deps.notifyLane,
         backgroundLocation: deps.backgroundLocation,
         locationMonitor: deps.locationMonitor,
         locationMode: deps.locationMode,
@@ -159,6 +163,8 @@ class _AppServicesHost extends StatefulWidget {
     required this.widgetLocationCatalogCoordinator,
     required this.deviceLocationReporter,
     required this.deviceRegistration,
+    required this.liveActivityRegistration,
+    required this.notifyLane,
     required this.backgroundLocation,
     required this.locationMonitor,
     required this.locationMode,
@@ -175,6 +181,8 @@ class _AppServicesHost extends StatefulWidget {
   final WidgetLocationCatalogCoordinator widgetLocationCatalogCoordinator;
   final DeviceLocationReporter deviceLocationReporter;
   final DeviceRegistration? deviceRegistration;
+  final LiveActivityRegistration? liveActivityRegistration;
+  final NotifyRequestLane notifyLane;
   final BackgroundLocationService backgroundLocation;
   final LocationMonitor locationMonitor;
   final LocationMode locationMode;
@@ -271,7 +279,18 @@ class _AppServicesHostState extends State<_AppServicesHost>
     widget.locationMonitor.start();
     widget.permissionHealth.start();
     widget.statusPage.start();
-    _startLocationIfGranted();
+    // The launch's location report and registration reach the notify backend
+    // before the Live Activity report: the backend limits them per address
+    // together, and the location decides where alerts go. Starting them first
+    // is not enough — the location side spends up to 10 s on permission and a
+    // fix before it has anything to send, while the Live Activity's first
+    // state arrives the moment it is listened to and would find the lane idle.
+    // So the lane holds deferred requests until this launch work is done; the
+    // lane's own ordering covers everything after.
+    unawaited(widget.notifyLane.holdDeferred(_startLocationIfGranted));
+    // Its first state arrives on listen, so this alone reports a device the
+    // backend already knows; the rest ride on [_register].
+    widget.liveActivityRegistration?.start();
   }
 
   @override
@@ -328,9 +347,15 @@ class _AppServicesHostState extends State<_AppServicesHost>
     _register('push token changed');
   }
 
+  /// Asks the registration first, then the Live Activity report. The order is
+  /// not what keeps the Live Activity request behind: the registration holds
+  /// the lane's deferred requests from the moment it is asked until it is done
+  /// (see [DeviceRegistration.ensure]), a pending location report included.
   void _register(String reason) {
     final registration = widget.deviceRegistration;
     if (registration != null) unawaited(registration.ensure(reason));
+    final liveActivity = widget.liveActivityRegistration;
+    if (liveActivity != null) unawaited(liveActivity.ensure(reason));
   }
 
   /// Arms native background reporting when a push token exists and background
@@ -373,6 +398,7 @@ class _AppServicesHostState extends State<_AppServicesHost>
     widget.onboarding.removeListener(_onOnboardingChanged);
     widget.locationMode.removeListener(_onLocationModeChanged);
     unawaited(_tokenChanges?.cancel());
+    widget.liveActivityRegistration?.dispose();
     WidgetsBinding.instance.removeObserver(this);
     widget.widgetLocationCatalogCoordinator.dispose();
     _observer.dispose();
