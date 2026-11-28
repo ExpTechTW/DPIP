@@ -2234,7 +2234,7 @@
   "eventReportSerial": "Bản tin {serial}",
   "eventReportKindIssue": "Phát hành",
   "eventReportKindUpdate": "Cập nhật",
-  "eventReportKindCorrect": "Đính chính",
+  "eventReportKindCorrect": "Đã đính chính",
   "eventReportKindCancel": "Hủy",
   "eventReportKindUnknown": "Không rõ",
   "eventDetailTitle": "Chi tiết sự kiện",

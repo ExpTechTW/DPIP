@@ -1,3 +1,4 @@
+import 'package:dpip/app/theme/app_caution.dart';
 import 'package:dpip/app/theme/app_radius.dart';
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/realtime/app_time.dart';
@@ -315,8 +316,12 @@ class _ReportEntryState extends State<_ReportEntry> {
   }
 }
 
-/// The kind of a report as a small pill; a cancellation is drawn in the
-/// error tone so it is not mistaken for another update.
+/// The kind of a report as a small pill. A cancellation is drawn in the
+/// error tone so it is not mistaken for another update; a correction — the
+/// report was changed after it was issued, by its source or by hand, and
+/// shows the corrected content — in the caution tone, so it reads as
+/// "corrected" rather than as one more update. What it said before is not
+/// shown, nor who corrected it.
 class _KindChip extends StatelessWidget {
   const _KindChip({required this.kind});
 
@@ -326,12 +331,19 @@ class _KindChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
-    final cancel = kind == EventReportKind.cancel;
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: cancel ? colors.errorContainer : colors.secondaryContainer,
-        borderRadius: AppRadius.small,
+    final (fill, ink) = switch (kind) {
+      EventReportKind.cancel => (
+        colors.errorContainer,
+        colors.onErrorContainer,
       ),
+      EventReportKind.correct => (
+        AppCaution.container(context),
+        AppCaution.onContainer(context),
+      ),
+      _ => (colors.secondaryContainer, colors.onSecondaryContainer),
+    };
+    return DecoratedBox(
+      decoration: BoxDecoration(color: fill, borderRadius: AppRadius.small),
       child: Padding(
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.sm,
@@ -340,9 +352,7 @@ class _KindChip extends StatelessWidget {
         child: Text(
           eventReportKindLabel(kind, AppLocalizations.of(context)),
           style: theme.textTheme.labelSmall?.copyWith(
-            color: cancel
-                ? colors.onErrorContainer
-                : colors.onSecondaryContainer,
+            color: ink,
             fontWeight: FontWeight.w600,
           ),
         ),

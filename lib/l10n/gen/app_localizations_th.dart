@@ -4049,7 +4049,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get eventReportKindUpdate => 'อัปเดต';
 
   @override
-  String get eventReportKindCorrect => 'แก้ไข';
+  String get eventReportKindCorrect => 'แก้ไขแล้ว';
 
   @override
   String get eventReportKindCancel => 'ยกเลิก';

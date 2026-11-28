@@ -4061,7 +4061,7 @@ class AppLocalizationsVi extends AppLocalizations {
   String get eventReportKindUpdate => 'Cập nhật';
 
   @override
-  String get eventReportKindCorrect => 'Đính chính';
+  String get eventReportKindCorrect => 'Đã đính chính';
 
   @override
   String get eventReportKindCancel => 'Hủy';

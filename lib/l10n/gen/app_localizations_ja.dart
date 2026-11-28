@@ -3964,7 +3964,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get eventReportKindUpdate => '更新';
 
   @override
-  String get eventReportKindCorrect => '訂正';
+  String get eventReportKindCorrect => '訂正済み';
 
   @override
   String get eventReportKindCancel => '取り消し';

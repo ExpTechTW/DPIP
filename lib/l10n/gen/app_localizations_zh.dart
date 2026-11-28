@@ -3931,7 +3931,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get eventReportKindUpdate => '更新';
 
   @override
-  String get eventReportKindCorrect => '更正';
+  String get eventReportKindCorrect => '已更正';
 
   @override
   String get eventReportKindCancel => '撤銷';
@@ -7972,7 +7972,7 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
   String get eventReportKindUpdate => '更新';
 
   @override
-  String get eventReportKindCorrect => '更正';
+  String get eventReportKindCorrect => '已更正';
 
   @override
   String get eventReportKindCancel => '撤销';
@@ -12014,7 +12014,7 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
   String get eventReportKindUpdate => '更新';
 
   @override
-  String get eventReportKindCorrect => '更正';
+  String get eventReportKindCorrect => '已更正';
 
   @override
   String get eventReportKindCancel => '取消';
@@ -16056,7 +16056,7 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
   String get eventReportKindUpdate => '更新';
 
   @override
-  String get eventReportKindCorrect => '更正';
+  String get eventReportKindCorrect => '已更正';
 
   @override
   String get eventReportKindCancel => '撤銷';
