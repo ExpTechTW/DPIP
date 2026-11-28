@@ -19,6 +19,8 @@ List<SingleChildWidget> notificationProviders(SharedDeps deps) => [
       NotifyApi(deps.apiClient),
       LocationApi(deps.apiClient),
       deps.locationService,
+      onReported: (fix) =>
+          deps.backgroundLocation.recordReport(lat: fix.lat, lng: fix.lng),
     ),
   ),
 ];

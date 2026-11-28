@@ -80,6 +80,50 @@ class BackgroundLocationChannel(private val context: Context) :
                 result.success(null)
             }
 
+            // The report heartbeat's inputs ([ReportHeartbeat]). Dart sends
+            // them in every mode — none of them enables anything, and `stop`
+            // clears none of them, because the heartbeat reports from devices
+            // that never `start`.
+            "setReportIdentity" -> {
+                val token = call.argument<String>("token")
+                val version = call.argument<String>("version")
+                val platform = call.argument<Number>("platform")?.toInt()
+                if (token == null || version == null || platform == null) {
+                    result.error("bad_args", "Missing setReportIdentity args", null)
+                    return
+                }
+                BgLocationStore.saveIdentity(context, token, version, platform)
+                result.success(null)
+            }
+
+            "setManualPoint" -> {
+                val point = point(call) ?: return result.error(
+                    "bad_args", "Missing setManualPoint args", null,
+                )
+                ReportHeartbeat.setManualPoint(context, point.lat, point.lng)
+                result.success(null)
+            }
+
+            "clearManualPoint" -> {
+                ReportHeartbeat.clearManualPoint(context)
+                result.success(null)
+            }
+
+            // A foreground report the server answered with a 2xx, stamped with
+            // this side's own clock so the heartbeat compares like with like.
+            "recordReport" -> {
+                val point = point(call) ?: return result.error(
+                    "bad_args", "Missing recordReport args", null,
+                )
+                BgLocationStore.recordReported(
+                    context,
+                    System.currentTimeMillis(),
+                    point.lat,
+                    point.lng,
+                )
+                result.success(null)
+            }
+
             // WorkManager exposes real work state asynchronously. Query it off
             // the platform thread so opening Developer diagnostics cannot stall UI.
             "diagnostics" -> Thread {
@@ -222,7 +266,14 @@ class BackgroundLocationChannel(private val context: Context) :
                     append("not scheduled")
                 }
             },
-        ) + BackgroundLocationWatchdog.diagnostics(context)
+        ) + BackgroundLocationWatchdog.diagnostics(context) +
+            ReportHeartbeat.diagnostics(context)
+    }
+
+    private fun point(call: MethodCall): ReportHeartbeat.Point? {
+        val lat = call.argument<Number>("lat")?.toDouble() ?: return null
+        val lng = call.argument<Number>("lng")?.toDouble() ?: return null
+        return ReportHeartbeat.Point(lat, lng)
     }
 
     /** The OS location authorization, in the same vocabulary the iOS side uses. */

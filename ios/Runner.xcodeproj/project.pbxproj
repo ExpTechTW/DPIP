@@ -118,6 +118,8 @@
 		FA189DB6B5D2AEDE6B6F84EC /* ForecastClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A4C17303E0719AE3C5AA97C /* ForecastClient.swift */; };
 		LR0S00000000000000000002 /* LocationReportSender.swift in Sources */ = {isa = PBXBuildFile; fileRef = LR0S00000000000000000001 /* LocationReportSender.swift */; };
 		LR0S00000000000000000004 /* LocationReportSenderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = LR0S00000000000000000003 /* LocationReportSenderTests.swift */; };
+		RH0B00000000000000000002 /* ReportHeartbeat.swift in Sources */ = {isa = PBXBuildFile; fileRef = RH0B00000000000000000001 /* ReportHeartbeat.swift */; };
+		RH0B00000000000000000004 /* ReportHeartbeatTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = RH0B00000000000000000003 /* ReportHeartbeatTests.swift */; };
 		NL0G00000000000000000002 /* NativeLogPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = NL0G00000000000000000001 /* NativeLogPlugin.swift */; };
 		IMSV00000000000000000002 /* ImageSaverPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = IMSV00000000000000000001 /* ImageSaverPlugin.swift */; };
 		NL0G00000000000000000004 /* NativeLogTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = NL0G00000000000000000003 /* NativeLogTests.swift */; };
@@ -316,6 +318,8 @@
 		FD769D73A7C4BE3619C1F9FB /* report.aiff */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = audio.aiff; path = Sounds/report.aiff; sourceTree = "<group>"; };
 		LR0S00000000000000000001 /* LocationReportSender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationReportSender.swift; sourceTree = "<group>"; };
 		LR0S00000000000000000003 /* LocationReportSenderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationReportSenderTests.swift; sourceTree = "<group>"; };
+		RH0B00000000000000000001 /* ReportHeartbeat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportHeartbeat.swift; sourceTree = "<group>"; };
+		RH0B00000000000000000003 /* ReportHeartbeatTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportHeartbeatTests.swift; sourceTree = "<group>"; };
 		NL0G00000000000000000001 /* NativeLogPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeLogPlugin.swift; sourceTree = "<group>"; };
 		IMSV00000000000000000001 /* ImageSaverPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageSaverPlugin.swift; sourceTree = "<group>"; };
 		NL0G00000000000000000003 /* NativeLogTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeLogTests.swift; sourceTree = "<group>"; };
@@ -613,6 +617,7 @@
 				ACCE10000000000000000003 /* AccelerometerDecimatorTests.swift */,
 				LR0S00000000000000000003 /* LocationReportSenderTests.swift */,
 				SK0S00000000000000000003 /* SecretStorePluginTests.swift */,
+				RH0B00000000000000000003 /* ReportHeartbeatTests.swift */,
 				NSE000000000000000000011 /* NotificationDeliveryBreadcrumbTests.swift */,
 				270FCEA4305CD2D6003D1E62 /* CurrentWeatherSnapshotAddressTests.swift */,
 				270FCEF4305D1EB2003D1E62 /* WidgetSnapshotFileTests.swift */,
@@ -698,6 +703,7 @@
 				CAC4EF00000000000000B002 /* MapCachePlugin.swift */,
 				CAC4EF00000000000000C002 /* BackgroundLocationPlugin.swift */,
 				LR0S00000000000000000001 /* LocationReportSender.swift */,
+				RH0B00000000000000000001 /* ReportHeartbeat.swift */,
 				CAC4EF00000000000000C102 /* BackgroundExecutionPlugin.swift */,
 				CAC4EF00000000000000E102 /* WidgetSnapshotPlugin.swift */,
 				CAC4EF00000000000000D002 /* StorageScanPlugin.swift */,
@@ -1145,6 +1151,7 @@
 				ACCE10000000000000000004 /* AccelerometerDecimatorTests.swift in Sources */,
 				LR0S00000000000000000004 /* LocationReportSenderTests.swift in Sources */,
 				SK0S00000000000000000004 /* SecretStorePluginTests.swift in Sources */,
+				RH0B00000000000000000004 /* ReportHeartbeatTests.swift in Sources */,
 				NSE000000000000000000012 /* NotificationDeliveryBreadcrumbTests.swift in Sources */,
 				270FCEF5305D1EB2003D1E62 /* WidgetSnapshotFileTests.swift in Sources */,
 				27CACC3E305C64AA0046F79C /* WidgetLocationIntentTests.swift in Sources */,
@@ -1235,6 +1242,7 @@
 				CAC4EF00000000000000B001 /* MapCachePlugin.swift in Sources */,
 				CAC4EF00000000000000C001 /* BackgroundLocationPlugin.swift in Sources */,
 				LR0S00000000000000000002 /* LocationReportSender.swift in Sources */,
+				RH0B00000000000000000002 /* ReportHeartbeat.swift in Sources */,
 				CAC4EF00000000000000C101 /* BackgroundExecutionPlugin.swift in Sources */,
 				CAC4EF00000000000000E101 /* WidgetSnapshotPlugin.swift in Sources */,
 				CAC4EF00000000000000D001 /* StorageScanPlugin.swift in Sources */,

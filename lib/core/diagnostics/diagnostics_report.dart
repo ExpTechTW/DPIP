@@ -179,6 +179,22 @@ String _watchdogRepairs(Map<String, Object?> d) {
   return '${count is int ? count : 0} · last $last';
 }
 
+/// The report heartbeat: its job, its last run and what that run did, and when
+/// it next comes due — `nothing to resend` before any report has succeeded.
+/// Its own row, because its lines in the native ring are the first to be
+/// pushed out on a device whose alarm path is busy.
+String _heartbeat(Map<String, Object?> d) {
+  final state = d['heartbeatState'] as String? ?? 'unknown';
+  final ran = d['heartbeatLastRunAt'] is int
+      ? 'last run ${_relativeTime(d['heartbeatLastRunAt'], absent: '')}'
+      : 'never run';
+  final outcome = d['heartbeatLastOutcome'];
+  final due = d['heartbeatDueAt'] is int
+      ? 'due ${_relativeTime(d['heartbeatDueAt'], absent: '')}'
+      : 'nothing to resend';
+  return '$state · $ran${outcome is String ? ' ($outcome)' : ''} · $due';
+}
+
 String _lastGeofenceTransition(Map<String, Object?> d) {
   final at = d['lastGeofenceTransitionAt'];
   if (at is! int) return 'never';
@@ -428,6 +444,8 @@ class DiagnosticsCollector {
               value: _watchdogRepairs(bgLocation),
             ),
           ],
+          if (bgLocation.containsKey('heartbeatState'))
+            (label: 'Report heartbeat', value: _heartbeat(bgLocation)),
           (label: 'Centred on', value: _centre(bgLocation)),
           (label: 'Detail', value: bgLocation['detail'] as String?),
           (

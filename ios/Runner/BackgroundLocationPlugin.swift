@@ -101,8 +101,49 @@ public class BackgroundLocationPlugin: NSObject, FlutterPlugin, CLLocationManage
       stopMonitoring()
       sender.discardPending("background reporting stopped")
       result(nil)
+    // The report heartbeat's inputs (`ReportHeartbeat`). Dart sends them in
+    // every mode; none of them enables anything, and `stop` clears none of
+    // them, because the heartbeat reports from devices that never `start`.
+    case "setReportIdentity":
+      guard
+        let args = call.arguments as? [String: Any],
+        let token = args["token"] as? String,
+        let version = args["version"] as? String,
+        let platform = args["platform"] as? Int
+      else {
+        result(
+          FlutterError(code: "bad_args", message: "Missing setReportIdentity args", details: nil))
+        return
+      }
+      sender.store.saveIdentity(token: token, version: version, platform: platform)
+      result(nil)
+    case "setManualPoint":
+      guard let point = Self.point(call) else {
+        result(FlutterError(code: "bad_args", message: "Missing setManualPoint args", details: nil))
+        return
+      }
+      sender.store.setManualPoint(point)
+      result(nil)
+    case "clearManualPoint":
+      sender.store.clearManualPoint()
+      result(nil)
+    // A foreground report the server answered with a 2xx, stamped with this
+    // side's own clock so the heartbeat compares like with like.
+    case "recordReport":
+      guard let point = Self.point(call) else {
+        result(FlutterError(code: "bad_args", message: "Missing recordReport args", details: nil))
+        return
+      }
+      sender.store.recordReported(point, at: Date())
+      result(nil)
+    // The scheduler answers asynchronously, and only it knows whether the
+    // heartbeat's request is still queued.
     case "diagnostics":
-      result(diagnostics())
+      var out = diagnostics()
+      ReportHeartbeat.state { state in
+        out["heartbeatState"] = state
+        result(out)
+      }
     // Answered only once the delete has run. The developer page re-reads the
     // fix count the moment this returns, and replying early would show it the
     // count it just asked to throw away.
@@ -181,7 +222,16 @@ public class BackgroundLocationPlugin: NSObject, FlutterPlugin, CLLocationManage
       out["centreLat"] = centre.latitude
       out["centreLng"] = centre.longitude
     }
+    out.merge(ReportHeartbeat.shared.diagnostics()) { _, heartbeat in heartbeat }
     return out
+  }
+
+  private static func point(_ call: FlutterMethodCall) -> CLLocationCoordinate2D? {
+    guard let args = call.arguments as? [String: Any],
+      let lat = (args["lat"] as? NSNumber)?.doubleValue,
+      let lng = (args["lng"] as? NSNumber)?.doubleValue
+    else { return nil }
+    return CLLocationCoordinate2D(latitude: lat, longitude: lng)
   }
 
   private static func describe(_ status: CLAuthorizationStatus) -> String {

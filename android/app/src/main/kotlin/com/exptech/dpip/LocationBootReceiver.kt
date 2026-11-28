@@ -4,7 +4,14 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 
-/** Restores scheduling after reboot/update and delegates repair to JobScheduler. */
+/**
+ * Restores scheduling after reboot/update and delegates repair to JobScheduler.
+ *
+ * The report heartbeat is armed here too, before the background-location
+ * check: it runs in every mode (manual included, where background reporting is
+ * off), and an app update that is never opened would otherwise leave the
+ * device without it until the next launch.
+ */
 class LocationBootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val app = context.applicationContext
@@ -14,6 +21,7 @@ class LocationBootReceiver : BroadcastReceiver() {
         ) {
             return
         }
+        ReportHeartbeat.ensure(app)
         if (!BgLocationStore.enabled(app)) return
 
         if (intent.action == Intent.ACTION_BOOT_COMPLETED) {

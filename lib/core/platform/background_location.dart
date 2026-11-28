@@ -110,13 +110,65 @@ class BackgroundLocationService {
     }
   }
 
-  /// When the native path last had a 2xx, in **device** time, or null when it
-  /// never has or cannot say.
+  /// When the native side last saw a 2xx, in **device** time, or null when it
+  /// never has or cannot say: the later of the background path's own success
+  /// and the report record every path writes (`reportedAt`), which counts the
+  /// report heartbeat too.
   Future<DateTime?> lastSuccessAt() async {
-    final at = (await diagnostics())['lastSuccessAt'];
-    return at is int
-        ? DateTime.fromMillisecondsSinceEpoch(at, isUtc: true)
-        : null;
+    final diagnostics = await this.diagnostics();
+    int? latest;
+    for (final key in const ['lastSuccessAt', 'reportedAt']) {
+      final at = diagnostics[key];
+      if (at is int && (latest == null || at > latest)) latest = at;
+    }
+    return latest == null
+        ? null
+        : DateTime.fromMillisecondsSinceEpoch(latest, isUtc: true);
+  }
+
+  // The report heartbeat's inputs. Native reports once when the device has had
+  // no successful report for about three days, in every mode, and never asks
+  // for a fix to do it — so everything it sends is handed over from here:
+  //
+  //   setReportIdentity {platform: int, version: String, token: String}
+  //   setManualPoint    {lat: double, lng: double}
+  //   clearManualPoint  (no arguments)
+  //   recordReport      {lat: double, lng: double}
+  //
+  // None of them enables background reporting, and `stop` clears none of
+  // them. A platform that has no heartbeat yet answers "not implemented",
+  // which each call below takes as a quiet no-op: each answers false then.
+
+  /// Hands native the push [token] a report is sent with, beside this
+  /// service's platform and version. Call whenever the token changes, in every
+  /// mode — a device that never [start]s still has to be reported as.
+  Future<bool> setReportIdentity(String token) => _heartbeat(
+    'setReportIdentity',
+    {'platform': _platform, 'token': token, 'version': _version},
+  );
+
+  /// The point reported while a township is pinned by hand.
+  Future<bool> setManualPoint({required double lat, required double lng}) =>
+      _heartbeat('setManualPoint', {'lat': lat, 'lng': lng});
+
+  /// Back to automatic: the heartbeat resends the last reported point.
+  Future<bool> clearManualPoint() => _heartbeat('clearManualPoint');
+
+  /// Tells native a report from this isolate was answered with a 2xx, and
+  /// from where. Native stamps it with its own clock.
+  Future<bool> recordReport({required double lat, required double lng}) =>
+      _heartbeat('recordReport', {'lat': lat, 'lng': lng});
+
+  Future<bool> _heartbeat(String method, [Map<String, Object?>? args]) async {
+    try {
+      await _channel.invokeMethod<void>(method, args);
+      return true;
+    } on MissingPluginException {
+      return false;
+    } on PlatformException catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'background location $method');
+      return false;
+    }
   }
 
   /// Writes everything the native background path recorded into the app's own

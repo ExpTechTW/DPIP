@@ -137,6 +137,53 @@ final class LocationReportSender: NSObject, URLSessionDownloadDelegate {
     note(.info, "pending fix \(pending.id.prefix(8)) discarded: \(reason)")
   }
 
+  /// Sends one report for the report heartbeat, under the same rules as a
+  /// fix: one request on the wire at a time, and nothing while a pending fix
+  /// is backing off after the server said "not now". A pending fix that is
+  /// due goes out instead — it is newer than anything the heartbeat holds.
+  ///
+  /// Records nothing itself; the heartbeat applies the answer. Returns a
+  /// cancel for the request, which the background task's expiration calls.
+  @discardableResult
+  func sendHeartbeat(
+    _ coordinate: CLLocationCoordinate2D, completion: @escaping (HeartbeatSendResult) -> Void
+  ) -> (() -> Void)? {
+    guard inFlight == nil else {
+      completion(.busy("a background report is on the wire"))
+      return nil
+    }
+    if let pending = store.pending {
+      if pending.notBefore > Date() {
+        completion(.busy("a background report is backing off"))
+      } else {
+        retryPending("heartbeat")
+        completion(.busy("a background report was pending, retried instead"))
+      }
+      return nil
+    }
+    guard let url = store.url(latitude: coordinate.latitude, longitude: coordinate.longitude)
+    else {
+      completion(.noToken)
+      return nil
+    }
+    let marker = "heartbeat-\(UUID().uuidString)"
+    inFlight = marker
+    var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData)
+    request.timeoutInterval = 15
+    let task = URLSession.shared.dataTask(with: request) { [weak self] _, response, _ in
+      let status = (response as? HTTPURLResponse)?.statusCode
+      DispatchQueue.main.async {
+        guard let self else { return }
+        if self.inFlight == marker { self.inFlight = nil }
+        completion(.answered(status))
+        // A fix that arrived while this was on the wire.
+        if let pending = self.store.pending { self.attempt(pending) }
+      }
+    }
+    task.resume()
+    return { task.cancel() }
+  }
+
   // MARK: - Sending
 
   private func attempt(_ pending: PendingLocationReport) {
@@ -289,6 +336,23 @@ final class LocationReportSender: NSObject, URLSessionDownloadDelegate {
   private func note(_ level: NativeLogLevel, _ message: String) {
     FileNativeLog.appGroup()?.record(level: level, tag: "BackgroundLocation", message: message)
   }
+}
+
+/// What became of one heartbeat send.
+enum HeartbeatSendResult: Equatable {
+  /// The request went out; the HTTP status, or nil for no response at all.
+  case answered(Int?)
+  /// Not sent: the background path is reporting, and has the wire.
+  case busy(String)
+  /// Not sent: no push token or app version yet.
+  case noToken
+}
+
+/// The device's last successful report, from any path.
+struct ReportedFix: Equatable {
+  var at: Date
+  var latitude: Double
+  var longitude: Double
 }
 
 // MARK: - Decisions
@@ -449,6 +513,20 @@ struct LocationReportStore {
   static let lastSuccessCodeKey = "dpip.bgloc.lastSuccessCode"
   static let pendingKey = "dpip.bgloc.pending"
   static let sessionUsedKey = "dpip.bgloc.sessionUsed"
+  /// The device's last successful report from **any** path — this one, the
+  /// Dart foreground reports and the report heartbeat — and the point it sent.
+  /// Kept apart from `lastSuccessAtKey` and `lastLatKey`, which are this
+  /// path's own: the diagnostics page's "Last success" and the point the
+  /// distance gate measures from.
+  static let reportedAtKey = "dpip.bgloc.reportedAt"
+  static let reportedLatKey = "dpip.bgloc.reportedLat"
+  static let reportedLngKey = "dpip.bgloc.reportedLng"
+  /// The pinned township's reporting point, which the heartbeat sends instead.
+  static let manualLatKey = "dpip.bgloc.manualLat"
+  static let manualLngKey = "dpip.bgloc.manualLng"
+  static let heartbeatJitterKey = "dpip.bgloc.heartbeatJitter"
+  static let heartbeatLastRunAtKey = "dpip.bgloc.heartbeatLastRunAt"
+  static let heartbeatLastOutcomeKey = "dpip.bgloc.heartbeatLastOutcome"
 
   let defaults: UserDefaults
 
@@ -507,6 +585,76 @@ struct LocationReportStore {
     defaults.set(coordinate.longitude, forKey: Self.lastLngKey)
     defaults.set(at.timeIntervalSince1970, forKey: Self.lastSuccessAtKey)
     defaults.set(status, forKey: Self.lastSuccessCodeKey)
+    recordReported(coordinate, at: at)
+  }
+
+  // MARK: Report heartbeat
+
+  /// The last successful report from any path, or nil before the first.
+  var reported: ReportedFix? {
+    guard defaults.object(forKey: Self.reportedAtKey) != nil,
+      defaults.object(forKey: Self.reportedLatKey) != nil,
+      defaults.object(forKey: Self.reportedLngKey) != nil
+    else { return nil }
+    return ReportedFix(
+      at: Date(timeIntervalSince1970: defaults.double(forKey: Self.reportedAtKey)),
+      latitude: defaults.double(forKey: Self.reportedLatKey),
+      longitude: defaults.double(forKey: Self.reportedLngKey))
+  }
+
+  /// A 2xx for [coordinate], answered at [at] (device time).
+  func recordReported(_ coordinate: CLLocationCoordinate2D, at: Date) {
+    defaults.set(at.timeIntervalSince1970, forKey: Self.reportedAtKey)
+    defaults.set(coordinate.latitude, forKey: Self.reportedLatKey)
+    defaults.set(coordinate.longitude, forKey: Self.reportedLngKey)
+  }
+
+  /// What a report is sent as, without enabling anything: Dart hands it over
+  /// in every mode, because the heartbeat reports from devices that never
+  /// `start`. `stop` keeps it.
+  func saveIdentity(token: String, version: String, platform: Int) {
+    defaults.set(token, forKey: Self.tokenKey)
+    defaults.set(version, forKey: Self.versionKey)
+    defaults.set(platform, forKey: Self.platformKey)
+  }
+
+  var manualPoint: CLLocationCoordinate2D? {
+    guard defaults.object(forKey: Self.manualLatKey) != nil,
+      defaults.object(forKey: Self.manualLngKey) != nil
+    else { return nil }
+    return CLLocationCoordinate2D(
+      latitude: defaults.double(forKey: Self.manualLatKey),
+      longitude: defaults.double(forKey: Self.manualLngKey))
+  }
+
+  func setManualPoint(_ coordinate: CLLocationCoordinate2D) {
+    defaults.set(coordinate.latitude, forKey: Self.manualLatKey)
+    defaults.set(coordinate.longitude, forKey: Self.manualLngKey)
+  }
+
+  func clearManualPoint() {
+    defaults.removeObject(forKey: Self.manualLatKey)
+    defaults.removeObject(forKey: Self.manualLngKey)
+  }
+
+  /// This install's fixed share of `ReportHeartbeatPolicy.jitterRange`, drawn
+  /// once and kept.
+  func heartbeatJitter(
+    draw: () -> TimeInterval = {
+      TimeInterval.random(in: 0..<ReportHeartbeatPolicy.jitterRange)
+    }
+  ) -> TimeInterval {
+    if defaults.object(forKey: Self.heartbeatJitterKey) != nil {
+      return defaults.double(forKey: Self.heartbeatJitterKey)
+    }
+    let jitter = draw()
+    defaults.set(jitter, forKey: Self.heartbeatJitterKey)
+    return jitter
+  }
+
+  func recordHeartbeatRun(at: Date, outcome: String) {
+    defaults.set(at.timeIntervalSince1970, forKey: Self.heartbeatLastRunAtKey)
+    defaults.set(outcome, forKey: Self.heartbeatLastOutcomeKey)
   }
 
   func recordAttempt(at: Date, status: Int) {
@@ -518,6 +666,10 @@ struct LocationReportStore {
   /// The report URL with the configuration as it is *now* — a fix that waited
   /// out a token change goes out under the new token.
   func url(for pending: PendingLocationReport) -> URL? {
+    url(latitude: pending.latitude, longitude: pending.longitude)
+  }
+
+  func url(latitude: Double, longitude: Double) -> URL? {
     guard
       let token = defaults.string(forKey: Self.tokenKey),
       let version = defaults.string(forKey: Self.versionKey)
@@ -526,7 +678,7 @@ struct LocationReportStore {
     // coreExclusiveApi is tnn1-only (no failover) — matches ApiTier.coreExclusiveApi.
     return URL(
       string:
-        "https://api.core-tnn1.exptech.dev/api/v2/location/\(platform)/\(token)/\(version)/\(pending.latitude),\(pending.longitude)"
+        "https://api.core-tnn1.exptech.dev/api/v2/location/\(platform)/\(token)/\(version)/\(latitude),\(longitude)"
     )
   }
 }

@@ -73,6 +73,9 @@ class MainActivity : FlutterActivity() {
 
         MethodChannel(messenger, BackgroundLocationChannel.NAME)
             .setMethodCallHandler(BackgroundLocationChannel(applicationContext))
+        // On every start and in every mode, independent of the background
+        // location grant and of `start` / `stop`; KEEP makes a relaunch free.
+        ReportHeartbeat.ensure(applicationContext)
 
         MethodChannel(messenger, BatteryOptimizationChannel.NAME)
             .setMethodCallHandler(BatteryOptimizationChannel(applicationContext))

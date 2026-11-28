@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import java.net.HttpURLConnection
 import java.net.URL
+import java.security.MessageDigest
 
 /**
  * Shared persistence + reporting for background device-location reporting, used
@@ -47,17 +48,40 @@ object BgLocationStore {
     /** How many triggers the throttle has dropped, for the diagnostics page. */
     const val KEY_THROTTLED_N = "throttled_n"
 
+    /**
+     * Which identity `start` last armed with, hashed — the token need not be
+     * stored twice. [KEY_TOKEN] and its siblings can no longer answer that,
+     * because Dart now writes them in every mode ([saveIdentity]).
+     */
+    const val KEY_STARTED_WITH = "started_with"
+
+    // The device's last successful report from **any** path — this one, the
+    // Dart foreground reports and the [ReportHeartbeat] — and the point it
+    // sent. Kept apart from KEY_LAST_SUCCESS_AT, which is the background
+    // path's own evidence on the diagnostics page and would stop meaning
+    // anything if a foreground report could write it. Device time; the
+    // coordinates as raw double bits, so the heartbeat resends exactly them.
+    const val KEY_REPORTED_AT = "reported_at"
+    const val KEY_REPORTED_LAT = "reported_lat"
+    const val KEY_REPORTED_LNG = "reported_lng"
+
     fun prefs(context: Context): SharedPreferences =
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 
     fun enabled(context: Context): Boolean = prefs(context).getBoolean(KEY_ENABLED, false)
 
+    /** Whether `start` is already armed with exactly this identity. */
     fun configMatches(context: Context, token: String, version: String, platform: Int): Boolean {
         val prefs = prefs(context)
-        return prefs.getBoolean(KEY_ENABLED, false) &&
-            prefs.getString(KEY_TOKEN, null) == token &&
-            prefs.getString(KEY_VERSION, null) == version &&
-            prefs.getInt(KEY_PLATFORM, Int.MIN_VALUE) == platform
+        if (!prefs.getBoolean(KEY_ENABLED, false)) return false
+        // Builds before the heartbeat wrote the identity keys from `start`
+        // alone, so on a device that has not started since, they still say
+        // what it started with.
+        val startedWith = prefs.getString(KEY_STARTED_WITH, null)
+            ?: return prefs.getString(KEY_TOKEN, null) == token &&
+                prefs.getString(KEY_VERSION, null) == version &&
+                prefs.getInt(KEY_PLATFORM, Int.MIN_VALUE) == platform
+        return startedWith == configId(token, version, platform)
     }
 
     fun saveConfig(context: Context, token: String, version: String, platform: Int) {
@@ -66,7 +90,65 @@ object BgLocationStore {
             .putString(KEY_TOKEN, token)
             .putString(KEY_VERSION, version)
             .putInt(KEY_PLATFORM, platform)
+            .putString(KEY_STARTED_WITH, configId(token, version, platform))
             .apply()
+    }
+
+    /**
+     * Stores what a report is sent as — push token, app version, platform —
+     * without enabling anything. Dart hands it over in every mode, because the
+     * [ReportHeartbeat] reports from devices that never `start`: a township
+     * pinned by hand, or no "Always" grant. [disable] keeps it.
+     *
+     * [configMatches] reads [KEY_STARTED_WITH], not these, so a new token that
+     * arrives here first still makes the next `start` report it.
+     */
+    fun saveIdentity(context: Context, token: String, version: String, platform: Int) {
+        val prefs = prefs(context)
+        if (prefs.getString(KEY_TOKEN, null) == token &&
+            prefs.getString(KEY_VERSION, null) == version &&
+            prefs.contains(KEY_PLATFORM) &&
+            prefs.getInt(KEY_PLATFORM, 0) == platform
+        ) {
+            return
+        }
+        prefs.edit()
+            .putString(KEY_TOKEN, token)
+            .putString(KEY_VERSION, version)
+            .putInt(KEY_PLATFORM, platform)
+            .apply()
+    }
+
+    private fun configId(token: String, version: String, platform: Int): String =
+        MessageDigest.getInstance("SHA-256")
+            .digest("$platform\n$version\n$token".toByteArray())
+            .joinToString("") { "%02x".format(it) }
+
+    /** The device's last successful report, from any path, or null if none. */
+    data class Reported(val at: Long, val lat: Double, val lng: Double)
+
+    /** Records a 2xx sent at [at] (device time) from [lat], [lng]. */
+    fun recordReported(context: Context, at: Long, lat: Double, lng: Double) {
+        prefs(context).edit()
+            .putLong(KEY_REPORTED_AT, at)
+            .putLong(KEY_REPORTED_LAT, lat.toRawBits())
+            .putLong(KEY_REPORTED_LNG, lng.toRawBits())
+            .apply()
+    }
+
+    fun reported(context: Context): Reported? {
+        val prefs = prefs(context)
+        if (!prefs.contains(KEY_REPORTED_AT) ||
+            !prefs.contains(KEY_REPORTED_LAT) ||
+            !prefs.contains(KEY_REPORTED_LNG)
+        ) {
+            return null
+        }
+        return Reported(
+            prefs.getLong(KEY_REPORTED_AT, 0L),
+            Double.fromBits(prefs.getLong(KEY_REPORTED_LAT, 0L)),
+            Double.fromBits(prefs.getLong(KEY_REPORTED_LNG, 0L)),
+        )
     }
 
     fun disable(context: Context) {
@@ -154,38 +236,97 @@ object BgLocationStore {
         // JobWorkItems and a foreground report can otherwise pass the throttle
         // together and issue duplicate requests.
         prefs.edit().putLong(KEY_LAST_SENT_AT, now).apply()
-        var code = -1
-        try {
-            val url = URL(
-                "https://api.core-tnn1.exptech.dev/api/v2/location/" +
-                    "$platform/$token/$version/$lat,$lng",
-            )
-            (url.openConnection() as HttpURLConnection).apply {
-                requestMethod = "GET"
-                connectTimeout = 10_000
-                readTimeout = 10_000
-                code = responseCode // fire the request
-                disconnect()
-            }
-        } catch (e: Exception) {
-            // Best-effort; the next trigger retries. The outcome is still
-            // recorded below — "tried at T and failed" is the diagnostic that
-            // separates "never fired" from "fires but cannot reach the server".
-            //
-            // The exception's name is kept, because -1 on its own is not a
-            // diagnosis. On a device where the alarm path failed three times
-            // running while the app's own SSE connections were live, -1 was
-            // everything the app could say, and it fits UnknownHostException,
-            // a timeout, a TLS failure and a Doze network block equally well.
-            note(context, "report failed: ${e.javaClass.simpleName}")
-        }
+        // Best-effort; the next trigger retries. The outcome is still recorded
+        // below — "tried at T and failed" is the diagnostic that separates
+        // "never fired" from "fires but cannot reach the server".
+        val code = send(context, "report", platform, token, version, lat, lng)
         stampAttempt(prefs, now, code)
         if (code in 200..299) {
             prefs.edit()
                 .putLong(KEY_LAST_SUCCESS_AT, now)
                 .putInt(KEY_LAST_SUCCESS_CODE, code)
                 .apply()
+            recordReported(context, now, lat, lng)
         }
+    }
+
+    /**
+     * Sends one report for the [ReportHeartbeat], under the same lock and the
+     * same one-a-minute floor as [report], and records a 2xx. Blocking — call
+     * off the main thread.
+     *
+     * Unlike [report] it ignores [enabled] — the heartbeat reports in every
+     * mode — and records nothing on the local track, because the point is a
+     * resend, not a fix. Its attempts stay out of the background path's
+     * diagnostics too; the heartbeat keeps its own.
+     *
+     * The HTTP status; [NO_TOKEN] or [NO_VERSION] when no request could be
+     * made; null when a report went out inside the last minute.
+     */
+    @Synchronized
+    fun reportOnce(context: Context, now: Long, lat: Double, lng: Double): Int? {
+        val prefs = prefs(context)
+        val sent = prefs.getLong(KEY_LAST_SENT_AT, 0L)
+        if (sent in 1..now && now - sent < MIN_REPORT_INTERVAL_MS) return null
+        val token = prefs.getString(KEY_TOKEN, null) ?: return NO_TOKEN
+        val version = prefs.getString(KEY_VERSION, null) ?: return NO_VERSION
+        val platform = prefs.getInt(KEY_PLATFORM, 0)
+        prefs.edit().putLong(KEY_LAST_SENT_AT, now).apply()
+        val code = send(context, "heartbeat", platform, token, version, lat, lng)
+        if (code in 200..299) recordReported(context, now, lat, lng)
+        return code
+    }
+
+    /** One `GET` against an absolute URL, answering the HTTP status. */
+    fun interface Transport {
+        fun get(url: String): Int
+    }
+
+    /** The real network. Tests swap in their own, so nothing reaches production. */
+    @Volatile
+    internal var transport: Transport = Transport { url ->
+        val connection = URL(url).openConnection() as HttpURLConnection
+        try {
+            connection.requestMethod = "GET"
+            connection.connectTimeout = 10_000
+            connection.readTimeout = 10_000
+            connection.responseCode // fires the request
+        } finally {
+            connection.disconnect()
+        }
+    }
+
+    internal fun reportUrl(
+        platform: Int,
+        token: String,
+        version: String,
+        lat: Double,
+        lng: Double,
+    ): String = "https://api.core-tnn1.exptech.dev/api/v2/location/" +
+        "$platform/$token/$version/$lat,$lng"
+
+    /**
+     * Fires `updateDeviceLocation` once; the HTTP status, or -1 when no answer
+     * came. coreExclusiveApi is tnn1-only (no failover). Never throws.
+     */
+    private fun send(
+        context: Context,
+        label: String,
+        platform: Int,
+        token: String,
+        version: String,
+        lat: Double,
+        lng: Double,
+    ): Int = try {
+        transport.get(reportUrl(platform, token, version, lat, lng))
+    } catch (e: Exception) {
+        // The exception's name is kept, because -1 on its own is not a
+        // diagnosis. On a device where the alarm path failed three times
+        // running while the app's own SSE connections were live, -1 was
+        // everything the app could say, and it fits UnknownHostException, a
+        // timeout, a TLS failure and a Doze network block equally well.
+        note(context, "$label failed: ${e.javaClass.simpleName}")
+        -1
     }
 
     /** The floor between two reports, whichever trigger asks. */

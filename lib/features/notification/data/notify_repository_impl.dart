@@ -27,11 +27,20 @@ import 'package:package_info_plus/package_info_plus.dart';
 /// outcome — success, a different error, or a registration that itself
 /// fails — is returned as-is.
 class NotifyRepositoryImpl implements NotifyRepository {
-  const NotifyRepositoryImpl(this._api, this._locationApi, this._location);
+  const NotifyRepositoryImpl(
+    this._api,
+    this._locationApi,
+    this._location, {
+    this._onReported,
+  });
 
   final NotifyApi _api;
   final LocationApi _locationApi;
   final LocationService _location;
+
+  /// Called after the registration report was answered with a 2xx, with the
+  /// fix it sent — the native report heartbeat counts every path's success.
+  final Future<void> Function(GpsFix fix)? _onReported;
 
   /// Cool-down applied twice during 401 recovery: before the registration
   /// call, and again before retrying the call that 401'd.
@@ -148,6 +157,11 @@ class NotifyRepositoryImpl implements NotifyRepository {
         lng: fix.lng,
       );
       Log.info('notify: register location → OK');
+      try {
+        await _onReported?.call(fix);
+      } catch (error, stackTrace) {
+        Log.handle(error, stackTrace, 'notify: register location onReported');
+      }
       return true;
     } on DioException catch (error) {
       // A non-2xx here is routine load-shedding by the backend (429), not a

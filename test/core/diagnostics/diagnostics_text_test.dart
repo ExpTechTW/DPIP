@@ -253,6 +253,10 @@ void main() {
           'watchdogLastRunAt': ago(const Duration(hours: 3, minutes: 5)),
           'watchdogRepairCount': 1,
           'watchdogLastRepairAt': ago(const Duration(days: 2, hours: 1)),
+          'heartbeatState': 'enqueued',
+          'heartbeatLastRunAt': ago(const Duration(hours: 5, minutes: 5)),
+          'heartbeatLastOutcome': 'not due, last success 3 h ago',
+          'heartbeatDueAt': ahead(const Duration(days: 3, hours: 1)),
           'centreLat': 25.0333,
           'centreLng': 121.5654,
           'detail': 'armed on the geofence',
@@ -286,6 +290,13 @@ void main() {
         expect(text, contains('Watchdog: scheduled · healthy · in 1 h'));
         expect(text, contains('Watchdog runs: 4 · last 3 h ago'));
         expect(text, contains('Watchdog repair attempts: 1 · last 2 d ago'));
+        expect(
+          text,
+          contains(
+            'Report heartbeat: enqueued · last run 5 h ago '
+            '(not due, last success 3 h ago) · due in 3 d',
+          ),
+        );
         expect(text, contains('Centred on: 25.0333, 121.5654'));
         expect(text, contains('Background execution: unknown'));
         expect(text, contains('Kept active: n/a'));
