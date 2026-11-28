@@ -3563,4 +3563,42 @@ class AppLocalizationsTh extends AppLocalizations {
   @override
   String get trendRainHourLastReading =>
       'ปริมาณฝน 1 ชั่วโมงถึงการวัดครั้งสุดท้ายของชั่วโมงนี้';
+
+  @override
+  String get notifyVolumeMismatchTitle =>
+      'การแจ้งเตือนบางรายการยังใช้การตั้งค่าระดับเสียงจากเวอร์ชันเก่า';
+
+  @override
+  String get notifyVolumeMismatchSubtitle =>
+      'แตะเพื่อดูว่าเป็นรายการใดและวิธีเปลี่ยน';
+
+  @override
+  String get notifyVolumeMismatchCause =>
+      'หมวดหมู่การแจ้งเตือนเหล่านี้สร้างโดย DPIP เวอร์ชันเก่า และใช้ระดับเสียงต่างจากเวอร์ชันปัจจุบัน Android ไม่อนุญาตให้แอปเปลี่ยนหมวดหมู่การแจ้งเตือนที่สร้างไว้แล้ว การอัปเดต DPIP จึงเปลี่ยนไม่ได้';
+
+  @override
+  String notifyVolumeMismatchChannel(String current, String expected) {
+    return 'ตอนนี้ใช้$current — เวอร์ชันนี้ใช้$expected';
+  }
+
+  @override
+  String get notifyVolumeAlarm => 'ระดับเสียงนาฬิกาปลุก';
+
+  @override
+  String get notifyVolumeNotification => 'ระดับเสียงการแจ้งเตือน';
+
+  @override
+  String get notifyVolumeMismatchFix =>
+      'หากต้องการเปลี่ยน ให้ล้างพื้นที่เก็บข้อมูลของ DPIP จากหน้าข้อมูลแอป หรือถอนการติดตั้งแล้วติดตั้ง DPIP ใหม่';
+
+  @override
+  String get notifyVolumeMismatchWarning =>
+      'ทั้งสองวิธีจะลบการตั้งค่าทั้งหมดของ DPIP และคุณจะต้องตั้งค่าแอปใหม่อีกครั้ง';
+
+  @override
+  String get notifyVolumeMismatchOptional =>
+      'หากระดับเสียงตอนนี้ใช้ได้ดีอยู่แล้ว ก็ไม่ต้องทำอะไร';
+
+  @override
+  String get notifyVolumeMismatchOpenAppInfo => 'เปิดข้อมูลแอป';
 }

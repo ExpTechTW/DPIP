@@ -205,4 +205,121 @@ void main() {
       expect(entry['importance'], NotificationImportance.Max.index);
     });
   });
+
+  group('channels an older build left on the wrong stream', () {
+    /// Every sound channel of the catalogue on the stream it asks for.
+    Map<String, int> matching() => {
+      for (final channel in NotificationChannels.channels)
+        if (PlainChannels.usageOf(channel) case final usage?)
+          channel.channelKey!: usage.android,
+    };
+
+    test('a fresh install has none', () {
+      expect(
+        PlainChannels.mismatchesAmong(
+          NotificationChannels.channels,
+          matching(),
+        ),
+        isEmpty,
+      );
+    });
+
+    test('the general channels an old mirror put on the alarm stream', () {
+      final actual = matching()
+        ..['int_report-general-v2'] = 4
+        ..['eq-v2'] = 4
+        ..['report-general-v2'] = 4;
+
+      final found = PlainChannels.mismatchesAmong(
+        NotificationChannels.channels,
+        actual,
+      );
+
+      expect(
+        [for (final m in found) m.key],
+        ['int_report-general-v2', 'eq-v2', 'report-general-v2'],
+      );
+      for (final m in found) {
+        expect(m.actual, ChannelAudioUsage.alarm);
+        expect(m.expected, ChannelAudioUsage.notification);
+      }
+      // Named the way Android lists it, which is where the user will look.
+      expect(found.first.name, '震度速報(一般)');
+    });
+
+    test('and the other way: a major alert on the notification stream', () {
+      final actual = matching()..['eew_alert-important-v2'] = 5;
+
+      expect(
+        PlainChannels.mismatchesAmong(NotificationChannels.channels, actual),
+        [
+          const ChannelUsageMismatch(
+            key: 'eew_alert-important-v2',
+            name: '緊急地震速報(重大)',
+            actual: ChannelAudioUsage.notification,
+            expected: ChannelAudioUsage.alarm,
+          ),
+        ],
+      );
+    });
+
+    test('nothing that cannot be judged is reported', () {
+      final actual = matching()
+        // Missing: the channel does not exist, or plays nothing.
+        ..remove('eq-v2')
+        // A silent catalogue channel has no stream to be wrong about.
+        ..['eew_alert-silent-v2'] = 4
+        // A usage no DPIP build has ever created.
+        ..['report-general-v2'] = 6;
+
+      expect(
+        PlainChannels.mismatchesAmong(NotificationChannels.channels, actual),
+        isEmpty,
+      );
+    });
+
+    test('is read from the native side on Android', () async {
+      Object? asked;
+      messenger.setMockMethodCallHandler(channel, (call) async {
+        if (call.method != 'usages') return null;
+        asked = call.arguments;
+        return matching()..['eq-v2'] = 4;
+      });
+
+      final found = await PlainChannels(
+        channel: channel,
+        isAndroid: true,
+      ).usageMismatches(NotificationChannels.channels);
+
+      expect([for (final m in found) m.key], ['eq-v2']);
+      expect((asked! as Map<Object?, Object?>)['ids'], [
+        for (final channel in NotificationChannels.channels) channel.channelKey,
+      ]);
+    });
+
+    test('is empty, without asking, off Android', () async {
+      final calls = record();
+
+      final found = await PlainChannels(
+        channel: channel,
+        isAndroid: false,
+      ).usageMismatches(NotificationChannels.channels);
+
+      expect(found, isEmpty);
+      expect(calls, isEmpty);
+    });
+
+    test('is empty when the native side fails', () async {
+      messenger.setMockMethodCallHandler(channel, (call) async {
+        throw PlatformException(code: 'boom');
+      });
+
+      final found = await PlainChannels(
+        channel: channel,
+        isAndroid: true,
+      ).usageMismatches(NotificationChannels.channels);
+
+      expect(found, isEmpty);
+    });
+  });
 }

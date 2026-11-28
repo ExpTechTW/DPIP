@@ -3594,4 +3594,42 @@ class AppLocalizationsFil extends AppLocalizations {
   @override
   String get trendRainHourLastReading =>
       'Ulan sa 1 oras hanggang sa huling sukat ng oras na ito';
+
+  @override
+  String get notifyVolumeMismatchTitle =>
+      'May ilang alerto na gumagamit pa ng lumang setting ng volume';
+
+  @override
+  String get notifyVolumeMismatchSubtitle =>
+      'I-tap para makita kung alin ang mga ito at kung paano baguhin';
+
+  @override
+  String get notifyVolumeMismatchCause =>
+      'Ginawa ng lumang bersyon ng DPIP ang mga uri ng alertong ito na may ibang volume kaysa sa bersyong ito. Hindi pinapayagan ng Android na baguhin ng app ang uri ng notification na nagawa na nito, kaya hindi ito nabago ng pag-update ng DPIP.';
+
+  @override
+  String notifyVolumeMismatchChannel(String current, String expected) {
+    return 'Tumutunog sa $current — $expected sa bersyong ito';
+  }
+
+  @override
+  String get notifyVolumeAlarm => 'volume ng alarm';
+
+  @override
+  String get notifyVolumeNotification => 'volume ng notification';
+
+  @override
+  String get notifyVolumeMismatchFix =>
+      'Para baguhin ang mga ito, i-clear ang storage ng DPIP mula sa page ng app info nito, o i-uninstall at i-install muli ang DPIP.';
+
+  @override
+  String get notifyVolumeMismatchWarning =>
+      'Alinman sa dalawa ay magbubura ng lahat ng setting ng DPIP, at kakailanganin mong i-set up muli ang app.';
+
+  @override
+  String get notifyVolumeMismatchOptional =>
+      'Kung ayos sa iyo ang kasalukuyang volume, wala kang kailangang gawin.';
+
+  @override
+  String get notifyVolumeMismatchOpenAppInfo => 'Buksan ang app info';
 }

@@ -2092,5 +2092,15 @@
   "seismometerDisclaimer": "휴대전화를 단단한 평면에 평평하게 놓으세요. 휴대전화 센서의 정밀도는 제한되어 있어 이 값은 참고용이며, 중앙기상서가 발표하는 진도가 아닙니다.",
   "seismometerAlgorithm": "ES-Net에서 쓰는 일본 기상청 계측진도 방법으로 계산합니다",
   "trendRainPastHour": "지난 1시간 강수량",
-  "trendRainHourLastReading": "이 시간대 마지막 관측까지의 1시간 강수량"
+  "trendRainHourLastReading": "이 시간대 마지막 관측까지의 1시간 강수량",
+  "notifyVolumeMismatchTitle": "일부 알림이 이전 버전의 음량 설정을 사용하고 있습니다",
+  "notifyVolumeMismatchSubtitle": "탭하여 해당 알림과 변경 방법을 확인하세요",
+  "notifyVolumeMismatchCause": "이 알림 카테고리는 이전 버전의 DPIP가 만든 것으로, 현재 버전과 다른 음량을 사용합니다. Android는 앱이 이미 만든 알림 카테고리를 변경할 수 없도록 하므로 DPIP를 업데이트해도 바뀌지 않습니다.",
+  "notifyVolumeMismatchChannel": "현재: {current} · 이 버전: {expected}",
+  "notifyVolumeAlarm": "알람 음량",
+  "notifyVolumeNotification": "알림 음량",
+  "notifyVolumeMismatchFix": "변경하려면 DPIP의 앱 정보 페이지에서 저장공간을 삭제하거나, DPIP를 삭제한 후 다시 설치하세요.",
+  "notifyVolumeMismatchWarning": "어느 방법이든 DPIP의 모든 설정이 지워지며, 앱을 다시 설정해야 합니다.",
+  "notifyVolumeMismatchOptional": "지금 음량으로 문제가 없다면 아무것도 하지 않아도 됩니다.",
+  "notifyVolumeMismatchOpenAppInfo": "앱 정보 열기"
 }

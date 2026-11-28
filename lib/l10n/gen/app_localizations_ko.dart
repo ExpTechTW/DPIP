@@ -3498,4 +3498,39 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get trendRainHourLastReading => '이 시간대 마지막 관측까지의 1시간 강수량';
+
+  @override
+  String get notifyVolumeMismatchTitle => '일부 알림이 이전 버전의 음량 설정을 사용하고 있습니다';
+
+  @override
+  String get notifyVolumeMismatchSubtitle => '탭하여 해당 알림과 변경 방법을 확인하세요';
+
+  @override
+  String get notifyVolumeMismatchCause =>
+      '이 알림 카테고리는 이전 버전의 DPIP가 만든 것으로, 현재 버전과 다른 음량을 사용합니다. Android는 앱이 이미 만든 알림 카테고리를 변경할 수 없도록 하므로 DPIP를 업데이트해도 바뀌지 않습니다.';
+
+  @override
+  String notifyVolumeMismatchChannel(String current, String expected) {
+    return '현재: $current · 이 버전: $expected';
+  }
+
+  @override
+  String get notifyVolumeAlarm => '알람 음량';
+
+  @override
+  String get notifyVolumeNotification => '알림 음량';
+
+  @override
+  String get notifyVolumeMismatchFix =>
+      '변경하려면 DPIP의 앱 정보 페이지에서 저장공간을 삭제하거나, DPIP를 삭제한 후 다시 설치하세요.';
+
+  @override
+  String get notifyVolumeMismatchWarning =>
+      '어느 방법이든 DPIP의 모든 설정이 지워지며, 앱을 다시 설정해야 합니다.';
+
+  @override
+  String get notifyVolumeMismatchOptional => '지금 음량으로 문제가 없다면 아무것도 하지 않아도 됩니다.';
+
+  @override
+  String get notifyVolumeMismatchOpenAppInfo => '앱 정보 열기';
 }

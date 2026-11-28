@@ -3473,4 +3473,38 @@ class AppLocalizationsYue extends AppLocalizations {
 
   @override
   String get trendRainHourLastReading => '截至呢個鐘最後一筆嘅 1 個鐘雨量';
+
+  @override
+  String get notifyVolumeMismatchTitle => '有啲通知仲用緊舊版嘅音量設定';
+
+  @override
+  String get notifyVolumeMismatchSubtitle => '撳一下睇吓係邊啲通知，同埋點樣改';
+
+  @override
+  String get notifyVolumeMismatchCause =>
+      '呢啲通知類別係舊版 DPIP 建立嘅，用嘅音量同而家呢個版本唔同。Android 唔畀 App 改已經建立咗嘅通知類別，所以更新 DPIP 都改唔到佢哋。';
+
+  @override
+  String notifyVolumeMismatchChannel(String current, String expected) {
+    return '而家用緊$current，呢個版本用$expected';
+  }
+
+  @override
+  String get notifyVolumeAlarm => '鬧鐘音量';
+
+  @override
+  String get notifyVolumeNotification => '通知音量';
+
+  @override
+  String get notifyVolumeMismatchFix =>
+      '如果想改，可以喺 DPIP 嘅應用程式資料頁面清除儲存空間，或者解除安裝之後再重新安裝 DPIP。';
+
+  @override
+  String get notifyVolumeMismatchWarning => '兩個方法都會清走 DPIP 所有設定，之後要重新設定一次。';
+
+  @override
+  String get notifyVolumeMismatchOptional => '如果而家嘅音量啱你用，就唔使做任何嘢。';
+
+  @override
+  String get notifyVolumeMismatchOpenAppInfo => '開啟應用程式資料';
 }

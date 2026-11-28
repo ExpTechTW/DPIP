@@ -6,7 +6,9 @@ library;
 import 'package:dpip/core/settings/locale_config.dart';
 import 'package:dpip/core/error/failure.dart';
 import 'package:dpip/core/error/result.dart';
+import 'package:dpip/core/notifications/notification_channels.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
+import 'package:dpip/core/notifications/plain_channels.dart';
 import 'package:dpip/core/settings/setting_keys.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/features/notification/domain/notify_preset.dart';
@@ -17,6 +19,7 @@ import 'package:dpip/features/notification/presentation/pages/notify_page.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
 import 'package:dpip/shared/navigation/app_routes.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -53,6 +56,7 @@ Future<void> _pump(
   WidgetTester tester, {
   required NotifyRepository repo,
   String? token,
+  PlainChannels? plainChannels,
 }) async {
   tester.view.physicalSize = _tall;
   tester.view.devicePixelRatio = 1;
@@ -77,7 +81,13 @@ Future<void> _pump(
     MultiProvider(
       providers: [
         Provider<NotifyRepository>.value(value: repo),
-        Provider(create: (_) => NotificationService(store)),
+        Provider(
+          create: (_) => NotificationService(
+            store,
+            // Off Android unless a test says otherwise: the host is not one.
+            plainChannels: plainChannels ?? PlainChannels(isAndroid: false),
+          ),
+        ),
       ],
       child: MaterialApp.router(
         routerConfig: router,
@@ -91,6 +101,7 @@ Future<void> _pump(
 
 void main() {
   presetTests();
+  channelVolumeTests();
 
   testWidgets('no token shows the unavailable state', (tester) async {
     await _pump(tester, repo: _Repo(Ok(_settings())));
@@ -346,6 +357,138 @@ void presetTests() {
             .groupValue,
         NotifyPreset.custom,
       );
+    });
+  });
+}
+
+/// The entry for channels an older version created on the wrong volume. It
+/// must say nothing at all unless Android reports a mismatch, and when it does,
+/// the way out it offers must be the app-info page.
+void channelVolumeTests() {
+  group('channel volume entry', () {
+    const native = MethodChannel('test/plain_notification_channels');
+    const permissions = MethodChannel(
+      'flutter.baseflow.com/permissions/methods',
+    );
+    final messenger =
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+
+    tearDown(() {
+      messenger.setMockMethodCallHandler(native, null);
+      messenger.setMockMethodCallHandler(permissions, null);
+    });
+
+    /// Android reporting every sound channel on the stream the catalogue asks
+    /// for, except [overrides].
+    PlainChannels android([Map<String, int> overrides = const {}]) {
+      messenger.setMockMethodCallHandler(native, (call) async {
+        if (call.method != 'usages') return null;
+        return {
+          for (final channel in NotificationChannels.channels)
+            if (PlainChannels.usageOf(channel) case final usage?)
+              channel.channelKey!: usage.android,
+          ...overrides,
+        };
+      });
+      return PlainChannels(channel: native, isAndroid: true);
+    }
+
+    testWidgets('says nothing when every channel matches', (tester) async {
+      await _pump(
+        tester,
+        repo: _Repo(Ok(_settings())),
+        token: 'token',
+        plainChannels: android(),
+      );
+      final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+
+      expect(find.text(l10n.notifyVolumeMismatchTitle), findsNothing);
+      expect(find.text(l10n.notifyPresetSection), findsOneWidget);
+    });
+
+    testWidgets('says nothing off Android, and never asks', (tester) async {
+      var asked = false;
+      messenger.setMockMethodCallHandler(native, (call) async {
+        asked = true;
+        return {'eq-v2': 4};
+      });
+      await _pump(
+        tester,
+        repo: _Repo(Ok(_settings())),
+        token: 'token',
+        plainChannels: PlainChannels(channel: native, isAndroid: false),
+      );
+      final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+
+      expect(find.text(l10n.notifyVolumeMismatchTitle), findsNothing);
+      expect(asked, isFalse);
+    });
+
+    testWidgets('names each channel, its volume, and the way to change it', (
+      tester,
+    ) async {
+      var opened = 0;
+      messenger.setMockMethodCallHandler(permissions, (call) async {
+        if (call.method == 'openAppSettings') opened++;
+        return true;
+      });
+      await _pump(
+        tester,
+        repo: _Repo(Ok(_settings())),
+        token: 'token',
+        plainChannels: android({
+          'report-general-v2': 4, // a report on the alarm volume — #660
+          'eew_alert-important-v2': 5, // a major alert on the notification one
+        }),
+      );
+      final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+
+      await tester.tap(find.text(l10n.notifyVolumeMismatchTitle));
+      await tester.pumpAndSettle();
+
+      expect(find.text(l10n.notifyVolumeMismatchCause), findsOneWidget);
+      expect(find.text('地震報告(一般)'), findsOneWidget);
+      expect(
+        find.text(
+          l10n.notifyVolumeMismatchChannel(
+            l10n.notifyVolumeAlarm,
+            l10n.notifyVolumeNotification,
+          ),
+        ),
+        findsOneWidget,
+      );
+      expect(find.text('緊急地震速報(重大)'), findsOneWidget);
+      expect(
+        find.text(
+          l10n.notifyVolumeMismatchChannel(
+            l10n.notifyVolumeNotification,
+            l10n.notifyVolumeAlarm,
+          ),
+        ),
+        findsOneWidget,
+      );
+      // Only the two that differ.
+      expect(find.text('地震報告 (無聲通知)'), findsNothing);
+      expect(find.text('強震監視器(一般)'), findsNothing);
+      // The cost is stated before the button.
+      expect(find.text(l10n.notifyVolumeMismatchWarning), findsOneWidget);
+
+      await tester.tap(find.text(l10n.notifyVolumeMismatchOpenAppInfo));
+      await tester.pumpAndSettle();
+
+      expect(opened, 1);
+    });
+
+    testWidgets('shows without a push token too', (tester) async {
+      await _pump(
+        tester,
+        repo: _Repo(Ok(_settings())),
+        plainChannels: android({'eq-v2': 4}),
+      );
+      final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+
+      expect(find.text(l10n.notifyUnavailable), findsOneWidget);
+      expect(find.text(l10n.notifyVolumeMismatchTitle), findsOneWidget);
     });
   });
 }

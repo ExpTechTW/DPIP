@@ -1,9 +1,12 @@
 /// The notification-settings page: a preset picker, then the per-channel push
-/// filters grouped by domain.
+/// filters grouped by domain — and, on an Android install whose alert channels
+/// an older version created on the wrong volume, an entry saying so.
 library;
 
 import 'package:dpip/app/theme/app_spacing.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
+import 'package:dpip/core/notifications/plain_channels.dart';
+import 'package:dpip/core/permissions/system_settings.dart';
 import 'package:dpip/features/notification/domain/notify_preset.dart';
 import 'package:dpip/features/notification/domain/notify_repository.dart';
 import 'package:dpip/features/notification/domain/notify_settings.dart';
@@ -28,11 +31,21 @@ class NotifyPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<NotifyController>(
-      create: (context) => NotifyController(
-        context.read<NotifyRepository>(),
-        context.read<NotificationService>().token,
-      )..load(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<NotifyController>(
+          create: (context) => NotifyController(
+            context.read<NotifyRepository>(),
+            context.read<NotificationService>().token,
+          )..load(),
+        ),
+        // Once per visit: a channel's volume cannot change while the app runs.
+        FutureProvider<List<ChannelUsageMismatch>>(
+          create: (context) =>
+              context.read<NotificationService>().channelUsageMismatches(),
+          initialData: const [],
+        ),
+      ],
       child: const _NotifyView(),
     );
   }
@@ -45,6 +58,18 @@ class _NotifyView extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final controller = context.watch<NotifyController>();
+    final unready = switch (controller.status) {
+      NotifyLoadStatus.noToken => EmptyView(
+        icon: Icons.notifications_off_outlined,
+        message: l10n.notifyUnavailable,
+      ),
+      NotifyLoadStatus.loading => const LoadingView(),
+      NotifyLoadStatus.error => ErrorView(
+        detail: controller.failure?.message,
+        onRetry: controller.load,
+      ),
+      NotifyLoadStatus.ready => null,
+    };
 
     return Scaffold(
       appBar: AppBar(
@@ -61,18 +86,18 @@ class _NotifyView extends StatelessWidget {
           ),
         ],
       ),
-      body: switch (controller.status) {
-        NotifyLoadStatus.noToken => EmptyView(
-          icon: Icons.notifications_off_outlined,
-          message: l10n.notifyUnavailable,
-        ),
-        NotifyLoadStatus.loading => const LoadingView(),
-        NotifyLoadStatus.error => ErrorView(
-          detail: controller.failure?.message,
-          onRetry: controller.load,
-        ),
-        NotifyLoadStatus.ready => _NotifyList(controller: controller),
-      },
+      // The volume entry does not wait for the server, like the test button:
+      // it is about this phone's channels, which play the app's own local
+      // alerts too, and a device with no token yet still has them. Ready, it
+      // scrolls with the list; otherwise it sits above the state view.
+      body: unready == null
+          ? _NotifyList(controller: controller)
+          : Column(
+              children: [
+                const _ChannelVolumeEntry(),
+                Expanded(child: unready),
+              ],
+            ),
     );
   }
 }
@@ -118,6 +143,7 @@ class _NotifyList extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.only(bottom: AppSpacing.xl),
       children: [
+        const _ChannelVolumeEntry(),
         SectionHeader(l10n.notifyPresetSection),
         _PresetSection(controller: controller),
         for (final section in sections) ...[
@@ -132,6 +158,138 @@ class _NotifyList extends StatelessWidget {
             _ChannelTile(controller: controller, channel: channel),
         ],
       ],
+    );
+  }
+}
+
+/// The entry for alert channels that play on another volume than this version
+/// gives them; nothing at all when every channel matches, and always nothing
+/// on iOS.
+///
+/// Android freezes a channel's sound when it is created, so an install whose
+/// channels an older version made keeps that version's volumes through every
+/// update — reports and monitors on the alarm volume, or the major alerts on
+/// the notification volume — and the app cannot change them. Only clearing
+/// DPIP's storage or reinstalling it does, and both erase every setting. That
+/// trade is the user's to make, so this only says what is going on and how:
+/// a row on the page they came to, with the details one tap away. No dialog,
+/// no launch prompt.
+class _ChannelVolumeEntry extends StatelessWidget {
+  const _ChannelVolumeEntry();
+
+  @override
+  Widget build(BuildContext context) {
+    final mismatches = context.watch<List<ChannelUsageMismatch>>();
+    if (mismatches.isEmpty) return const SizedBox.shrink();
+    final l10n = AppLocalizations.of(context);
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ListTile(
+          leading: const Icon(Icons.volume_up_outlined),
+          title: Text(l10n.notifyVolumeMismatchTitle),
+          subtitle: Text(l10n.notifyVolumeMismatchSubtitle),
+          trailing: const Icon(Icons.chevron_right),
+          onTap: () => showModalBottomSheet<void>(
+            context: context,
+            showDragHandle: true,
+            isScrollControlled: true,
+            builder: (_) => _ChannelVolumeSheet(mismatches: mismatches),
+          ),
+        ),
+        const Divider(
+          height: 1,
+          indent: AppSpacing.lg,
+          endIndent: AppSpacing.lg,
+        ),
+      ],
+    );
+  }
+}
+
+/// Which channels, why the app cannot fix them, and how the user can — with
+/// the cost said before the button, not after.
+///
+/// Channels are named as Android names them, which is what the user will see
+/// under DPIP in the system settings.
+class _ChannelVolumeSheet extends StatelessWidget {
+  const _ChannelVolumeSheet({required this.mismatches});
+
+  final List<ChannelUsageMismatch> mismatches;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    String volume(ChannelAudioUsage usage) => switch (usage) {
+      ChannelAudioUsage.alarm => l10n.notifyVolumeAlarm,
+      ChannelAudioUsage.notification => l10n.notifyVolumeNotification,
+    };
+
+    return SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(
+          AppSpacing.lg,
+          AppSpacing.sm,
+          AppSpacing.lg,
+          AppSpacing.lg,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              l10n.notifyVolumeMismatchTitle,
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: theme.colorScheme.primary,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            Text(l10n.notifyVolumeMismatchCause),
+            const SizedBox(height: AppSpacing.sm),
+            for (final mismatch in mismatches)
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: Icon(switch (mismatch.actual) {
+                  ChannelAudioUsage.alarm => Icons.alarm_outlined,
+                  ChannelAudioUsage.notification =>
+                    Icons.notifications_outlined,
+                }),
+                title: Text(mismatch.name),
+                subtitle: Text(
+                  l10n.notifyVolumeMismatchChannel(
+                    volume(mismatch.actual),
+                    volume(mismatch.expected),
+                  ),
+                ),
+              ),
+            const SizedBox(height: AppSpacing.sm),
+            Text(l10n.notifyVolumeMismatchFix),
+            const SizedBox(height: AppSpacing.sm),
+            Text(
+              l10n.notifyVolumeMismatchWarning,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Text(
+              l10n.notifyVolumeMismatchOptional,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            FilledButton.tonalIcon(
+              onPressed: openAppSettingsPage,
+              icon: const Icon(Icons.settings_outlined),
+              label: Text(l10n.notifyVolumeMismatchOpenAppInfo),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

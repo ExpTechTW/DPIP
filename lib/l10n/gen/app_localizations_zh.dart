@@ -3473,6 +3473,40 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get trendRainHourLastReading => '截至該小時最後一筆的 1 小時雨量';
+
+  @override
+  String get notifyVolumeMismatchTitle => '部分通知沿用舊版的音量設定';
+
+  @override
+  String get notifyVolumeMismatchSubtitle => '點一下查看是哪些通知，以及如何更改';
+
+  @override
+  String get notifyVolumeMismatchCause =>
+      '這些通知類別是由舊版 DPIP 建立的，使用的音量和目前版本不同。Android 不允許 App 更改已經建立的通知類別，所以更新 DPIP 也無法改變它們。';
+
+  @override
+  String notifyVolumeMismatchChannel(String current, String expected) {
+    return '目前使用$current，這個版本使用$expected';
+  }
+
+  @override
+  String get notifyVolumeAlarm => '鬧鐘音量';
+
+  @override
+  String get notifyVolumeNotification => '通知音量';
+
+  @override
+  String get notifyVolumeMismatchFix =>
+      '若要更改，可以在 DPIP 的應用程式資訊頁面清除儲存空間，或是移除後重新安裝 DPIP。';
+
+  @override
+  String get notifyVolumeMismatchWarning => '兩種方式都會清除 DPIP 的所有設定，之後需要重新設定一次。';
+
+  @override
+  String get notifyVolumeMismatchOptional => '如果目前的音量對你來說沒問題，就不需要做任何事。';
+
+  @override
+  String get notifyVolumeMismatchOpenAppInfo => '開啟應用程式資訊';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -6940,6 +6974,40 @@ class AppLocalizationsZhHans extends AppLocalizationsZh {
 
   @override
   String get trendRainHourLastReading => '截至该小时最后一笔的 1 小时雨量';
+
+  @override
+  String get notifyVolumeMismatchTitle => '部分通知沿用旧版的音量设置';
+
+  @override
+  String get notifyVolumeMismatchSubtitle => '点一下查看是哪些通知，以及如何更改';
+
+  @override
+  String get notifyVolumeMismatchCause =>
+      '这些通知类别是由旧版 DPIP 创建的，使用的音量与当前版本不同。Android 不允许应用更改已经创建的通知类别，因此更新 DPIP 也无法改变它们。';
+
+  @override
+  String notifyVolumeMismatchChannel(String current, String expected) {
+    return '当前使用$current，此版本使用$expected';
+  }
+
+  @override
+  String get notifyVolumeAlarm => '闹钟音量';
+
+  @override
+  String get notifyVolumeNotification => '通知音量';
+
+  @override
+  String get notifyVolumeMismatchFix =>
+      '如需更改，可以在 DPIP 的应用信息页面清除存储空间，或卸载后重新安装 DPIP。';
+
+  @override
+  String get notifyVolumeMismatchWarning => '两种方式都会清除 DPIP 的所有设置，之后需要重新设置一次。';
+
+  @override
+  String get notifyVolumeMismatchOptional => '如果当前的音量对你来说没有问题，就不需要做任何事。';
+
+  @override
+  String get notifyVolumeMismatchOpenAppInfo => '打开应用信息';
 }
 
 /// The translations for Chinese, as used in Hong Kong, using the Han script (`zh_Hant_HK`).
@@ -10408,6 +10476,40 @@ class AppLocalizationsZhHantHk extends AppLocalizationsZh {
 
   @override
   String get trendRainHourLastReading => '截至該小時最後一筆的 1 小時雨量';
+
+  @override
+  String get notifyVolumeMismatchTitle => '部分通知沿用舊版的音量設定';
+
+  @override
+  String get notifyVolumeMismatchSubtitle => '點一下查看是哪些通知，以及如何更改';
+
+  @override
+  String get notifyVolumeMismatchCause =>
+      '這些通知類別是由舊版 DPIP 建立的，使用的音量和目前版本不同。Android 不允許應用程式更改已經建立的通知類別，所以更新 DPIP 也無法改變它們。';
+
+  @override
+  String notifyVolumeMismatchChannel(String current, String expected) {
+    return '目前使用$current，這個版本使用$expected';
+  }
+
+  @override
+  String get notifyVolumeAlarm => '鬧鐘音量';
+
+  @override
+  String get notifyVolumeNotification => '通知音量';
+
+  @override
+  String get notifyVolumeMismatchFix =>
+      '如要更改，可以在 DPIP 的應用程式資料頁面清除儲存空間，或解除安裝後重新安裝 DPIP。';
+
+  @override
+  String get notifyVolumeMismatchWarning => '兩種方式都會清除 DPIP 的所有設定，之後需要重新設定一次。';
+
+  @override
+  String get notifyVolumeMismatchOptional => '如果目前的音量對你來說沒問題，就不需要做任何事。';
+
+  @override
+  String get notifyVolumeMismatchOpenAppInfo => '開啟應用程式資料';
 }
 
 /// The translations for Chinese, as used in Taiwan (`zh_TW`).
@@ -13876,4 +13978,38 @@ class AppLocalizationsZhTw extends AppLocalizationsZh {
 
   @override
   String get trendRainHourLastReading => '截至該小時最後一筆的 1 小時雨量';
+
+  @override
+  String get notifyVolumeMismatchTitle => '部分通知沿用舊版的音量設定';
+
+  @override
+  String get notifyVolumeMismatchSubtitle => '點一下查看是哪些通知，以及如何更改';
+
+  @override
+  String get notifyVolumeMismatchCause =>
+      '這些通知類別是由舊版 DPIP 建立的，使用的音量和目前版本不同。Android 不允許 App 更改已經建立的通知類別，所以更新 DPIP 也無法改變它們。';
+
+  @override
+  String notifyVolumeMismatchChannel(String current, String expected) {
+    return '目前使用$current，這個版本使用$expected';
+  }
+
+  @override
+  String get notifyVolumeAlarm => '鬧鐘音量';
+
+  @override
+  String get notifyVolumeNotification => '通知音量';
+
+  @override
+  String get notifyVolumeMismatchFix =>
+      '若要更改，可以在 DPIP 的應用程式資訊頁面清除儲存空間，或是移除後重新安裝 DPIP。';
+
+  @override
+  String get notifyVolumeMismatchWarning => '兩種方式都會清除 DPIP 的所有設定，之後需要重新設定一次。';
+
+  @override
+  String get notifyVolumeMismatchOptional => '如果目前的音量對你來說沒問題，就不需要做任何事。';
+
+  @override
+  String get notifyVolumeMismatchOpenAppInfo => '開啟應用程式資訊';
 }

@@ -165,4 +165,39 @@ class PlainChannelsChannelTest {
             manager.getNotificationChannel("eq-v2").audioAttributes.usage,
         )
     }
+
+    @Test
+    fun `usages reads back what each channel really plays on`() {
+        ensure(
+            entry("report-general-v2", "usage" to 4, "sound" to "report"),
+            entry("eew_alert-important-v2", "usage" to 5, "sound" to "eew_alert"),
+            entry("eq-v2", "usage" to 5, "sound" to "eq"),
+        )
+
+        val result = call("usages", mapOf("ids" to listOf("report-general-v2", "eew_alert-important-v2", "eq-v2")))
+
+        assertEquals(
+            mapOf(
+                "report-general-v2" to AudioAttributes.USAGE_ALARM,
+                "eew_alert-important-v2" to AudioAttributes.USAGE_NOTIFICATION,
+                "eq-v2" to AudioAttributes.USAGE_NOTIFICATION,
+            ),
+            result.value,
+        )
+    }
+
+    @Test
+    fun `usages leaves out a missing channel and one that plays nothing`() {
+        ensure(entry("eew_alert-silent-v2", "playSound" to false))
+
+        val result = call("usages", mapOf("ids" to listOf("eew_alert-silent-v2", "never-created")))
+
+        assertEquals(emptyMap<String, Int>(), result.value)
+    }
+
+    @Test
+    fun `usages refuses ids that are not strings`() {
+        assertEquals("invalid_ids", call("usages", mapOf("ids" to listOf(""))).errorCode)
+        assertEquals("invalid_ids", call("usages", emptyMap()).errorCode)
+    }
 }

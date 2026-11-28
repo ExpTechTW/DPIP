@@ -30,6 +30,51 @@ enum ChannelAudioUsage {
 
   /// The `AudioAttributes.USAGE_*` constant.
   final int android;
+
+  /// The value for [android], or null for a usage no DPIP build creates.
+  static ChannelAudioUsage? fromAndroid(int android) {
+    for (final usage in values) {
+      if (usage.android == android) return usage;
+    }
+    return null;
+  }
+}
+
+/// A channel whose sound plays on another stream than the catalogue asks for.
+///
+/// Always an older build's doing — see [PlainChannels.usageMismatches].
+class ChannelUsageMismatch {
+  const ChannelUsageMismatch({
+    required this.key,
+    required this.name,
+    required this.actual,
+    required this.expected,
+  });
+
+  final String key;
+
+  /// The name Android lists the channel under in the system settings.
+  final String name;
+
+  /// The stream it plays on.
+  final ChannelAudioUsage actual;
+
+  /// The stream [PlainChannels.usageOf] gives it.
+  final ChannelAudioUsage expected;
+
+  @override
+  bool operator ==(Object other) =>
+      other is ChannelUsageMismatch &&
+      other.key == key &&
+      other.name == name &&
+      other.actual == actual &&
+      other.expected == expected;
+
+  @override
+  int get hashCode => Object.hash(key, name, actual, expected);
+
+  @override
+  String toString() => '$key: ${actual.name} instead of ${expected.name}';
 }
 
 class PlainChannels {
@@ -84,6 +129,69 @@ class PlainChannels {
       // into a fresh messenger) simply skips the mirror.
     }
   }
+
+  /// The channels of [catalogue] whose sound plays on another stream than
+  /// [usageOf] asks for, by what Android says each one was created with.
+  ///
+  /// Android freezes a channel's audio attributes at creation, and deleting it
+  /// and creating the same id again brings the old one back — so an install
+  /// whose plain ids an older build created keeps that build's volumes through
+  /// every update, and the app cannot change them. Only the user can, by
+  /// clearing DPIP's storage or reinstalling it, both of which reset every
+  /// channel. This is how the notification settings page knows to say so.
+  ///
+  /// Empty off Android, and whenever the answer cannot be read: a channel that
+  /// cannot be checked is not reported as wrong.
+  Future<List<ChannelUsageMismatch>> usageMismatches(
+    List<NotificationChannel> catalogue,
+  ) async {
+    if (!_isAndroid || catalogue.isEmpty) return const [];
+    try {
+      final usages = await _channel.invokeMapMethod<String, int>('usages', {
+        'ids': [for (final channel in catalogue) channel.channelKey],
+      });
+      final found = mismatchesAmong(catalogue, usages ?? const {});
+      if (found.isNotEmpty) {
+        Log.info(
+          'notifications: ${found.length} channel(s) on another stream than '
+          'the catalogue asks for — ${found.join(', ')}',
+        );
+      }
+      return found;
+    } on PlatformException catch (error, stackTrace) {
+      Log.handle(error, stackTrace, 'reading notification channel usages');
+      return const [];
+    } on MissingPluginException {
+      return const [];
+    }
+  }
+
+  /// The channels of [catalogue] whose entry in [actual] — `AudioAttributes`
+  /// usages keyed by channel id — differs from [usageOf], in either direction.
+  ///
+  /// A channel missing from [actual] (it does not exist, or plays nothing), a
+  /// silent catalogue channel, and a usage no DPIP build creates are all left
+  /// out: none of them is a volume this app put in the wrong place.
+  static List<ChannelUsageMismatch> mismatchesAmong(
+    Iterable<NotificationChannel> catalogue,
+    Map<String, int> actual,
+  ) => [
+    for (final channel in catalogue)
+      if ((
+            usageOf(channel),
+            switch (actual[channel.channelKey]) {
+              final int usage => ChannelAudioUsage.fromAndroid(usage),
+              null => null,
+            },
+          )
+          case (final expected?, final current?) when current != expected)
+        ChannelUsageMismatch(
+          key: channel.channelKey!,
+          name: channel.channelName ?? channel.channelKey!,
+          actual: current,
+          expected: expected,
+        ),
+  ];
 
   /// Everything awesome's `setAndroidChannel` reads from the model, so the
   /// native side can build the same channel — plus the audio usage, which

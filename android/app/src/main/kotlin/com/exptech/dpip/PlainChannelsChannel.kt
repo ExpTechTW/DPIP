@@ -37,6 +37,12 @@ import io.flutter.plugin.common.MethodChannel
  * awesome would, except for the audio usage, which the catalogue decides
  * (`usage`, from `PlainChannels.usageOf` in Dart).
  *
+ * The same freeze is why [usages] exists: an install whose plain ids an older
+ * build created keeps that build's volumes through every update, and the only
+ * way to know is to ask the system what each channel actually has. Dart compares
+ * that with the catalogue and shows the notification settings page's entry
+ * when they differ.
+ *
  * `list` and `delete` exist for the other end of a channel's life: the ids
  * earlier builds created and this one dropped, which Android keeps until the
  * app deletes them. *Which* ids are retired is decided in Dart
@@ -60,6 +66,15 @@ class PlainChannelsChannel(private val context: Context) :
             }
 
             "list" -> result.success(manager().notificationChannels.map { it.id })
+
+            "usages" -> {
+                val ids = call.argument<List<*>>("ids")
+                if (ids == null || ids.any { it !is String || it.isBlank() }) {
+                    result.error("invalid_ids", "ids must be non-empty strings", null)
+                    return
+                }
+                result.success(usages(ids.filterIsInstance<String>()))
+            }
 
             "delete" -> {
                 val ids = call.argument<List<*>>("ids")
@@ -89,6 +104,25 @@ class PlainChannelsChannel(private val context: Context) :
             deleted++
         }
         return deleted
+    }
+
+    /**
+     * The `AudioAttributes.USAGE_*` each of [ids] really plays on, read back
+     * from the system rather than assumed from what this build would create.
+     *
+     * Left out: an id that does not exist, and a channel that plays no sound —
+     * including one the user silenced in the OS settings, which has no volume
+     * to be wrong about.
+     */
+    private fun usages(ids: List<String>): Map<String, Int> {
+        val manager = manager()
+        val usages = HashMap<String, Int>()
+        for (id in ids) {
+            val channel = manager.getNotificationChannel(id) ?: continue
+            if (channel.sound == null) continue
+            usages[id] = channel.audioAttributes?.usage ?: continue
+        }
+        return usages
     }
 
     /** Creates each missing group, then each missing channel; returns how many channels. */

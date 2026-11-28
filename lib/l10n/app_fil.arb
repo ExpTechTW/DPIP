@@ -2092,5 +2092,15 @@
   "seismometerDisclaimer": "Ihiga nang patag ang telepono sa matatag na ibabaw. Limitado ang katumpakan ng sensor ng telepono, kaya sanggunian lang ang pagbasang ito at hindi ito opisyal na intensidad ng CWA.",
   "seismometerAlgorithm": "Kinukuwenta gamit ang paraan ng instrumental intensity ng JMA na ginagamit ng ES-Net",
   "trendRainPastHour": "Ulan sa nakaraang 1 oras",
-  "trendRainHourLastReading": "Ulan sa 1 oras hanggang sa huling sukat ng oras na ito"
+  "trendRainHourLastReading": "Ulan sa 1 oras hanggang sa huling sukat ng oras na ito",
+  "notifyVolumeMismatchTitle": "May ilang alerto na gumagamit pa ng lumang setting ng volume",
+  "notifyVolumeMismatchSubtitle": "I-tap para makita kung alin ang mga ito at kung paano baguhin",
+  "notifyVolumeMismatchCause": "Ginawa ng lumang bersyon ng DPIP ang mga uri ng alertong ito na may ibang volume kaysa sa bersyong ito. Hindi pinapayagan ng Android na baguhin ng app ang uri ng notification na nagawa na nito, kaya hindi ito nabago ng pag-update ng DPIP.",
+  "notifyVolumeMismatchChannel": "Tumutunog sa {current} — {expected} sa bersyong ito",
+  "notifyVolumeAlarm": "volume ng alarm",
+  "notifyVolumeNotification": "volume ng notification",
+  "notifyVolumeMismatchFix": "Para baguhin ang mga ito, i-clear ang storage ng DPIP mula sa page ng app info nito, o i-uninstall at i-install muli ang DPIP.",
+  "notifyVolumeMismatchWarning": "Alinman sa dalawa ay magbubura ng lahat ng setting ng DPIP, at kakailanganin mong i-set up muli ang app.",
+  "notifyVolumeMismatchOptional": "Kung ayos sa iyo ang kasalukuyang volume, wala kang kailangang gawin.",
+  "notifyVolumeMismatchOpenAppInfo": "Buksan ang app info"
 }
