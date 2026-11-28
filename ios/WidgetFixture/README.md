@@ -28,6 +28,8 @@ fixture process (the UI tests use `XCUIApplication.launchEnvironment`):
 | `DPIP_FIXTURE_CARD` | `narrow`, `wide`. Medium: 338 × 158 and 364 × 170 pt. Large: 319 × 318 and 350 × 365 pt. Small: 158 × 158 and 170 × 170 pt. |
 | `DPIP_FIXTURE_DARK` | `0` (light), `1` (dark) |
 | `DPIP_FIXTURE_SMALL_OBSERVATION` | `regular`, `heavyRain`, `dry`, `missingValues`, `noSnapshot` |
+| `DPIP_FIXTURE_OBSERVATION_AGE` | `current`, `stale` (the entry is past the stale threshold, every family) |
+| `DPIP_FIXTURE_RAIN` | `none`, `light` (6 mm a minute for twenty minutes from 15:20), `heavy` (20 mm a minute all hour, the longest summary), `dry` |
 
 The fixture uses a fixed September 25, 2026 entry (15:21 in Asia/Taipei) and
 a distinct observation time (14:21). Fresh, stale and expired forecasts use

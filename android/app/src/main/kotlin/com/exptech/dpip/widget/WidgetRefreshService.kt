@@ -34,7 +34,7 @@ sealed interface LocationResolution {
 /**
  * One refresh of one address: reserve, calibrate, resolve, fetch, order, commit.
  *
- * The shape is iOS's `CurrentWeatherWidgetRefreshPipeline` plus the resolution
+ * The shape is iOS's `WidgetRefresher` plus the resolution
  * in front of it, with three rules that are the difference between a correct
  * widget and a subtly wrong one:
  *

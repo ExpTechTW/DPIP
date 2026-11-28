@@ -26,6 +26,17 @@ final class MediumWeatherUITests: XCTestCase {
             }
         }
 
+        /// The stale observation's cue, word or symbol.
+        var staleLabel: String {
+            switch self {
+            case .en: "Outdated"
+            case .traditionalChinese: "較舊"
+            case .simplifiedChinese: "已过时"
+            case .ja: "古いデータ"
+            case .ko: "오래된 정보"
+            }
+        }
+
         func timeLabel(utcHour: Int) -> String {
             let formatter = DateFormatter()
             formatter.locale = Locale(identifier: expected.locale)
@@ -68,6 +79,10 @@ final class MediumWeatherUITests: XCTestCase {
         case regular, heavyRain, dry, missingValues, noSnapshot
     }
 
+    private enum Rain: String {
+        case none, light, heavy, dry
+    }
+
     private enum Card: String, CaseIterable {
         case narrow, wide
 
@@ -85,6 +100,10 @@ final class MediumWeatherUITests: XCTestCase {
 
     private enum Family: String {
         case small, medium, large
+    }
+
+    private enum ObservationAge: String {
+        case current, stale
     }
 
     private let hours = ["16:00", "17:00", "18:00", "19:00", "20:00"]
@@ -172,9 +191,88 @@ final class MediumWeatherUITests: XCTestCase {
         }
     }
 
+    func testComingRainReplacesTheHourlyRowWithAChartThatFitsTheCard() {
+        for family in [Family.medium, .large] {
+            for size in [TextSize.normal, .accessibility] {
+                XCTContext.runActivity(named: "\(family.rawValue)-\(size.rawValue)") { _ in
+                    let app = launch(.fresh, language: .traditionalChinese, size: size, location: .xitun,
+                                     card: .narrow, family: family, rain: .light)
+                    capture(size == .normal ? "rain-\(family.rawValue)-zh-Hant" : nil)
+                    guard let layout = assertCurrentWeather(app, language: .traditionalChinese, location: .xitun,
+                                                            card: .narrow, family: family),
+                          let chart = requireOne(rainCharts(app), "Rain chart") else { return }
+                    // One element, read as title, summary and the forecast's own time. The
+                    // rain ends at 15:40, counted from the entry's 15:21, not the 15:20 origin.
+                    XCTAssertEqual(chart.label, "近 1 小時降水趨勢, 預計 19 分鐘後停止下小雨, 更新 15:20")
+                    assertInside(chart.frame, forecastBounds(layout.forecast, card: layout.bounds, size: size),
+                                 "Rain chart")
+                    let hourly = app.descendants(matching: .any).matching(NSCompoundPredicate(
+                        orPredicateWithSubpredicates: hours.map { NSPredicate(format: "label CONTAINS %@", $0) }
+                    ))
+                    XCTAssertEqual(hourly.count, 0, "The chart and the hourly row never share the card")
+                }
+            }
+        }
+    }
+
+    func testDryHourKeepsTheHourlyRow() {
+        let app = launch(.fresh, language: .traditionalChinese, size: .normal, location: .xitun,
+                         card: .narrow, rain: .dry)
+        guard let layout = assertCurrentWeather(app, language: .traditionalChinese, location: .xitun,
+                                                card: .narrow) else { return }
+        _ = assertForecast(app, region: forecastBounds(layout.forecast, card: layout.bounds, size: .normal),
+                           size: .normal)
+        XCTAssertEqual(rainCharts(app).count, 0, "A dry hour must not draw an empty chart")
+    }
+
+    func testLongestEnglishRainSummarySharesTheMediumHeaderWithoutOverlapOrTruncation() {
+        // The longest English summary, beside the fixed-width update time.
+        let summaryLabel = "Heavy rain continuing for the next hour"
+        let updatedLabel = "Updated 15:20"
+        // Every whole rendering of the summary is at least this wide: the
+        // header's smallest whole font is caption 2 at the default size. Only
+        // the last-resort line, which may squeeze or cut, is narrower.
+        let caption2 = UIFont.preferredFont(
+            forTextStyle: .caption2, compatibleWith: UITraitCollection(preferredContentSizeCategory: .large)
+        )
+        let wholeWidth = (summaryLabel as NSString).size(withAttributes: [.font: caption2]).width
+        for size in [TextSize.normal, .accessibility5] {
+            XCTContext.runActivity(named: "medium-en-\(size.rawValue)") { _ in
+                let app = launch(.fresh, language: .en, size: size, location: .compact, card: .narrow,
+                                 family: .medium, rain: .heavy)
+                capture("rain-medium-en-longest-\(size.rawValue)")
+                guard let layout = assertCurrentWeather(app, language: .en, location: .compact, card: .narrow),
+                      let chart = requireOne(rainCharts(app, title: "Next hour precipitation"), "Rain chart"),
+                      let summary = requireOne(texts(app, label: summaryLabel), "Rain summary"),
+                      let updated = requireOne(texts(app, label: updatedLabel), "Rain update time") else { return }
+                let content = layout.bounds.insetBy(dx: margin, dy: margin)
+                let summaryFrame = summary.frame
+                let updatedFrame = updated.frame
+                assertInside(chart.frame, content, "Rain chart")
+                assertInside(summaryFrame, chart.frame, "Rain summary")
+                assertInside(updatedFrame, chart.frame, "Rain update time")
+                XCTAssertGreaterThan(min(summaryFrame.maxY, updatedFrame.maxY), max(summaryFrame.minY, updatedFrame.minY),
+                                     "The summary and the update time must share the header line")
+                XCTAssertLessThanOrEqual(summaryFrame.maxX, updatedFrame.minX + tolerance,
+                                         "The summary must not overlap the update time")
+                XCTAssertGreaterThanOrEqual(summaryFrame.width, wholeWidth - 1,
+                                            "The summary was cut or squeezed: \(summaryFrame.width) < \(wholeWidth)")
+            }
+        }
+    }
+
+    /// The chart's single combined element. XCUITest also lists the views
+    /// inside it, the title text among them, so the query is held to the
+    /// container's role; VoiceOver reaches only the container.
+    private func rainCharts(_ app: XCUIApplication, title: String = "近 1 小時降水趨勢") -> XCUIElementQuery {
+        app.otherElements.matching(NSPredicate(format: "label BEGINSWITH %@", title))
+    }
+
     private func launch(
         _ forecast: Forecast, language: Language, size: TextSize, location: Location, card: Card,
-        family: Family = .medium, dark: Bool = false, smallObservation: SmallObservation = .regular
+        family: Family = .medium, dark: Bool = false, smallObservation: SmallObservation = .regular,
+        observationAge: ObservationAge = .current,
+        rain: Rain = .none
     ) -> XCUIApplication {
         let app = XCUIApplication()
         app.launchEnvironment = [
@@ -186,6 +284,8 @@ final class MediumWeatherUITests: XCTestCase {
             "DPIP_FIXTURE_FAMILY": family.rawValue,
             "DPIP_FIXTURE_DARK": dark ? "1" : "0",
             "DPIP_FIXTURE_SMALL_OBSERVATION": smallObservation.rawValue,
+            "DPIP_FIXTURE_OBSERVATION_AGE": observationAge.rawValue,
+            "DPIP_FIXTURE_RAIN": rain.rawValue,
         ]
         app.launch()
         return app
@@ -591,6 +691,74 @@ extension MediumWeatherUITests {
             for frame in frames {
                 assertInside(frame, content, "Detail '\(label)'")
                 XCTAssertGreaterThanOrEqual(frame.minY, forecastBottom - tolerance)
+            }
+        }
+    }
+
+    func testStaleObservationIsMarkedBesideItsTime() {
+        for family in [Family.medium, .large] {
+            for size in [TextSize.normal, .accessibility5] {
+                for language in [Language.en, .traditionalChinese] {
+                    let name = "stale-observation-\(family.rawValue)-\(size.rawValue)-\(language.rawValue)"
+                    XCTContext.runActivity(named: name) { _ in
+                        // The forecast is stale too: the header has one place for a cue.
+                        let app = launch(.stale, language: language, size: size, location: .short,
+                                         card: .narrow, family: family, observationAge: .stale)
+                        capture(name)
+                        guard let layout = assertCurrentWeather(app, language: language, location: .short,
+                                                                card: .narrow, family: family),
+                              let cue = requireOne(elements(app, label: language.staleLabel),
+                                                   "Stale observation cue") else { return }
+                        if size.isAccessibility {
+                            XCTAssertEqual(cue.elementType, .image, "The adaptive header marks with the symbol")
+                        }
+                        let frame = cue.frame
+                        assertInside(frame, layout.bounds.insetBy(dx: margin, dy: margin), "Stale observation cue")
+                        XCTAssertLessThanOrEqual(layout.location.maxX, frame.minX + tolerance,
+                                                 "Location must precede the stale cue")
+                        XCTAssertLessThanOrEqual(frame.maxX, layout.time.minX + tolerance,
+                                                 "The stale cue must precede the observation time")
+                        XCTAssertGreaterThan(min(frame.maxY, layout.time.maxY), max(frame.minY, layout.time.minY),
+                                             "The stale cue and observation time must share a row")
+                        XCTAssertEqual(warningElements(app, language: language).count, 0,
+                                       "A stale observation outranks the forecast warning")
+                    }
+                }
+            }
+        }
+    }
+
+    func testCurrentObservationCarriesNoStaleCue() {
+        for family in [Family.small, .medium, .large] {
+            let app = launch(.fresh, language: .en, size: .normal, location: .compact, card: .narrow, family: family)
+            guard assertCurrentWeather(app, language: .en, location: .compact, card: .narrow, family: family) != nil
+            else { return }
+            XCTAssertEqual(elements(app, label: Language.en.staleLabel).count, 0, "\(family)")
+        }
+    }
+
+    func testSmallMarksAStaleObservationBesideItsTime() {
+        for language in [Language.en, .traditionalChinese] {
+            for size in [TextSize.normal, .accessibility5] {
+                let name = "small-stale-observation-\(size.rawValue)-\(language.rawValue)"
+                XCTContext.runActivity(named: name) { _ in
+                    let app = launch(.stale, language: language, size: size, location: .compact, card: .narrow,
+                                     family: .small, observationAge: .stale)
+                    capture(name)
+                    let timeLabel = language.timeLabel(utcHour: 6)
+                    guard let bounds = smallBounds(app, card: .narrow),
+                          let time = requireOne(texts(app, label: timeLabel), "Observation time"),
+                          let cue = requireOne(elements(app, label: language.staleLabel),
+                                               "Stale observation cue") else { return }
+                    let content = bounds.insetBy(dx: margin, dy: margin)
+                    let frame = cue.frame
+                    assertInside(frame, content, "Stale observation cue")
+                    assertInside(time.frame, content, "Observation time")
+                    XCTAssertLessThanOrEqual(frame.maxX, time.frame.minX + tolerance,
+                                             "The stale cue must precede the observation time")
+                    XCTAssertGreaterThan(min(frame.maxY, time.frame.maxY), max(frame.minY, time.frame.minY),
+                                         "The stale cue and observation time must share a row")
+                }
             }
         }
     }

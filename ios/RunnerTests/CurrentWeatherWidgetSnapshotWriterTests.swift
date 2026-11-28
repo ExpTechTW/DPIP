@@ -1203,10 +1203,8 @@ final class CurrentWeatherWidgetSnapshotWriterTests: XCTestCase {
         )
     }
 
-    private var writer: CurrentWeatherWidgetSnapshotWriter {
-        CurrentWeatherWidgetSnapshotWriter(
-            containerURL: containerURL
-        )
+    private var writer: WidgetTargetStore {
+        WidgetTargetStore(containerURL: containerURL)
     }
 
     private func write(

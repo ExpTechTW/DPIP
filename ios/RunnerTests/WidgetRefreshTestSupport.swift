@@ -91,6 +91,55 @@ actor ScriptedServerTimeSource: WidgetServerTimeSource {
     }
 }
 
+final class InMemoryClockAnchorStore: WidgetClockAnchorStoring,
+    @unchecked Sendable
+{
+    private let lock = NSLock()
+    private var stored: WidgetClockAnchor?
+    private var storedSaveCount = 0
+
+    init(_ anchor: WidgetClockAnchor? = nil) {
+        stored = anchor
+    }
+
+    var anchor: WidgetClockAnchor? { lock.withLock { stored } }
+    var saveCount: Int { lock.withLock { storedSaveCount } }
+
+    func load() -> WidgetClockAnchor? {
+        lock.withLock { stored }
+    }
+
+    func save(_ anchor: WidgetClockAnchor) {
+        lock.withLock {
+            stored = anchor
+            storedSaveCount += 1
+        }
+    }
+}
+
+final class TestBootMonotonicClock: WidgetMonotonicTimeSource,
+    @unchecked Sendable
+{
+    private let lock = NSLock()
+    private var milliseconds: Int64
+    private var boot: String?
+
+    init(milliseconds: Int64, boot: String?) {
+        self.milliseconds = milliseconds
+        self.boot = boot
+    }
+
+    func elapsedMilliseconds() -> Int64 { lock.withLock { milliseconds } }
+    func bootSessionIdentifier() -> String? { lock.withLock { boot } }
+
+    func set(milliseconds: Int64, boot: String?) {
+        lock.withLock {
+            self.milliseconds = milliseconds
+            self.boot = boot
+        }
+    }
+}
+
 struct PassthroughServerClockTimeoutRunner: WidgetServerClockTimeoutRunning {
     func serverTimeUnixMilliseconds(
         from source: any WidgetServerTimeSource,
@@ -119,89 +168,5 @@ actor AsyncOperationGate {
         isOpen = true
         continuation?.resume()
         continuation = nil
-    }
-}
-
-actor ScriptedCurrentWeather {
-    struct Coordinates: Equatable, Sendable {
-        let latitude: Double
-        let longitude: Double
-    }
-
-    private(set) var callCount = 0
-    private(set) var coordinates: [Coordinates] = []
-    private let result: Result<CurrentWeatherRemoteDTO?, WidgetRefreshTestError>
-    private let onFetch: @Sendable () -> Void
-
-    init(
-        result: Result<CurrentWeatherRemoteDTO?, WidgetRefreshTestError>,
-        onFetch: @escaping @Sendable () -> Void = {}
-    ) {
-        self.result = result
-        self.onFetch = onFetch
-    }
-
-    func fetch(
-        latitude: Double,
-        longitude: Double
-    ) throws -> CurrentWeatherRemoteDTO? {
-        onFetch()
-        callCount += 1
-        coordinates.append(
-            Coordinates(latitude: latitude, longitude: longitude)
-        )
-        return try result.get()
-    }
-}
-
-actor ScriptedSnapshotClock {
-    private(set) var callCount = 0
-    private let sample: CurrentWeatherSnapshotTime?
-
-    init(sample: CurrentWeatherSnapshotTime?) {
-        self.sample = sample
-    }
-
-    func synchronizeAndSample() -> CurrentWeatherSnapshotTime? {
-        callCount += 1
-        return sample
-    }
-}
-
-final class CurrentWeatherSnapshotWriterSpy: @unchecked Sendable {
-    private let lock = NSLock()
-    private let error: WidgetRefreshTestError?
-    private let onWrite: @Sendable () -> Void
-    private var storedSnapshots: [CurrentWeatherWidgetSnapshot] = []
-    private var storedWriteCount = 0
-
-    init(
-        error: WidgetRefreshTestError? = nil,
-        onWrite: @escaping @Sendable () -> Void = {}
-    ) {
-        self.error = error
-        self.onWrite = onWrite
-    }
-
-    var snapshots: [CurrentWeatherWidgetSnapshot] {
-        lock.withLock { storedSnapshots }
-    }
-
-    var writeCount: Int {
-        lock.withLock { storedWriteCount }
-    }
-
-    func write(_ snapshot: CurrentWeatherWidgetSnapshot) throws {
-        onWrite()
-        let error = lock.withLock {
-            storedWriteCount += 1
-            if self.error == nil {
-                storedSnapshots.append(snapshot)
-            }
-            return self.error
-        }
-        if let error {
-            throw error
-        }
     }
 }

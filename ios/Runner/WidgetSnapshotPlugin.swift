@@ -163,7 +163,7 @@ enum WidgetSnapshotFile {
       switch kind {
       case .currentWeather:
         try CurrentWeatherSnapshotStorage(containerURL: container).removeAll()
-        // And the pre-per-target file. WidgetSnapshotStore still reads it as a
+        // And the pre-per-target file. WidgetTargetStore still reads it as a
         // migration fallback, so on a device upgraded across that change it is
         // exactly what would stay on screen after everything else was cleared.
         try remove(directory.appendingPathComponent(kind.filename))

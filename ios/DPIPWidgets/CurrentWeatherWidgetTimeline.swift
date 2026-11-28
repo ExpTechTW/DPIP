@@ -30,7 +30,50 @@ struct CurrentWeatherWidgetTimeCalibration {
 }
 
 enum CurrentWeatherWidgetTimeline {
-    static let defaultStaleAfter: TimeInterval = 30 * 60
+    /// Observations are published ten to twenty minutes after the reading, so
+    /// a thirty-minute limit made a fresh fetch stale within one reload.
+    static let defaultStaleAfter: TimeInterval = 60 * 60
+
+    /// Device-clock instant at which `snapshot` becomes stale.
+    static func staleDate(
+        for snapshot: CurrentWeatherWidgetSnapshot,
+        staleAfter: TimeInterval
+    ) -> Date {
+        CurrentWeatherWidgetTimeCalibration(snapshot: snapshot).deviceDate(
+            forCalibratedDate: Date(
+                timeIntervalSince1970: TimeInterval(snapshot.observationTime)
+            ).addingTimeInterval(staleAfter)
+        )
+    }
+
+    /// Device-clock instants of each whole Taipei hour in `(after, before)`.
+    ///
+    /// The hourly row picks its first hour from the entry date once the
+    /// observation is stale, so without an entry on each hour a delayed
+    /// reload keeps showing an hour that has already passed.
+    static func hourBoundaries(
+        for snapshot: CurrentWeatherWidgetSnapshot,
+        after deviceDate: Date,
+        before deviceLimit: Date
+    ) -> [Date] {
+        let calibration = CurrentWeatherWidgetTimeCalibration(
+            snapshot: snapshot
+        )
+        // Taipei is a whole-hour offset from UTC, so UTC hours are its hours.
+        let calibrated = calibration.calibratedDate(fromDeviceDate: deviceDate)
+            .timeIntervalSince1970
+        var hour = (calibrated / 3_600).rounded(.down) * 3_600 + 3_600
+        var boundaries: [Date] = []
+        while true {
+            let device = calibration.deviceDate(
+                forCalibratedDate: Date(timeIntervalSince1970: hour)
+            )
+            guard device < deviceLimit else { break }
+            if device > deviceDate { boundaries.append(device) }
+            hour += 3_600
+        }
+        return boundaries
+    }
 
     static func state(
         snapshot: CurrentWeatherWidgetSnapshot?,
@@ -81,12 +124,7 @@ enum CurrentWeatherWidgetTimeline {
         let calibration = CurrentWeatherWidgetTimeCalibration(
             snapshot: snapshot
         )
-        let observationDate = Date(
-            timeIntervalSince1970: TimeInterval(snapshot.observationTime)
-        )
-        let staleAt = calibration.deviceDate(
-            forCalibratedDate: observationDate.addingTimeInterval(staleAfter)
-        )
+        let staleAt = staleDate(for: snapshot, staleAfter: staleAfter)
         let transitionAt = calibration.deviceDate(
             forCalibratedDate: Date(
                 timeIntervalSince1970:

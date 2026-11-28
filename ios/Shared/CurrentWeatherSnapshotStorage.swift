@@ -279,6 +279,21 @@ struct CurrentWeatherSnapshotStorage: Sendable {
         }
     }
 
+    /// Removes one target's snapshot and its ordering sidecar, under a
+    /// delete claim on the snapshot file. With the sidecar gone, a `replace`
+    /// whose token was issued before the removal is refused rather than
+    /// bringing the snapshot back.
+    func remove(for address: CurrentWeatherSnapshotAddress) throws {
+        try coordinator.coordinate(
+            deletingItemAt: snapshotURL(for: address)
+        ) { coordinatedSnapshot in
+            try removeDirectory(
+                at: orderingStateURL(coordinatedSnapshotURL: coordinatedSnapshot)
+            )
+            try removeDirectory(at: coordinatedSnapshot)
+        }
+    }
+
     private func removeDirectory(at url: URL) throws {
         do {
             try FileManager.default.removeItem(at: url)
@@ -327,7 +342,7 @@ struct CurrentWeatherSnapshotStorage: Sendable {
     ) -> URL {
         // Keep the coordinator-provided filename in case Foundation redirects
         // the coordinated item, while storing ordering outside the canonical
-        // cache directory consumed by WidgetSnapshotStore.
+        // cache directory consumed by WidgetTargetStore.
         orderingDirectoryURL.appendingPathComponent(
             coordinatedSnapshotURL.lastPathComponent + ".json"
         )

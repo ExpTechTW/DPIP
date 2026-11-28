@@ -175,16 +175,17 @@ final class ForecastWidgetSelectionTests: XCTestCase {
         }
     }
 
-    func testStaleBoundaryMatchesCurrentWeatherAtExactlyThirtyMinutes() {
+    func testStaleBoundaryMatchesCurrentWeatherAtExactlySixtyMinutes() {
         let observation = instant("2026-09-25T11:50:00Z")
         let points = forecastPoints(times: ["20:00", "21:00"])
         let timestamp = Int(observation.timeIntervalSince1970)
+        XCTAssertEqual(CurrentWeatherWidgetTimeline.defaultStaleAfter, 3_600)
         XCTAssertEqual(ForecastWidgetSelection.upcomingPoints(
-            points, at: observation.addingTimeInterval(1_799),
+            points, at: observation.addingTimeInterval(3_599),
             observationTime: timestamp, limit: 5
         ).first?.time, "20:00")
         XCTAssertEqual(ForecastWidgetSelection.upcomingPoints(
-            points, at: observation.addingTimeInterval(1_800),
+            points, at: observation.addingTimeInterval(3_600),
             observationTime: timestamp, limit: 5
         ).map(\.time), ["21:00"])
     }
@@ -194,7 +195,9 @@ final class ForecastWidgetSelectionTests: XCTestCase {
         let points = forecastPoints(times: ["23:00", "00:00", "01:00", "02:00"])
         for (timestamp, expected) in [
             ("2026-09-25T16:04:00Z", ["00:00", "01:00", "02:00"]),
-            ("2026-09-25T16:30:00Z", ["01:00", "02:00"]),
+            // Sixty minutes after the observation it is stale, and the
+            // calibrated clock's own hour takes over.
+            ("2026-09-25T16:50:00Z", ["01:00", "02:00"]),
         ] {
             XCTAssertEqual(ForecastWidgetSelection.upcomingPoints(
                 points, at: instant(timestamp),
@@ -508,12 +511,12 @@ final class ForecastWidgetExpiryTests: XCTestCase {
     }
 }
 
-final class ForecastWidgetSnapshotStoreTests: XCTestCase {
+final class ForecastTargetStoreTests: XCTestCase {
     func testTargetIsolationAndRegionMatching() throws {
         let directory = FileManager.default.temporaryDirectory
             .appendingPathComponent(UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: directory) }
-        let store = ForecastWidgetSnapshotStore(containerURL: directory)
+        let store = WidgetTargetStore(containerURL: directory)
         let saved = WidgetLocationTarget.saved(regionCode: "407")
         let other = WidgetLocationTarget.saved(regionCode: "242")
         let current = WidgetLocationTarget.currentLocation
@@ -521,50 +524,50 @@ final class ForecastWidgetSnapshotStoreTests: XCTestCase {
         let snapshot = forecastSnapshot(
             updateTime: milliseconds("2026-09-25T07:10:00Z"),
             receivedAt: milliseconds("2026-09-25T07:21:00Z"))
-        XCTAssertTrue(try store.write(snapshot, for: saved))
-        XCTAssertEqual(store.load(for: saved, regionCode: "407", at: date)?
+        XCTAssertTrue(try store.writeForecast(snapshot, for: saved))
+        XCTAssertEqual(store.loadForecast(for: saved, regionCode: "407", at: date)?
             .points.first?.time, "23:00")
-        XCTAssertNil(store.load(for: other, regionCode: "242", at: date))
-        XCTAssertNil(store.load(for: saved, regionCode: "242", at: date))
-        XCTAssertFalse(try store.write(snapshot, for: other))
+        XCTAssertNil(store.loadForecast(for: other, regionCode: "242", at: date))
+        XCTAssertNil(store.loadForecast(for: saved, regionCode: "242", at: date))
+        XCTAssertFalse(try store.writeForecast(snapshot, for: other))
         let otherSnapshot = forecastSnapshot(
             sourceIdentifier: "region:242", regionCode: "242",
             updateTime: milliseconds("2026-09-25T07:10:00Z"),
             receivedAt: milliseconds("2026-09-25T07:21:00Z"))
-        XCTAssertTrue(try store.write(otherSnapshot, for: other))
-        XCTAssertNotNil(store.load(for: other, regionCode: "242", at: date))
-        XCTAssertNotNil(store.load(for: saved, regionCode: "407", at: date))
+        XCTAssertTrue(try store.writeForecast(otherSnapshot, for: other))
+        XCTAssertNotNil(store.loadForecast(for: other, regionCode: "242", at: date))
+        XCTAssertNotNil(store.loadForecast(for: saved, regionCode: "407", at: date))
 
         let currentSnapshot = forecastSnapshot(
             sourceIdentifier: "current-location", regionCode: "407",
             updateTime: milliseconds("2026-09-25T07:10:00Z"),
             receivedAt: milliseconds("2026-09-25T07:21:00Z"))
-        XCTAssertTrue(try store.write(currentSnapshot, for: current))
-        XCTAssertNotNil(store.load(for: current, regionCode: "407", at: date))
-        XCTAssertNil(store.load(for: current, regionCode: "242", at: date))
-        XCTAssertNotEqual(store.snapshotURL(for: saved),
-                          store.snapshotURL(for: current))
+        XCTAssertTrue(try store.writeForecast(currentSnapshot, for: current))
+        XCTAssertNotNil(store.loadForecast(for: current, regionCode: "407", at: date))
+        XCTAssertNil(store.loadForecast(for: current, regionCode: "242", at: date))
+        XCTAssertNotEqual(store.forecastURL(for: saved),
+                          store.forecastURL(for: current))
     }
 
     func testCorruptAndExpiredCacheAreRejected() throws {
         let directory = FileManager.default.temporaryDirectory
             .appendingPathComponent(UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: directory) }
-        let store = ForecastWidgetSnapshotStore(containerURL: directory)
+        let store = WidgetTargetStore(containerURL: directory)
         let target = WidgetLocationTarget.saved(regionCode: "407")
         let snapshot = forecastSnapshot(
             updateTime: milliseconds("2026-09-25T07:10:00Z"),
             receivedAt: milliseconds("2026-09-25T07:21:00Z"))
-        try store.write(snapshot, for: target)
-        XCTAssertNil(store.load(for: target, regionCode: "407",
+        try store.writeForecast(snapshot, for: target)
+        XCTAssertNil(store.loadForecast(for: target, regionCode: "407",
                                 at: instant("2026-09-25T09:10:00Z")))
-        let url = try XCTUnwrap(store.snapshotURL(for: target))
+        let url = try XCTUnwrap(store.forecastURL(for: target))
         try Data("broken".utf8).write(to: url, options: .atomic)
-        XCTAssertNil(store.load(for: target, regionCode: "407",
+        XCTAssertNil(store.loadForecast(for: target, regionCode: "407",
                                 at: instant("2026-09-25T07:21:00Z")))
         try Data(repeating: 65, count: 128 * 1024 + 1)
             .write(to: url, options: .atomic)
-        XCTAssertNil(store.load(for: target, regionCode: "407",
+        XCTAssertNil(store.loadForecast(for: target, regionCode: "407",
                                 at: instant("2026-09-25T07:21:00Z")))
     }
 
@@ -572,20 +575,20 @@ final class ForecastWidgetSnapshotStoreTests: XCTestCase {
         let directory = FileManager.default.temporaryDirectory
             .appendingPathComponent(UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: directory) }
-        let store = ForecastWidgetSnapshotStore(containerURL: directory)
+        let store = WidgetTargetStore(containerURL: directory)
         let target = WidgetLocationTarget.saved(regionCode: "407")
         let snapshot = forecastSnapshot(
             updateTime: milliseconds("2026-09-25T07:10:00Z"),
             receivedAt: milliseconds("2026-09-25T07:26:00Z")
         )
-        try store.write(snapshot, for: target)
+        try store.writeForecast(snapshot, for: target)
 
-        XCTAssertNotNil(store.load(
+        XCTAssertNotNil(store.loadForecast(
             for: target, regionCode: "407",
             at: instant("2026-09-25T09:14:59Z"),
             calibratedTimeOffsetMilliseconds: -300_000
         ))
-        XCTAssertNil(store.load(
+        XCTAssertNil(store.loadForecast(
             for: target, regionCode: "407",
             at: instant("2026-09-25T09:15:00Z"),
             calibratedTimeOffsetMilliseconds: -300_000
@@ -706,7 +709,7 @@ final class ForecastWidgetProviderTests: XCTestCase {
                                             receivedAt: Int64(now.timeIntervalSince1970 * 1_000),
                                             times: ["21:00", "22:00", "23:00", "00:00"])
             )
-            let planner = DPIPWidgetTimelinePlanner(
+            let planner = testPlanner(
                 staleAfter: CurrentWeatherWidgetTimeline.defaultStaleAfter, refreshInterval: 20 * 60,
                 loadSnapshot: { state.loadCurrent($0) },
                 refreshSaved: { _ in .failed }, refreshCurrent: { .failed },
@@ -723,27 +726,6 @@ final class ForecastWidgetProviderTests: XCTestCase {
             XCTAssertEqual(entry.snapshot?.observationTime, observation)
             XCTAssertEqual(plan.reloadDate, instant("2026-09-25T14:50:00Z"))
         }
-    }
-
-    func testSmallDoesNotRefreshForecast() async {
-        let target = WidgetLocationTarget.saved(regionCode: "407")
-        let state = ForecastPlannerState(current: currentSnapshot(target: target))
-        let planner = makePlanner(state: state)
-        _ = await planner.plan(for: target, family: .systemSmall)
-        XCTAssertEqual(state.forecastRefreshCount, 0)
-        XCTAssertTrue(state.requestedRegions.isEmpty)
-    }
-
-    func testMediumAndLargeEachRefreshForecast() async {
-        let target = WidgetLocationTarget.saved(regionCode: "407")
-        let state = ForecastPlannerState(current: currentSnapshot(target: target))
-        let planner = makePlanner(state: state)
-        _ = await planner.plan(for: target, family: .systemMedium)
-        XCTAssertEqual(state.forecastRefreshCount, 1)
-        XCTAssertEqual(state.requestedRegions, ["407"])
-        _ = await planner.plan(for: target, family: .systemLarge)
-        XCTAssertEqual(state.forecastRefreshCount, 2)
-        XCTAssertEqual(state.requestedRegions, ["407", "407"])
     }
 
     func testMediumSnapshotReadsMatchingCacheWithoutNetworkRequest() {
@@ -801,7 +783,8 @@ final class ForecastWidgetProviderTests: XCTestCase {
         XCTAssertEqual(plan.snapshot?.regionCode, "407")
         XCTAssertNotNil(plan.forecast)
         let expiry = instant("2026-09-25T09:10:00Z")
-        XCTAssertEqual(plan.states.count, 4)
+        // now, forecast stale, current stale, 08:00, 09:00, forecast expiry.
+        XCTAssertEqual(plan.states.count, 6)
         XCTAssertTrue(plan.states.contains { $0.date == expiry })
         XCTAssertNotNil(plan.forecast(at: plan.states[0].date))
         XCTAssertNil(plan.forecast(at: expiry))
@@ -869,7 +852,7 @@ final class ForecastWidgetProviderTests: XCTestCase {
         let gate = AsyncOperationGate()
         let fetchStarted = expectation(description: "Forecast fetch started")
         let dto = try! forecastDTO(times: ["23:00"])
-        let service = ForecastWidgetRefreshService(
+        let service = ForecastRefreshHarness(
             fetch: { _ in
                 fetchStarted.fulfill()
                 await gate.wait()
@@ -901,7 +884,7 @@ final class ForecastWidgetProviderTests: XCTestCase {
         let dto = try JSONDecoder().decode(ForecastRemoteDTO.self,
             from: JSONSerialization.data(withJSONObject: payload))
         let date = instant("2026-09-25T07:21:00Z")
-        let service = ForecastWidgetRefreshService(
+        let service = ForecastRefreshHarness(
             fetch: { _ in dto },
             loadCurrent: { state.loadCurrent($0) },
             savedIsResolved: { _ in true },
@@ -922,7 +905,7 @@ final class ForecastWidgetProviderTests: XCTestCase {
         let target = WidgetLocationTarget.saved(regionCode: "407")
         let state = ForecastPlannerState(current: currentSnapshot(target: target))
         let calls = ForecastCallCounter()
-        let service = ForecastWidgetRefreshService(
+        let service = ForecastRefreshHarness(
             fetch: { _ in
                 calls.increment()
                 return try forecastDTO(times: ["12:00"])
@@ -940,7 +923,7 @@ final class ForecastWidgetProviderTests: XCTestCase {
         state: ForecastPlannerState,
         now date: Date = instant("2026-09-25T07:21:00Z")
     ) -> DPIPWidgetTimelinePlanner {
-        DPIPWidgetTimelinePlanner(
+        testPlanner(
             staleAfter: 30 * 60,
             refreshInterval: 20 * 60,
             loadSnapshot: { state.loadCurrent($0) },
@@ -1198,23 +1181,23 @@ final class ForecastWidgetGalleryPreviewTests: XCTestCase {
             )
             defer { try? FileManager.default.removeItem(at: container) }
 
-            let store = WidgetSnapshotStore(containerURL: container)
-            let forecasts = ForecastWidgetSnapshotStore(containerURL: container)
+            let store = WidgetTargetStore(containerURL: container)
+            let forecasts = WidgetTargetStore(containerURL: container)
             let current = currentSnapshot(target: target)
             _ = try CurrentWeatherWidgetTestFixtures.seed(
                 current, at: .saved(regionCode: "407"), containerURL: container
             )
             if let forecast = scenario.forecast {
-                try forecasts.write(forecast, for: target)
+                try forecasts.writeForecast(forecast, for: target)
             }
 
             let currentRefreshes = ForecastCallCounter()
             let forecastRefreshes = ForecastCallCounter()
             let now = date
-            let planner = DPIPWidgetTimelinePlanner(
+            let planner = testPlanner(
                 staleAfter: 30 * 60,
                 refreshInterval: 20 * 60,
-                loadSnapshot: { store.loadCurrentWeatherSnapshot(for: $0) },
+                loadSnapshot: { store.loadCurrent(for: $0) },
                 refreshSaved: { _ in
                     currentRefreshes.increment()
                     return .failed
@@ -1224,16 +1207,16 @@ final class ForecastWidgetGalleryPreviewTests: XCTestCase {
                     return .failed
                 },
                 loadForecast: {
-                    forecasts.load(for: $0, regionCode: $1, at: $2)
+                    forecasts.loadForecast(for: $0, regionCode: $1, at: $2)
                 },
                 refreshForecast: { _, _ in forecastRefreshes.increment() },
                 now: { now }
             )
             let deps = DPIPWidgetProviderDependencies(
-                loadSnapshot: { store.loadCurrentWeatherSnapshot(for: $0) },
+                loadSnapshot: { store.loadCurrent(for: $0) },
                 timelinePlanner: planner,
                 loadForecast: {
-                    forecasts.load(for: $0, regionCode: $1, at: $2)
+                    forecasts.loadForecast(for: $0, regionCode: $1, at: $2)
                 }
             )
             let before = try persistedFiles(in: container)
@@ -1291,7 +1274,7 @@ final class ForecastWidgetGalleryPreviewTests: XCTestCase {
         let now = date
         return DPIPWidgetProviderDependencies(
             loadSnapshot: { state.loadCurrent($0) },
-            timelinePlanner: DPIPWidgetTimelinePlanner(
+            timelinePlanner: testPlanner(
                 staleAfter: 30 * 60, refreshInterval: 20 * 60,
                 loadSnapshot: { state.loadCurrent($0) },
                 refreshSaved: { _ in .failed }, refreshCurrent: { .failed },
@@ -1489,8 +1472,11 @@ final class ForecastExpiryRegressionTests: XCTestCase {
         for family: WidgetFamily in [.systemMedium, .systemLarge] {
             let plan = await planner(forecast: cached()).plan(for: target, family: family)
             XCTAssertEqual(plan.reloadDate, instant("2026-09-25T07:41:00Z"))
+            // Each whole hour up to the hard expiry is an entry, so the hourly
+            // row moves on even when the requested reload runs late.
             XCTAssertEqual(plan.states.map(\.date), [
                 initial, instant("2026-09-25T07:40:00Z"), instant("2026-09-25T07:51:00Z"),
+                instant("2026-09-25T08:00:00Z"), instant("2026-09-25T09:00:00Z"),
                 instant("2026-09-25T09:10:00Z"),
             ])
             XCTAssertNotNil(plan.forecast(at: initial))
@@ -1541,7 +1527,7 @@ final class ForecastExpiryRegressionTests: XCTestCase {
 
     func testSmallKeepsNormalTimelineAndNeverRequestsForecast() async {
         let state = ForecastPlannerState(current: currentSnapshot(target: target), forecast: cached())
-        let plan = await DPIPWidgetTimelinePlanner(
+        let plan = await testPlanner(
             staleAfter: 30 * 60, refreshInterval: 20 * 60,
             loadSnapshot: { state.loadCurrent($0) },
             refreshSaved: { _ in .failed }, refreshCurrent: { .failed },
@@ -1620,13 +1606,13 @@ final class ForecastExpiryRegressionTests: XCTestCase {
         for error: Error in [URLError(.timedOut), ForecastClientError.httpStatus(503)] {
             let clock = TestWallClock(milliseconds: milliseconds("2026-09-25T07:21:00Z"))
             let state = ForecastPlannerState(current: currentSnapshot(target: target), forecast: cached())
-            let service = ForecastWidgetRefreshService(
+            let service = ForecastRefreshHarness(
                 fetch: { _ in throw error },
                 loadCurrent: { state.loadCurrent($0) }, savedIsResolved: { _ in true },
                 write: { snapshot, _ in state.forecast = snapshot; return true },
                 now: { clock.now() }
             )
-            let failedPlanner = DPIPWidgetTimelinePlanner(
+            let failedPlanner = testPlanner(
                 staleAfter: 30 * 60, refreshInterval: 20 * 60,
                 loadSnapshot: { state.loadCurrent($0) },
                 refreshSaved: { _ in .failed }, refreshCurrent: { .failed },
@@ -1643,7 +1629,7 @@ final class ForecastExpiryRegressionTests: XCTestCase {
             XCTAssertEqual(after.reloadDate, instant("2026-09-25T09:30:00Z"))
 
             let dto = try refreshedDTO(publication: "2026-09-25T09:05:00Z", times: ["18:00", "19:00"])
-            let success = ForecastWidgetRefreshService(
+            let success = ForecastRefreshHarness(
                 fetch: { _ in dto },
                 loadCurrent: { state.loadCurrent($0) }, savedIsResolved: { _ in true },
                 write: { snapshot, _ in state.forecast = snapshot; return true },
@@ -1663,7 +1649,7 @@ final class ForecastExpiryRegressionTests: XCTestCase {
                 current: currentSnapshot(target: target, offset: offset), forecast: cached()
             )
             let dto = try refreshedDTO(publication: "2026-09-25T05:21:00Z")
-            let service = ForecastWidgetRefreshService(
+            let service = ForecastRefreshHarness(
                 fetch: { _ in dto },
                 loadCurrent: { state.loadCurrent($0) }, savedIsResolved: { _ in true },
                 write: { snapshot, _ in state.forecast = snapshot; return true },
@@ -1677,48 +1663,48 @@ final class ForecastExpiryRegressionTests: XCTestCase {
     func testSamePublicationReceivedAcrossHourCannotResurrectExpiredCache() throws {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: directory) }
-        let store = ForecastWidgetSnapshotStore(containerURL: directory)
+        let store = WidgetTargetStore(containerURL: directory)
         let first = forecastSnapshot(
             updateTime: milliseconds("2026-09-25T07:45:00Z"),
             receivedAt: milliseconds("2026-09-25T07:59:00Z"), times: ["16:00", "17:00"]
         )
-        XCTAssertTrue(try store.write(first, for: target))
+        XCTAssertTrue(try store.writeForecast(first, for: target))
         let repeated = forecastSnapshot(
             updateTime: first.updateTime, receivedAt: milliseconds("2026-09-25T08:01:00Z"),
             times: ["16:00", "17:00"]
         )
-        XCTAssertFalse(try store.write(repeated, for: target))
-        XCTAssertEqual(store.load(for: target, regionCode: "407",
+        XCTAssertFalse(try store.writeForecast(repeated, for: target))
+        XCTAssertEqual(store.loadForecast(for: target, regionCode: "407",
                                   at: instant("2026-09-25T07:59:30Z"))?.receivedAt, first.receivedAt)
-        XCTAssertEqual(store.load(for: target, regionCode: "407",
+        XCTAssertEqual(store.loadForecast(for: target, regionCode: "407",
                                   at: instant("2026-09-25T08:30:00Z"))?.receivedAt, first.receivedAt)
-        XCTAssertNil(store.load(for: target, regionCode: "407",
+        XCTAssertNil(store.loadForecast(for: target, regionCode: "407",
                                 at: instant("2026-09-25T09:45:00Z")))
         let newer = forecastSnapshot(
             updateTime: milliseconds("2026-09-25T08:00:00Z"),
             receivedAt: repeated.receivedAt, times: ["17:00"]
         )
-        XCTAssertTrue(try store.write(newer, for: target))
-        XCTAssertEqual(store.load(for: target, regionCode: "407",
+        XCTAssertTrue(try store.writeForecast(newer, for: target))
+        XCTAssertEqual(store.loadForecast(for: target, regionCode: "407",
                                   at: instant("2026-09-25T08:01:00Z"))?.updateTime, newer.updateTime)
     }
 
     func testMissingAndInvalidDiskCacheKeepCurrentWithoutForecast() async throws {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: directory) }
-        let store = ForecastWidgetSnapshotStore(containerURL: directory)
+        let store = WidgetTargetStore(containerURL: directory)
         let current = currentSnapshot(target: target)
-        let planner = DPIPWidgetTimelinePlanner(
+        let planner = testPlanner(
             staleAfter: 30 * 60, refreshInterval: 20 * 60,
             loadSnapshot: { _ in current },
             refreshSaved: { _ in .failed }, refreshCurrent: { .failed },
-            loadForecast: { store.load(for: $0, regionCode: $1, at: $2) },
+            loadForecast: { store.loadForecast(for: $0, regionCode: $1, at: $2) },
             now: { self.initial }
         )
         let missing = await planner.plan(for: target, family: .systemLarge)
         XCTAssertNil(missing.forecast)
         XCTAssertEqual(missing.snapshot?.temperature, 22)
-        let url = try XCTUnwrap(store.snapshotURL(for: target))
+        let url = try XCTUnwrap(store.forecastURL(for: target))
         try FileManager.default.createDirectory(at: url.deletingLastPathComponent(),
                                                  withIntermediateDirectories: true)
         try Data(#"{"schemaVersion":1,"points":[]}"#.utf8).write(to: url)
@@ -1733,7 +1719,7 @@ final class ForecastExpiryRegressionTests: XCTestCase {
         let dto = try refreshedDTO(publication: "2026-09-25T07:10:00Z")
         let gate = AsyncOperationGate()
         let fetchStarted = expectation(description: "Forecast fetch started")
-        let service = ForecastWidgetRefreshService(
+        let service = ForecastRefreshHarness(
             fetch: { _ in
                 fetchStarted.fulfill()
                 await gate.wait()
@@ -1743,7 +1729,7 @@ final class ForecastExpiryRegressionTests: XCTestCase {
             write: { snapshot, _ in state.forecast = snapshot; return true },
             now: { self.initial }
         )
-        let planner = DPIPWidgetTimelinePlanner(
+        let planner = testPlanner(
             staleAfter: 30 * 60, refreshInterval: 20 * 60,
             loadSnapshot: { state.loadCurrent($0) },
             refreshSaved: { _ in .failed }, refreshCurrent: { .failed },
@@ -1794,7 +1780,7 @@ final class ForecastExpiryRegressionTests: XCTestCase {
                         times: ["20:00", "21:00", "22:00"])
                     let state = ForecastPlannerState(current: current, forecast: forecast)
                     let currentCalls = ForecastCallCounter()
-                    let planner = DPIPWidgetTimelinePlanner(staleAfter: 30 * 60,
+                    let planner = testPlanner(staleAfter: 30 * 60,
                         refreshInterval: 20 * 60, loadSnapshot: { state.loadCurrent($0) },
                         refreshSaved: { _ in currentCalls.increment(); return .failed },
                         refreshCurrent: { currentCalls.increment(); return .failed },
@@ -1826,21 +1812,21 @@ final class ForecastExpiryRegressionTests: XCTestCase {
     func testSamePublicationRefreshKeepsStaleCacheBytesUntilHardExpiry() async throws {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: directory) }
-        let store = ForecastWidgetSnapshotStore(containerURL: directory)
+        let store = WidgetTargetStore(containerURL: directory)
         let first = cached(times: ["17:00", "18:00"])
-        XCTAssertTrue(try store.write(first, for: target))
-        let bytes = try Data(contentsOf: XCTUnwrap(store.snapshotURL(for: target)))
+        XCTAssertTrue(try store.writeForecast(first, for: target))
+        let bytes = try Data(contentsOf: XCTUnwrap(store.forecastURL(for: target)))
         let clock = TestWallClock(milliseconds: milliseconds("2026-09-25T07:40:00Z"))
         let current = currentSnapshot(target: target)
         let dto = try refreshedDTO(publication: "2026-09-25T07:10:00Z")
-        let service = ForecastWidgetRefreshService(fetch: { _ in dto },
+        let service = ForecastRefreshHarness(fetch: { _ in dto },
             loadCurrent: { _ in current }, savedIsResolved: { _ in true },
-            write: { try store.write($0, for: $1) }, now: { clock.now() })
+            write: { try store.writeForecast($0, for: $1) }, now: { clock.now() })
         for date in ["2026-09-25T07:40:00Z", "2026-09-25T09:09:59Z", "2026-09-25T09:10:00Z"] {
             clock.set(milliseconds: milliseconds(date))
             await service.refresh(target: target, regionCode: "407")
-            XCTAssertEqual(try Data(contentsOf: XCTUnwrap(store.snapshotURL(for: target))), bytes)
-            let loaded = store.load(for: target, regionCode: "407", at: clock.now())
+            XCTAssertEqual(try Data(contentsOf: XCTUnwrap(store.forecastURL(for: target))), bytes)
+            let loaded = store.loadForecast(for: target, regionCode: "407", at: clock.now())
             XCTAssertEqual(loaded != nil, date != "2026-09-25T09:10:00Z")
             if let loaded {
                 XCTAssertEqual(loaded.receivedAt, first.receivedAt)
@@ -1852,25 +1838,25 @@ final class ForecastExpiryRegressionTests: XCTestCase {
     func testNewPublicationReplacesStaleCacheAndRestoresFreshTimeline() async throws {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: directory) }
-        let store = ForecastWidgetSnapshotStore(containerURL: directory)
+        let store = WidgetTargetStore(containerURL: directory)
         let first = cached()
-        XCTAssertTrue(try store.write(first, for: target))
+        XCTAssertTrue(try store.writeForecast(first, for: target))
         let now = instant("2026-09-25T07:50:00Z")
         XCTAssertEqual(ForecastWidgetExpiry.freshness(of: first, at: now), .stale)
         let current = currentSnapshot(target: target)
         let dto = try refreshedDTO(publication: "2026-09-25T07:49:00Z")
-        let service = ForecastWidgetRefreshService(fetch: { _ in dto },
+        let service = ForecastRefreshHarness(fetch: { _ in dto },
             loadCurrent: { _ in current }, savedIsResolved: { _ in true },
-            write: { try store.write($0, for: $1) }, now: { now })
-        let planner = DPIPWidgetTimelinePlanner(staleAfter: 30 * 60, refreshInterval: 20 * 60,
+            write: { try store.writeForecast($0, for: $1) }, now: { now })
+        let planner = testPlanner(staleAfter: 30 * 60, refreshInterval: 20 * 60,
             loadSnapshot: { _ in current }, refreshSaved: { _ in .failed },
             refreshCurrent: { .failed },
-            loadForecast: { store.load(for: $0, regionCode: $1, at: $2) },
+            loadForecast: { store.loadForecast(for: $0, regionCode: $1, at: $2) },
             refreshForecast: { await service.refresh(target: $0, regionCode: $1) }, now: { now })
         let plan = await planner.plan(for: target, family: .systemMedium)
         let loaded = try XCTUnwrap(plan.forecast)
         XCTAssertEqual(loaded.updateTime, dto.updateTime)
-        XCTAssertFalse(try store.write(first, for: target))
+        XCTAssertFalse(try store.writeForecast(first, for: target))
         XCTAssertEqual(ForecastWidgetExpiry.freshness(of: loaded, at: now), .fresh)
         XCTAssertTrue(plan.states.contains { $0.date == instant("2026-09-25T08:19:00Z") })
         XCTAssertTrue(plan.states.contains { $0.date == instant("2026-09-25T09:49:00Z") })
@@ -1901,7 +1887,7 @@ final class ForecastExpiryRegressionTests: XCTestCase {
                          offset: Int = 0) -> DPIPWidgetTimelinePlanner {
         let date = now ?? initial
         let current = currentSnapshot(target: target, offset: offset)
-        return DPIPWidgetTimelinePlanner(
+        return testPlanner(
             staleAfter: 30 * 60, refreshInterval: 20 * 60,
             loadSnapshot: { _ in current },
             refreshSaved: { _ in .failed }, refreshCurrent: { .failed },
@@ -2388,13 +2374,13 @@ final class ForecastRefreshIntentTests: XCTestCase {
         guard #available(iOS 17.0, *) else { throw XCTSkip("Interactive widgets require iOS 17") }
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: directory) }
-        let store = ForecastWidgetSnapshotStore(containerURL: directory)
+        let store = WidgetTargetStore(containerURL: directory)
         let target = WidgetLocationTarget.saved(regionCode: "407")
         let original = forecastSnapshot(updateTime: milliseconds("2026-09-25T07:10:00Z"),
                                         receivedAt: milliseconds("2026-09-25T07:21:00Z"),
                                         times: ["16:00", "17:00"])
-        XCTAssertTrue(try store.write(original, for: target))
-        let url = try XCTUnwrap(store.snapshotURL(for: target))
+        XCTAssertTrue(try store.writeForecast(original, for: target))
+        let url = try XCTUnwrap(store.forecastURL(for: target))
         let bytes = try Data(contentsOf: url)
         for _ in 0..<10 {
             _ = try RefreshForecastIntent(locationIdentifier: "region:407")
@@ -2402,19 +2388,19 @@ final class ForecastRefreshIntentTests: XCTestCase {
         }
         XCTAssertEqual(try Data(contentsOf: url), bytes)
         for publication in [original.updateTime, original.updateTime - 60_000] {
-            XCTAssertFalse(try store.write(forecastSnapshot(
+            XCTAssertFalse(try store.writeForecast(forecastSnapshot(
                 updateTime: publication, receivedAt: original.receivedAt + 60_000,
                 times: ["16:00", "17:00"]
             ), for: target))
         }
         XCTAssertEqual(try Data(contentsOf: url), bytes)
-        XCTAssertNotNil(store.load(for: target, regionCode: "407", at: instant("2026-09-25T07:40:00Z")))
-        XCTAssertNil(store.load(for: target, regionCode: "407", at: instant("2026-09-25T09:10:00Z")))
+        XCTAssertNotNil(store.loadForecast(for: target, regionCode: "407", at: instant("2026-09-25T07:40:00Z")))
+        XCTAssertNil(store.loadForecast(for: target, regionCode: "407", at: instant("2026-09-25T09:10:00Z")))
         let newer = forecastSnapshot(updateTime: milliseconds("2026-09-25T07:35:00Z"),
                                      receivedAt: milliseconds("2026-09-25T07:40:00Z"),
                                      times: ["16:00", "17:00"])
-        XCTAssertTrue(try store.write(newer, for: target))
-        XCTAssertEqual(store.load(for: target, regionCode: "407",
+        XCTAssertTrue(try store.writeForecast(newer, for: target))
+        XCTAssertEqual(store.loadForecast(for: target, regionCode: "407",
                                   at: instant("2026-09-25T07:40:00Z"))?.updateTime, newer.updateTime)
     }
 
@@ -2444,4 +2430,145 @@ final class ForecastRefreshIntentTests: XCTestCase {
             withJSONObject: ["schemaVersion": 1, "locations": locations]
         )))
     }
+}
+
+/// The planner as these tests built it before the refresh moved into one
+/// `WidgetRefresher`: a saved or Current Location refresh, then — for
+/// Medium and Large — a forecast refresh for the township now cached. The
+/// refresher's own ordering and family rules are pinned in
+/// `WidgetRefresherTests`; these tests pin the timeline built afterwards.
+private func testPlanner(
+    staleAfter: TimeInterval,
+    refreshInterval: TimeInterval,
+    loadSnapshot: @escaping DPIPWidgetTimelinePlanner.LoadSnapshot,
+    refreshSaved: @escaping @Sendable (WidgetLocationTarget) async
+        -> WidgetRefreshOutcome = { _ in .failed },
+    refreshCurrent: @escaping @Sendable () async
+        -> WidgetRefreshOutcome = { .failed },
+    loadForecast: @escaping DPIPWidgetTimelinePlanner.LoadForecast = { _, _, _ in nil },
+    refreshForecast: @escaping @Sendable (WidgetLocationTarget, String) async
+        -> Void = { _, _ in },
+    now: @escaping DPIPWidgetTimelinePlanner.Now
+) -> DPIPWidgetTimelinePlanner {
+    DPIPWidgetTimelinePlanner(
+        builder: WidgetTimelineBuilder(
+            staleAfter: staleAfter, refreshInterval: refreshInterval
+        ),
+        loadSnapshot: loadSnapshot,
+        loadForecast: loadForecast,
+        refresh: { target, family in
+            let outcome: WidgetRefreshOutcome
+            switch target {
+            case .saved:
+                outcome = await refreshSaved(target)
+            case .currentLocation:
+                outcome = await refreshCurrent()
+            case .invalid:
+                return .unavailable
+            }
+            if ForecastWidgetFamilyPolicy.supportsForecast(family),
+               let current = loadSnapshot(target),
+               target.matches(snapshot: current) {
+                await refreshForecast(target, current.regionCode)
+            }
+            return outcome
+        },
+        now: now
+    )
+}
+
+/// Drives the real `WidgetRefresher` for one target's forecast. The
+/// observation request fails, so only the forecast part can commit, through
+/// the test's own `loadCurrent` and `write`.
+private struct ForecastRefreshHarness: Sendable {
+    let fetch: @Sendable (String) async throws -> ForecastRemoteDTO
+    let loadCurrent: @Sendable (WidgetLocationTarget) -> CurrentWeatherWidgetSnapshot?
+    let savedIsResolved: @Sendable (WidgetLocationTarget) -> Bool
+    let write: @Sendable (ForecastWidgetSnapshot, WidgetLocationTarget) throws -> Bool
+    let now: @Sendable () -> Date
+
+    init(
+        fetch: @escaping @Sendable (String) async throws -> ForecastRemoteDTO,
+        loadCurrent: @escaping @Sendable (WidgetLocationTarget) -> CurrentWeatherWidgetSnapshot?,
+        savedIsResolved: @escaping @Sendable (WidgetLocationTarget) -> Bool,
+        write: @escaping @Sendable (ForecastWidgetSnapshot, WidgetLocationTarget) throws -> Bool,
+        now: @escaping @Sendable () -> Date
+    ) {
+        self.fetch = fetch
+        self.loadCurrent = loadCurrent
+        self.savedIsResolved = savedIsResolved
+        self.write = write
+        self.now = now
+    }
+
+    func refresh(target: WidgetLocationTarget, regionCode: String) async {
+        let location = WidgetResolvedWeatherLocation(
+            address: CurrentWeatherSnapshotAddress(
+                sourceIdentifier: target.sourceIdentifier!
+            )!,
+            regionCode: regionCode,
+            regionName: "測試地區",
+            latitude: 24.18,
+            longitude: 120.64
+        )!
+        let savedIsResolved = savedIsResolved
+        let now = now
+        let refresher = WidgetRefresher(
+            store: ClosureRefreshStore(loadCurrent: loadCurrent, write: write),
+            dependencies: WidgetRefresher.Dependencies(
+                resolveSaved: { savedIsResolved($0) ? location : nil },
+                acquireCurrentLocation: { @MainActor in
+                    .acquired(WidgetCurrentLocation(latitude: 24.18, longitude: 120.64)!)
+                },
+                resolveTownship: { _ in location },
+                fetchWeather: { _, _ in throw URLError(.notConnectedToInternet) },
+                fetchForecast: fetch,
+                fetchRain: { _, _ in throw URLError(.notConnectedToInternet) },
+                synchronizeClock: {},
+                sampleClock: {
+                    CurrentWeatherSnapshotTime(
+                        calibratedNowUnixMilliseconds:
+                            Int64(now().timeIntervalSince1970 * 1_000),
+                        calibratedTimeOffsetMilliseconds: 0
+                    )
+                },
+                now: now
+            )
+        )
+        _ = await refresher.refresh(target: target, family: .systemMedium)
+    }
+}
+
+private struct ClosureRefreshStore: WidgetRefreshStoring {
+    let loadCurrent: @Sendable (WidgetLocationTarget) -> CurrentWeatherWidgetSnapshot?
+    let write: @Sendable (ForecastWidgetSnapshot, WidgetLocationTarget) throws -> Bool
+
+    func loadCurrent(for target: WidgetLocationTarget) -> CurrentWeatherWidgetSnapshot? {
+        loadCurrent(target)
+    }
+
+    func removeAll(for target: WidgetLocationTarget) throws {}
+
+    func beginCurrentWrite(
+        for address: CurrentWeatherSnapshotAddress
+    ) throws -> CurrentWeatherSnapshotWriteToken {
+        CurrentWeatherSnapshotWriteToken(address: address, generation: 1)
+    }
+
+    func commitCurrent(
+        _ snapshot: CurrentWeatherWidgetSnapshot,
+        using token: CurrentWeatherSnapshotWriteToken
+    ) throws -> CurrentWeatherSnapshotWriteResult {
+        .rejected
+    }
+
+    func writeForecast(
+        _ snapshot: ForecastWidgetSnapshot, for target: WidgetLocationTarget
+    ) throws -> Bool {
+        try write(snapshot, target)
+    }
+
+    func writeRain(
+        _ snapshot: RainTrendWidgetSnapshot, for target: WidgetLocationTarget
+    ) throws {}
 }

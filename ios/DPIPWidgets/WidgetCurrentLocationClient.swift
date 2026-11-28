@@ -99,6 +99,8 @@ protocol WidgetLocationManaging: AnyObject {
     var authorization: WidgetLocationAuthorization { get }
     var isAuthorizedForWidgetUpdates: Bool { get }
     var desiredAccuracy: Double { get set }
+    /// The fix Core Location already holds, if any, without a new request.
+    var cachedLocation: WidgetLocationSample? { get }
 
     func startUpdatingLocation()
     func stopUpdatingLocation()
@@ -123,8 +125,14 @@ final class WidgetCurrentLocationClient {
     typealias MakeManager = @MainActor () -> any WidgetLocationManaging
     typealias Now = @MainActor () -> Date
 
-    nonisolated static let defaultTimeout: TimeInterval = 10
+    /// A fresh fix gets half of the refresh's twelve-second budget, so the
+    /// observation and forecast requests behind it still have time to land.
+    nonisolated static let defaultTimeout: TimeInterval = 6
+    /// A township-level answer does not need a new fix. A widget process
+    /// rarely gets one quickly in the background, and waiting for it used to
+    /// end most Current Location refreshes in a timeout and no update.
     nonisolated static let defaultMaximumAge: TimeInterval = 10 * 60
+    /// How far in the future a sample's timestamp may sit, for clock jitter.
     nonisolated static let defaultRequestStartTolerance: TimeInterval = 1
     nonisolated static let defaultDesiredAccuracy: Double =
         kCLLocationAccuracyKilometer
@@ -198,6 +206,19 @@ final class WidgetCurrentLocationClient {
             return .unavailable
         }
 
+        if let cached = manager.cachedLocation,
+           let location = acceptableLocation(
+               from: [cached],
+               now: now(),
+               maximumAge: maximumAge,
+               futureTolerance: requestStartTolerance
+           ) {
+            #if DEBUG
+            WidgetWeatherRefreshDiagnostics.log("current location cached")
+            #endif
+            return .acquired(location)
+        }
+
         return await withCheckedContinuation { continuation in
             let requestID = UUID()
             let request = WidgetCurrentLocationRequest(
@@ -216,6 +237,26 @@ final class WidgetCurrentLocationClient {
             request.start()
         }
     }
+}
+
+/// The newest sample no older than `maximumAge`, ignoring invalid ones.
+private func acceptableLocation(
+    from samples: [WidgetLocationSample],
+    now: Date,
+    maximumAge: TimeInterval,
+    futureTolerance: TimeInterval
+) -> WidgetCurrentLocation? {
+    samples.sorted { $0.timestamp > $1.timestamp }.lazy.compactMap {
+        sample -> WidgetCurrentLocation? in
+        let age = now.timeIntervalSince(sample.timestamp)
+        guard age >= -futureTolerance, age <= maximumAge else {
+            return nil
+        }
+        return WidgetCurrentLocation(
+            latitude: sample.latitude,
+            longitude: sample.longitude
+        )
+    }.first
 }
 
 @MainActor
@@ -282,30 +323,16 @@ private final class WidgetCurrentLocationRequest:
             return
         }
 
-        guard let startedAt else {
+        guard startedAt != nil else {
             return
         }
 
-        let requestNow = now()
-        let earliestAcceptedTimestamp = startedAt.addingTimeInterval(
-            -requestStartTolerance
-        )
-        let location: WidgetCurrentLocation? = samples.reversed().compactMap {
-            sample -> WidgetCurrentLocation? in
-            let age = requestNow.timeIntervalSince(sample.timestamp)
-            guard age >= -requestStartTolerance,
-                  age <= maximumAge,
-                  sample.timestamp >= earliestAcceptedTimestamp
-            else {
-                return nil
-            }
-            return WidgetCurrentLocation(
-                latitude: sample.latitude,
-                longitude: sample.longitude
-            )
-        }.first
-
-        guard let location else {
+        guard let location = acceptableLocation(
+            from: samples,
+            now: now(),
+            maximumAge: maximumAge,
+            futureTolerance: requestStartTolerance
+        ) else {
             return
         }
         finish(.acquired(location))
@@ -365,6 +392,16 @@ private final class CoreLocationWidgetLocationManager: NSObject,
     var desiredAccuracy: Double {
         get { manager.desiredAccuracy }
         set { manager.desiredAccuracy = newValue }
+    }
+
+    var cachedLocation: WidgetLocationSample? {
+        manager.location.map {
+            WidgetLocationSample(
+                latitude: $0.coordinate.latitude,
+                longitude: $0.coordinate.longitude,
+                timestamp: $0.timestamp
+            )
+        }
     }
 
     private let manager: CLLocationManager

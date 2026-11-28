@@ -23,97 +23,7 @@ import 'package:dpip/features/weather/domain/weather_trend.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('initial valid-region sync invalidates persisted realtime', () async {
-    final regions = _savedRegions(['660'])..select(2);
-    addTearDown(regions.dispose);
-    var invalidationCount = 0;
-    final controller = HomeWeatherController(
-      _FakeWeatherRepository(onRealtime: (_, _) async => const Ok(null)),
-      const _FakeHourTrendRepository(),
-      regions,
-      _directory,
-      onRealtimeInvalidated: () async {
-        invalidationCount += 1;
-      },
-    );
-    addTearDown(controller.dispose);
-
-    await _waitUntilSettled(controller);
-
-    expect(regions.selectedCode, '660');
-    expect(invalidationCount, 1);
-  });
-
-  test('initial null-region sync invalidates persisted realtime', () {
-    final regions = _savedRegions(['660']);
-    addTearDown(regions.dispose);
-    var invalidationCount = 0;
-    final controller = HomeWeatherController(
-      _FakeWeatherRepository(onRealtime: (_, _) async => const Ok(null)),
-      const _FakeHourTrendRepository(),
-      regions,
-      _directory,
-      onRealtimeInvalidated: () async {
-        invalidationCount += 1;
-      },
-    );
-    addTearDown(controller.dispose);
-
-    expect(regions.selectedCode, isNull);
-    expect(invalidationCount, 1);
-  });
-
-  test(
-    'initial valid-region sync clears before publishing fresh data',
-    () async {
-      final regions = _savedRegions(['660'])..select(2);
-      addTearDown(regions.dispose);
-      final events = <String>[];
-      final controller = HomeWeatherController(
-        _FakeWeatherRepository(onRealtime: (_, _) async => Ok(_weather())),
-        const _FakeHourTrendRepository(),
-        regions,
-        _directory,
-        onRealtimeLoaded: (regionCode, _) async {
-          events.add('loaded:$regionCode');
-        },
-        onRealtimeInvalidated: () async {
-          events.add('invalidated');
-        },
-      );
-      addTearDown(controller.dispose);
-
-      await _waitUntilSettled(controller);
-
-      expect(events, ['invalidated', 'loaded:660']);
-    },
-  );
-
-  test('valid region change invalidates realtime exactly once', () async {
-    final regions = _savedRegions(['660', '100'])..select(2);
-    addTearDown(regions.dispose);
-    var invalidationCount = 0;
-    final controller = HomeWeatherController(
-      _FakeWeatherRepository(onRealtime: (_, _) async => const Ok(null)),
-      const _FakeHourTrendRepository(),
-      regions,
-      _directory,
-      onRealtimeInvalidated: () async {
-        invalidationCount += 1;
-      },
-    );
-    addTearDown(controller.dispose);
-    await _waitUntilSettled(controller);
-    invalidationCount = 0;
-
-    regions.select(3);
-    await _waitUntilSettled(controller);
-
-    expect(regions.selectedCode, '100');
-    expect(invalidationCount, 1);
-  });
-
-  test('successful changed-region response loads after invalidation', () async {
+  test('each selected region publishes its own reading', () async {
     final weather = _weather();
     final regions = _savedRegions(['660', '100'])..select(2);
     addTearDown(regions.dispose);
@@ -126,91 +36,45 @@ void main() {
       onRealtimeLoaded: (regionCode, _) async {
         events.add('loaded:$regionCode');
       },
-      onRealtimeInvalidated: () async {
-        events.add('invalidated');
-      },
     );
     addTearDown(controller.dispose);
     await _waitUntilSettled(controller);
-    events.clear();
 
+    expect(events, ['loaded:660']);
+
+    // A selection change only publishes the new town. Widgets cache one
+    // snapshot per configured target, so nothing is cleared on the way.
     regions.select(3);
     await _waitUntilSettled(controller);
 
-    expect(events, ['invalidated', 'loaded:100']);
+    expect(events, ['loaded:660', 'loaded:100']);
   });
 
-  test('valid region to Nationwide invalidates realtime once', () async {
+  test('notification with unchanged selected region does not reload', () async {
     final regions = _savedRegions(['660'])..select(2);
     addTearDown(regions.dispose);
-    var invalidationCount = 0;
+    var realtimeCalls = 0;
     final controller = HomeWeatherController(
-      _FakeWeatherRepository(onRealtime: (_, _) async => const Ok(null)),
+      _FakeWeatherRepository(
+        onRealtime: (_, _) async {
+          realtimeCalls += 1;
+          return const Ok(null);
+        },
+      ),
       const _FakeHourTrendRepository(),
       regions,
       _directory,
-      onRealtimeInvalidated: () async {
-        invalidationCount += 1;
-      },
     );
     addTearDown(controller.dispose);
     await _waitUntilSettled(controller);
-    invalidationCount = 0;
+    realtimeCalls = 0;
 
-    regions.select(0);
-
-    expect(regions.selectedCode, isNull);
-    expect(invalidationCount, 1);
-  });
-
-  test('null region to valid region invalidates realtime once', () async {
-    final regions = _savedRegions(['660']);
-    addTearDown(regions.dispose);
-    var invalidationCount = 0;
-    final controller = HomeWeatherController(
-      _FakeWeatherRepository(onRealtime: (_, _) async => const Ok(null)),
-      const _FakeHourTrendRepository(),
-      regions,
-      _directory,
-      onRealtimeInvalidated: () async {
-        invalidationCount += 1;
-      },
-    );
-    addTearDown(controller.dispose);
-    invalidationCount = 0;
-
-    regions.select(2);
+    expect(regions.addSaved('100'), isTrue);
     await _waitUntilSettled(controller);
 
     expect(regions.selectedCode, '660');
-    expect(invalidationCount, 1);
+    expect(realtimeCalls, 0);
   });
-
-  test(
-    'notification with unchanged selected region does not invalidate',
-    () async {
-      final regions = _savedRegions(['660'])..select(2);
-      addTearDown(regions.dispose);
-      var invalidationCount = 0;
-      final controller = HomeWeatherController(
-        _FakeWeatherRepository(onRealtime: (_, _) async => const Ok(null)),
-        const _FakeHourTrendRepository(),
-        regions,
-        _directory,
-        onRealtimeInvalidated: () async {
-          invalidationCount += 1;
-        },
-      );
-      addTearDown(controller.dispose);
-      await _waitUntilSettled(controller);
-      invalidationCount = 0;
-
-      expect(regions.addSaved('100'), isTrue);
-
-      expect(regions.selectedCode, '660');
-      expect(invalidationCount, 0);
-    },
-  );
 
   test('successful realtime weather invokes the callback once', () async {
     final weather = _weather();

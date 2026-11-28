@@ -62,6 +62,7 @@ struct DPIPWidgetProvider: IntentTimelineProvider {
             isStale: state.isStale,
             isNight: state.isNight,
             forecast: content.forecast,
+            rain: content.rain,
             locationTarget: target
         )
 
@@ -109,6 +110,7 @@ struct DPIPWidgetProvider: IntentTimelineProvider {
                     isStale: state.isStale,
                     isNight: state.isNight,
                     forecast: plan.forecast(at: state.date),
+                    rain: plan.rain(at: state.date),
                     locationTarget: target
                 )
             }
@@ -194,10 +196,15 @@ struct SmallCurrentWeatherView: View {
                             }
                         }
 
-                        Text(observationDate, style: .time)
-                            .lineLimit(1)
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
+                        HStack(alignment: .firstTextBaseline, spacing: 3) {
+                            if entry.headerCue(for: .systemSmall) == .staleObservation {
+                                staleMark
+                            }
+                            Text(observationDate, style: .time)
+                                .lineLimit(1)
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
                     }
 
                     Spacer()
@@ -278,6 +285,48 @@ struct SmallCurrentWeatherView: View {
     }
 }
 
+private extension SmallCurrentWeatherView {
+    /// The stale cue the larger cards put in their header: the word when it
+    /// fits beside the clock, the symbol when it does not.
+    @ViewBuilder
+    var staleMark: some View {
+        let cue = DPIPWidgetEntry.HeaderCue.staleObservation
+        let icon = Image(systemName: cue.systemImageName)
+            .font(.caption2)
+            .foregroundStyle(.secondary)
+            .fixedSize()
+            .accessibilityLabel(Text(cue.label, bundle: localizationBundle))
+        if #available(iOS 16.0, *) {
+            ViewThatFits(in: .horizontal) {
+                Text(cue.label, bundle: localizationBundle)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                    .fixedSize(horizontal: true, vertical: false)
+                icon
+            }
+        } else {
+            icon
+        }
+    }
+}
+
+private extension DPIPWidgetEntry.HeaderCue {
+    var label: LocalizedStringKey {
+        switch self {
+        case .staleObservation: "widget.stale"
+        case .outdatedForecast: "widget.forecast_outdated"
+        }
+    }
+
+    var systemImageName: String {
+        switch self {
+        case .staleObservation: "clock.badge.exclamationmark"
+        case .outdatedForecast: "exclamationmark.triangle"
+        }
+    }
+}
+
 struct MediumCurrentWeatherView: View {
     let entry: DPIPWidgetEntry
     var localizationBundle: Bundle = .main
@@ -337,8 +386,8 @@ private struct WeatherWidgetLayout: View {
     private var transitionDate: Date {
         Date(timeIntervalSince1970: TimeInterval(snapshot.nextDayNightTransitionTime))
     }
-    private var showsWarning: Bool {
-        entry.forecastFreshness == .stale && !entry.upcomingForecastPoints(for: family).isEmpty
+    private var headerCue: DPIPWidgetEntry.HeaderCue? {
+        entry.headerCue(for: family)
     }
 
     var body: some View {
@@ -440,17 +489,17 @@ private struct WeatherWidgetLayout: View {
             }
             Spacer(minLength: adaptive ? 0 : (isMedium ? 6 : nil))
             HStack(alignment: .firstTextBaseline, spacing: adaptive ? 4 : 6) {
-                if showsWarning {
+                if let headerCue {
                     if !adaptive, #available(iOS 16.0, *) {
                         ViewThatFits(in: .horizontal) {
-                            Text("widget.forecast_outdated", bundle: localizationBundle)
+                            Text(headerCue.label, bundle: localizationBundle)
                                 .font(.caption2)
                                 .foregroundStyle(.secondary)
                                 .fixedSize(horizontal: true, vertical: false)
-                            warningIcon(adaptive: false)
+                            warningIcon(headerCue, adaptive: false)
                         }
                     } else {
-                        warningIcon(adaptive: adaptive)
+                        warningIcon(headerCue, adaptive: adaptive)
                     }
                 }
                 Text(Date(timeIntervalSince1970: TimeInterval(snapshot.observationTime)), style: .time)
@@ -466,24 +515,35 @@ private struct WeatherWidgetLayout: View {
         }
     }
 
-    private func warningIcon(adaptive: Bool) -> some View {
-        Image(systemName: "exclamationmark.triangle")
+    private func warningIcon(_ cue: DPIPWidgetEntry.HeaderCue, adaptive: Bool) -> some View {
+        Image(systemName: cue.systemImageName)
             .font(adaptive ? .caption2 : .system(size: 12))
             .foregroundStyle(.secondary)
             .fixedSize()
-            .accessibilityLabel(Text("widget.forecast_outdated", bundle: localizationBundle))
+            .accessibilityLabel(Text(cue.label, bundle: localizationBundle))
     }
 
     private var forecast: some View {
         forecastContent(compactAccessibility: false)
     }
 
+    /// The hourly row, or the next-hour rain chart in its place while rain
+    /// is coming. The two never share the card.
+    @ViewBuilder
     private func forecastContent(compactAccessibility: Bool) -> some View {
-        HourlyForecastSection(
-            entry: entry, family: family, calibratedDate: calibratedDate,
-            isCurrentlyNight: entry.isNight, nextTransitionTime: snapshot.nextDayNightTransitionTime,
-            localizationBundle: localizationBundle, compactAccessibility: compactAccessibility
-        )
+        if let trend = entry.visibleRainTrend(for: family) {
+            RainTrendSection(
+                trend: trend, calibratedDate: calibratedDate, family: family,
+                localizationBundle: localizationBundle,
+                compactAccessibility: compactAccessibility
+            )
+        } else {
+            HourlyForecastSection(
+                entry: entry, family: family, calibratedDate: calibratedDate,
+                isCurrentlyNight: entry.isNight, nextTransitionTime: snapshot.nextDayNightTransitionTime,
+                localizationBundle: localizationBundle, compactAccessibility: compactAccessibility
+            )
+        }
     }
 
     @ViewBuilder
