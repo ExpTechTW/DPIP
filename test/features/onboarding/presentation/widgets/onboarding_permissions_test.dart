@@ -32,6 +32,7 @@ import 'package:dpip/core/geo/town.dart';
 import 'package:dpip/core/notifications/foreground_eew_announcement_gate.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/notifications/notification_settings_link.dart';
+import 'package:dpip/core/notifications/plain_channels.dart';
 import 'package:dpip/core/permissions/permission_health.dart';
 import 'package:dpip/core/permissions/permission_outcome.dart';
 import 'package:dpip/features/onboarding/presentation/widgets/onboarding_permissions.dart';
@@ -73,6 +74,10 @@ class _FakeNotificationService implements NotificationService {
 
   @override
   Future<bool> showTest(String channelKey) => throw UnimplementedError();
+
+  @override
+  Future<List<ChannelUsageMismatch>> channelUsageMismatches() =>
+      throw UnimplementedError();
 
   @override
   Future<void> showDebugEewWarning({

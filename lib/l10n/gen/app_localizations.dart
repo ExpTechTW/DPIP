@@ -6659,6 +6659,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'1-hour rain up to this hour\'s last reading'**
   String get trendRainHourLastReading;
+
+  /// Notification settings entry shown on Android when some alert channels play on a different volume stream than this version gives them
+  ///
+  /// In en, this message translates to:
+  /// **'Some alerts use an older volume setting'**
+  String get notifyVolumeMismatchTitle;
+
+  /// Subtitle of the volume-mismatch entry; tapping it opens the explanation
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to see which ones and how to change them'**
+  String get notifyVolumeMismatchSubtitle;
+
+  /// Explains that an older version created these alert channels with another volume, and Android does not let an app change a channel it already created
+  ///
+  /// In en, this message translates to:
+  /// **'An older version of DPIP created these alert types with a different volume than this version gives them. Android does not let an app change an alert type it has already created, so updating DPIP could not change them.'**
+  String get notifyVolumeMismatchCause;
+
+  /// Under each affected alert channel: the volume it plays at now, and the one this version gives it
+  ///
+  /// In en, this message translates to:
+  /// **'Plays at {current} — this version uses {expected}'**
+  String notifyVolumeMismatchChannel(String current, String expected);
+
+  /// Android's alarm volume, used inside notifyVolumeMismatchChannel
+  ///
+  /// In en, this message translates to:
+  /// **'alarm volume'**
+  String get notifyVolumeAlarm;
+
+  /// Android's notification volume, used inside notifyVolumeMismatchChannel
+  ///
+  /// In en, this message translates to:
+  /// **'notification volume'**
+  String get notifyVolumeNotification;
+
+  /// How to reset the alert channels: clear storage from the app info page, or reinstall
+  ///
+  /// In en, this message translates to:
+  /// **'To change them, clear DPIP\'s storage from its app info page, or uninstall and reinstall DPIP.'**
+  String get notifyVolumeMismatchFix;
+
+  /// Warns that either fix erases every in-app setting
+  ///
+  /// In en, this message translates to:
+  /// **'Either way erases every DPIP setting, and you will need to set the app up again.'**
+  String get notifyVolumeMismatchWarning;
+
+  /// Says the fix is optional
+  ///
+  /// In en, this message translates to:
+  /// **'If they work for you as they are, you don\'t need to do anything.'**
+  String get notifyVolumeMismatchOptional;
+
+  /// Button that opens DPIP's page in the system app settings
+  ///
+  /// In en, this message translates to:
+  /// **'Open app info'**
+  String get notifyVolumeMismatchOpenAppInfo;
 }
 
 class _AppLocalizationsDelegate

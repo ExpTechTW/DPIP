@@ -4467,5 +4467,55 @@
   "trendRainHourLastReading": "1-hour rain up to this hour's last reading",
   "@trendRainHourLastReading": {
     "description": "Line in a 7-day rain-trend bar's tooltip, above the bar's date and hour (e.g. 11/27 14h): the bar's value is the 1-hour rainfall of the last 10-minute reading within that clock hour, so for 14h it covers about 13:50-14:50, not 13:00-14:00."
+  },
+  "notifyVolumeMismatchTitle": "Some alerts use an older volume setting",
+  "@notifyVolumeMismatchTitle": {
+    "description": "Notification settings entry shown on Android when some alert channels play on a different volume stream than this version gives them"
+  },
+  "notifyVolumeMismatchSubtitle": "Tap to see which ones and how to change them",
+  "@notifyVolumeMismatchSubtitle": {
+    "description": "Subtitle of the volume-mismatch entry; tapping it opens the explanation"
+  },
+  "notifyVolumeMismatchCause": "An older version of DPIP created these alert types with a different volume than this version gives them. Android does not let an app change an alert type it has already created, so updating DPIP could not change them.",
+  "@notifyVolumeMismatchCause": {
+    "description": "Explains that an older version created these alert channels with another volume, and Android does not let an app change a channel it already created"
+  },
+  "notifyVolumeMismatchChannel": "Plays at {current} — this version uses {expected}",
+  "@notifyVolumeMismatchChannel": {
+    "description": "Under each affected alert channel: the volume it plays at now, and the one this version gives it",
+    "placeholders": {
+      "current": {
+        "type": "String",
+        "example": "alarm volume"
+      },
+      "expected": {
+        "type": "String",
+        "example": "notification volume"
+      }
+    }
+  },
+  "notifyVolumeAlarm": "alarm volume",
+  "@notifyVolumeAlarm": {
+    "description": "Android's alarm volume, used inside notifyVolumeMismatchChannel"
+  },
+  "notifyVolumeNotification": "notification volume",
+  "@notifyVolumeNotification": {
+    "description": "Android's notification volume, used inside notifyVolumeMismatchChannel"
+  },
+  "notifyVolumeMismatchFix": "To change them, clear DPIP's storage from its app info page, or uninstall and reinstall DPIP.",
+  "@notifyVolumeMismatchFix": {
+    "description": "How to reset the alert channels: clear storage from the app info page, or reinstall"
+  },
+  "notifyVolumeMismatchWarning": "Either way erases every DPIP setting, and you will need to set the app up again.",
+  "@notifyVolumeMismatchWarning": {
+    "description": "Warns that either fix erases every in-app setting"
+  },
+  "notifyVolumeMismatchOptional": "If they work for you as they are, you don't need to do anything.",
+  "@notifyVolumeMismatchOptional": {
+    "description": "Says the fix is optional"
+  },
+  "notifyVolumeMismatchOpenAppInfo": "Open app info",
+  "@notifyVolumeMismatchOpenAppInfo": {
+    "description": "Button that opens DPIP's page in the system app settings"
   }
 }

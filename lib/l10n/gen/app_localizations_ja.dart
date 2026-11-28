@@ -3496,4 +3496,39 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get trendRainHourLastReading => 'この時間帯の最終観測までの1時間雨量';
+
+  @override
+  String get notifyVolumeMismatchTitle => '一部の通知が以前のバージョンの音量設定のままです';
+
+  @override
+  String get notifyVolumeMismatchSubtitle => 'タップすると、対象の通知と変更方法を確認できます';
+
+  @override
+  String get notifyVolumeMismatchCause =>
+      'これらの通知カテゴリは以前のバージョンの DPIP が作成したもので、現在のバージョンとは異なる音量を使っています。Android ではアプリが作成済みの通知カテゴリを変更できないため、DPIP を更新しても変わりません。';
+
+  @override
+  String notifyVolumeMismatchChannel(String current, String expected) {
+    return '現在は$currentで鳴ります（このバージョンでは$expected）';
+  }
+
+  @override
+  String get notifyVolumeAlarm => 'アラームの音量';
+
+  @override
+  String get notifyVolumeNotification => '通知の音量';
+
+  @override
+  String get notifyVolumeMismatchFix =>
+      '変更するには、DPIP のアプリ情報ページでストレージを消去するか、DPIP をアンインストールして再インストールしてください。';
+
+  @override
+  String get notifyVolumeMismatchWarning =>
+      'どちらの方法でも DPIP の設定はすべて消去され、もう一度設定し直す必要があります。';
+
+  @override
+  String get notifyVolumeMismatchOptional => '今の音量で問題なければ、何もする必要はありません。';
+
+  @override
+  String get notifyVolumeMismatchOpenAppInfo => 'アプリ情報を開く';
 }

@@ -3575,4 +3575,42 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get trendRainHourLastReading =>
       'Lượng mưa 1 giờ tính đến lần đo cuối của giờ này';
+
+  @override
+  String get notifyVolumeMismatchTitle =>
+      'Một số thông báo vẫn dùng cài đặt âm lượng của phiên bản cũ';
+
+  @override
+  String get notifyVolumeMismatchSubtitle =>
+      'Chạm để xem đó là những thông báo nào và cách thay đổi';
+
+  @override
+  String get notifyVolumeMismatchCause =>
+      'Các loại thông báo này do phiên bản DPIP cũ tạo ra và dùng âm lượng khác với phiên bản hiện tại. Android không cho phép ứng dụng thay đổi loại thông báo đã tạo, nên cập nhật DPIP không thể thay đổi chúng.';
+
+  @override
+  String notifyVolumeMismatchChannel(String current, String expected) {
+    return 'Hiện phát theo $current — phiên bản này dùng $expected';
+  }
+
+  @override
+  String get notifyVolumeAlarm => 'âm lượng báo thức';
+
+  @override
+  String get notifyVolumeNotification => 'âm lượng thông báo';
+
+  @override
+  String get notifyVolumeMismatchFix =>
+      'Để thay đổi, hãy xóa bộ nhớ của DPIP trong trang thông tin ứng dụng, hoặc gỡ cài đặt rồi cài lại DPIP.';
+
+  @override
+  String get notifyVolumeMismatchWarning =>
+      'Cả hai cách đều xóa mọi cài đặt của DPIP và bạn sẽ cần thiết lập lại ứng dụng.';
+
+  @override
+  String get notifyVolumeMismatchOptional =>
+      'Nếu âm lượng hiện tại vẫn phù hợp với bạn, bạn không cần làm gì cả.';
+
+  @override
+  String get notifyVolumeMismatchOpenAppInfo => 'Mở thông tin ứng dụng';
 }

@@ -2092,5 +2092,15 @@
   "seismometerDisclaimer": "Đặt điện thoại nằm phẳng trên mặt phẳng vững. Cảm biến điện thoại có độ chính xác hạn chế, nên kết quả chỉ để tham khảo và không phải cường độ chính thức của CWA.",
   "seismometerAlgorithm": "Tính bằng phương pháp cường độ đo bằng máy của JMA mà ES-Net dùng",
   "trendRainPastHour": "Lượng mưa trong 1 giờ qua",
-  "trendRainHourLastReading": "Lượng mưa 1 giờ tính đến lần đo cuối của giờ này"
+  "trendRainHourLastReading": "Lượng mưa 1 giờ tính đến lần đo cuối của giờ này",
+  "notifyVolumeMismatchTitle": "Một số thông báo vẫn dùng cài đặt âm lượng của phiên bản cũ",
+  "notifyVolumeMismatchSubtitle": "Chạm để xem đó là những thông báo nào và cách thay đổi",
+  "notifyVolumeMismatchCause": "Các loại thông báo này do phiên bản DPIP cũ tạo ra và dùng âm lượng khác với phiên bản hiện tại. Android không cho phép ứng dụng thay đổi loại thông báo đã tạo, nên cập nhật DPIP không thể thay đổi chúng.",
+  "notifyVolumeMismatchChannel": "Hiện phát theo {current} — phiên bản này dùng {expected}",
+  "notifyVolumeAlarm": "âm lượng báo thức",
+  "notifyVolumeNotification": "âm lượng thông báo",
+  "notifyVolumeMismatchFix": "Để thay đổi, hãy xóa bộ nhớ của DPIP trong trang thông tin ứng dụng, hoặc gỡ cài đặt rồi cài lại DPIP.",
+  "notifyVolumeMismatchWarning": "Cả hai cách đều xóa mọi cài đặt của DPIP và bạn sẽ cần thiết lập lại ứng dụng.",
+  "notifyVolumeMismatchOptional": "Nếu âm lượng hiện tại vẫn phù hợp với bạn, bạn không cần làm gì cả.",
+  "notifyVolumeMismatchOpenAppInfo": "Mở thông tin ứng dụng"
 }

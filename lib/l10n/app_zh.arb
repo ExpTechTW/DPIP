@@ -2084,5 +2084,15 @@
   "seismometerDisclaimer": "請將手機平放在穩固的平面上。手機感測器精度有限，量測結果僅供參考，不代表中央氣象署發布的震度。",
   "seismometerAlgorithm": "依 ES-Net 的 JMA 計測震度演算法計算",
   "trendRainPastHour": "過去 1 小時雨量",
-  "trendRainHourLastReading": "截至該小時最後一筆的 1 小時雨量"
+  "trendRainHourLastReading": "截至該小時最後一筆的 1 小時雨量",
+  "notifyVolumeMismatchTitle": "部分通知沿用舊版的音量設定",
+  "notifyVolumeMismatchSubtitle": "點一下查看是哪些通知，以及如何更改",
+  "notifyVolumeMismatchCause": "這些通知類別是由舊版 DPIP 建立的，使用的音量和目前版本不同。Android 不允許 App 更改已經建立的通知類別，所以更新 DPIP 也無法改變它們。",
+  "notifyVolumeMismatchChannel": "目前使用{current}，這個版本使用{expected}",
+  "notifyVolumeAlarm": "鬧鐘音量",
+  "notifyVolumeNotification": "通知音量",
+  "notifyVolumeMismatchFix": "若要更改，可以在 DPIP 的應用程式資訊頁面清除儲存空間，或是移除後重新安裝 DPIP。",
+  "notifyVolumeMismatchWarning": "兩種方式都會清除 DPIP 的所有設定，之後需要重新設定一次。",
+  "notifyVolumeMismatchOptional": "如果目前的音量對你來說沒問題，就不需要做任何事。",
+  "notifyVolumeMismatchOpenAppInfo": "開啟應用程式資訊"
 }

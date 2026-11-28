@@ -2092,5 +2092,15 @@
   "seismometerDisclaimer": "Letakkan ponsel rata di permukaan yang stabil. Sensor ponsel tidak presisi, jadi pembacaan ini hanya referensi dan bukan intensitas resmi CWA.",
   "seismometerAlgorithm": "Dihitung dengan metode intensitas instrumental JMA yang dipakai ES-Net",
   "trendRainPastHour": "Curah hujan 1 jam terakhir",
-  "trendRainHourLastReading": "Curah hujan 1 jam hingga pengukuran terakhir jam ini"
+  "trendRainHourLastReading": "Curah hujan 1 jam hingga pengukuran terakhir jam ini",
+  "notifyVolumeMismatchTitle": "Beberapa peringatan masih memakai pengaturan volume versi lama",
+  "notifyVolumeMismatchSubtitle": "Ketuk untuk melihat peringatan mana dan cara mengubahnya",
+  "notifyVolumeMismatchCause": "Jenis peringatan ini dibuat oleh DPIP versi lama dan memakai volume yang berbeda dari versi ini. Android tidak mengizinkan aplikasi mengubah jenis notifikasi yang sudah dibuat, jadi memperbarui DPIP tidak dapat mengubahnya.",
+  "notifyVolumeMismatchChannel": "Saat ini memakai {current} — versi ini memakai {expected}",
+  "notifyVolumeAlarm": "volume alarm",
+  "notifyVolumeNotification": "volume notifikasi",
+  "notifyVolumeMismatchFix": "Untuk mengubahnya, hapus penyimpanan DPIP dari halaman info aplikasi, atau copot lalu pasang ulang DPIP.",
+  "notifyVolumeMismatchWarning": "Kedua cara akan menghapus semua pengaturan DPIP, dan Anda perlu mengatur aplikasi lagi.",
+  "notifyVolumeMismatchOptional": "Jika volumenya sudah sesuai untuk Anda, Anda tidak perlu melakukan apa pun.",
+  "notifyVolumeMismatchOpenAppInfo": "Buka info aplikasi"
 }

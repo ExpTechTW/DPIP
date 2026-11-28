@@ -43,8 +43,10 @@ class NotificationService {
     this._settings, {
     ForegroundEewAnnouncementGate? foregroundEewGate,
     NotificationSettingsLink? settingsLink,
+    PlainChannels? plainChannels,
   }) : foregroundEewGate = foregroundEewGate ?? ForegroundEewAnnouncementGate(),
-       settingsLink = settingsLink ?? NotificationSettingsLink() {
+       settingsLink = settingsLink ?? NotificationSettingsLink(),
+       _plainChannels = plainChannels ?? PlainChannels() {
     _foregroundEewGate = this.foregroundEewGate;
   }
 
@@ -54,6 +56,15 @@ class NotificationService {
   /// Requested here, alongside the permission it depends on; routed by the
   /// app layer, which owns the page it opens.
   final NotificationSettingsLink settingsLink;
+
+  /// The Android channels under the plain keys FCM's own renderer looks up.
+  final PlainChannels _plainChannels;
+
+  /// The alert channels that play on another volume than this version gives
+  /// them — an older build created them, and Android does not let the app
+  /// change them. Empty off Android and when everything matches.
+  Future<List<ChannelUsageMismatch>> channelUsageMismatches() =>
+      _plainChannels.usageMismatches(NotificationChannels.channels);
 
   /// Sequences foreground EEW speech before the notification channel sound.
   /// Background and terminated delivery bypass this object entirely.
@@ -337,6 +348,15 @@ class NotificationService {
   Future<({int total, int rejected})> _initChannels() async {
     final channels = NotificationChannels.channels;
 
+    // First, before awesome registers anything. Whoever creates a plain id
+    // first decides how it sounds for good — Android freezes a channel's
+    // sound, and deleting it and creating the same id again brings the old one
+    // back — and awesome puts every channel on the notification volume,
+    // whatever `defaultRingtoneType` says. On a fresh install this creates
+    // every plain id on the volume the catalogue asks for, and awesome adopts
+    // them; on an upgrade they all exist already and it changes nothing.
+    await _plainChannels.ensure(channels, groups: NotificationChannels.groups);
+
     // The normal path is one batch call — the same one this always made.
     //
     // What changed is what happens when it fails. `initialize` validates every
@@ -456,9 +476,10 @@ class NotificationService {
 
     // FCM renders background pushes itself against the PLAIN channel id, a
     // lookup that must not depend on how awesome hashed or re-hashed its own
-    // channels this launch. Mirror the catalogue under plain keys last, after
-    // every purge and re-registration above has settled.
-    await PlainChannels.ensure(channels);
+    // channels this launch. Mirror the catalogue under plain keys again, after
+    // every purge and re-registration above has settled: a channel the purge
+    // deleted and awesome then rejected is put back here.
+    await _plainChannels.ensure(channels, groups: NotificationChannels.groups);
     // Last, so nothing above can re-create what it deletes.
     await RetiredChannels().sweep();
     return (total: channels.length, rejected: rejected.length);

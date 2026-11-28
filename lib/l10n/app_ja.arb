@@ -2092,5 +2092,15 @@
   "seismometerDisclaimer": "スマートフォンを安定した平らな面に置いてください。端末のセンサー精度には限界があるため、この値は参考であり、中央気象署が発表する震度ではありません。",
   "seismometerAlgorithm": "ES-Net が用いる気象庁の計測震度の方法で計算しています",
   "trendRainPastHour": "過去1時間の雨量",
-  "trendRainHourLastReading": "この時間帯の最終観測までの1時間雨量"
+  "trendRainHourLastReading": "この時間帯の最終観測までの1時間雨量",
+  "notifyVolumeMismatchTitle": "一部の通知が以前のバージョンの音量設定のままです",
+  "notifyVolumeMismatchSubtitle": "タップすると、対象の通知と変更方法を確認できます",
+  "notifyVolumeMismatchCause": "これらの通知カテゴリは以前のバージョンの DPIP が作成したもので、現在のバージョンとは異なる音量を使っています。Android ではアプリが作成済みの通知カテゴリを変更できないため、DPIP を更新しても変わりません。",
+  "notifyVolumeMismatchChannel": "現在は{current}で鳴ります（このバージョンでは{expected}）",
+  "notifyVolumeAlarm": "アラームの音量",
+  "notifyVolumeNotification": "通知の音量",
+  "notifyVolumeMismatchFix": "変更するには、DPIP のアプリ情報ページでストレージを消去するか、DPIP をアンインストールして再インストールしてください。",
+  "notifyVolumeMismatchWarning": "どちらの方法でも DPIP の設定はすべて消去され、もう一度設定し直す必要があります。",
+  "notifyVolumeMismatchOptional": "今の音量で問題なければ、何もする必要はありません。",
+  "notifyVolumeMismatchOpenAppInfo": "アプリ情報を開く"
 }
