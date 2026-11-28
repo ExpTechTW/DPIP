@@ -3033,6 +3033,17 @@ class AppLocalizationsTh extends AppLocalizations {
   }
 
   @override
+  String get permissionLiveActivities => 'กิจกรรมสด';
+
+  @override
+  String get permissionLiveActivitiesDesc =>
+      'แสดงข้อมูลล่าสุดของการเตือนแผ่นดินไหวบนหน้าจอล็อกและ Dynamic Island ตลอดช่วงที่การเตือนยังมีผล หากปิดอยู่ คุณจะยังได้รับการเตือนเป็นการแจ้งเตือนตามปกติ';
+
+  @override
+  String get permissionGuideLiveActivities =>
+      'เปิดการตั้งค่าระบบเพื่อเปิด “กิจกรรมสด”';
+
+  @override
   String get permissionStillRequired =>
       'ยังจำเป็น — เปิดการตั้งค่าเพื่อเปิดใช้งาน';
 

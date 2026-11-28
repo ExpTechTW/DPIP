@@ -1860,6 +1860,9 @@
       "vendor": {}
     }
   },
+  "permissionLiveActivities": "Aktivitas Langsung",
+  "permissionLiveActivitiesDesc": "Menampilkan info terbaru peringatan dini gempa di Layar Terkunci dan Dynamic Island selama peringatan berlaku. Jika mati, peringatan tetap datang sebagai notifikasi.",
+  "permissionGuideLiveActivities": "Buka Pengaturan Sistem untuk mengaktifkan “Aktivitas Langsung”.",
   "permissionStillRequired": "Masih diperlukan — buka Pengaturan untuk mengaktifkannya.",
   "permissionVerifyManually": "Periksa secara manual bahwa izin ini diaktifkan di Pengaturan Sistem.",
   "permissionBackgroundLocationOption": "“Izinkan sepanjang waktu”",

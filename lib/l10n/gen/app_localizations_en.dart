@@ -3042,6 +3042,17 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get permissionLiveActivities => 'Live Activities';
+
+  @override
+  String get permissionLiveActivitiesDesc =>
+      'Keeps an earthquake early warning\'s latest details on the Lock Screen and in the Dynamic Island while it is in effect. Alerts still arrive as notifications when this is off.';
+
+  @override
+  String get permissionGuideLiveActivities =>
+      'Open System Settings to turn on “Live Activities”.';
+
+  @override
   String get permissionStillRequired =>
       'Still needs attention. Check the highlighted option in Settings.';
 

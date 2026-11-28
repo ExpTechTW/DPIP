@@ -11,6 +11,7 @@ import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/permissions/permission_health.dart';
 import 'package:dpip/core/platform/background_execution.dart';
 import 'package:dpip/core/platform/battery_optimization.dart';
+import 'package:dpip/core/platform/live_activity_authorization.dart';
 import 'package:dpip/core/platform/unused_app_restrictions.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -79,6 +80,17 @@ class _FakeUnusedApp extends UnusedAppRestrictionsService {
   Future<UnusedAppRestrictions> status() async => _status;
 }
 
+/// The Live Activities switch as the platform reports it; null is a device it
+/// does not apply to. Mutable so one health object can watch it change.
+class _FakeLiveActivities extends LiveActivityAuthorization {
+  _FakeLiveActivities(this.enabled);
+
+  bool? enabled;
+
+  @override
+  Future<bool?> isEnabled() async => enabled;
+}
+
 /// A health object with every permission granted, so `needsAttention` is false
 /// until the state under test makes it true.
 PermissionHealth _health({
@@ -87,6 +99,7 @@ PermissionHealth _health({
   bool batteryExempt = true,
   bool critical = true,
   bool criticalApplies = false,
+  LiveActivityAuthorization? liveActivities,
 }) => PermissionHealth(
   location: _GrantedLocation(),
   notifications: _AllowedNotifications(
@@ -97,6 +110,7 @@ PermissionHealth _health({
   execution: _FakeExecution(execution),
   unusedApp: _FakeUnusedApp(unusedApp),
   battery: _FakeBattery(batteryExempt),
+  liveActivities: liveActivities,
 );
 
 void main() {
@@ -249,5 +263,83 @@ void main() {
 
     expect(health.batteryExempt, isFalse);
     expect(health.needsAttention, isTrue);
+  });
+
+  group('Live Activities', () {
+    test('are read, and before the first read show nothing', () async {
+      final switchState = _FakeLiveActivities(true);
+      final health = _health(
+        execution: const BackgroundExecutionStatus(known: true),
+        unusedApp: UnusedAppRestrictions.exempt,
+        liveActivities: switchState,
+      );
+
+      expect(
+        health.liveActivitiesAllowed,
+        isNull,
+        reason:
+            'optimistic until the first read — and for a value where null '
+            'means "no row", that is null, not true',
+      );
+      await health.refresh();
+      expect(health.liveActivitiesAllowed, isTrue);
+    });
+
+    test('switched off is reported but never lights the badge', () async {
+      final health = _health(
+        execution: const BackgroundExecutionStatus(known: true),
+        unusedApp: UnusedAppRestrictions.exempt,
+        liveActivities: _FakeLiveActivities(false),
+      );
+      await health.refresh();
+
+      expect(health.liveActivitiesAllowed, isFalse);
+      expect(
+        health.needsAttention,
+        isFalse,
+        reason:
+            'with Live Activities off the alert still arrives as a '
+            'notification; only its Lock Screen presentation is lost, and the '
+            'badge is for what stops an alert arriving',
+      );
+    });
+
+    test('a change on its own is announced', () async {
+      final switchState = _FakeLiveActivities(true);
+      final health = _health(
+        execution: const BackgroundExecutionStatus(known: true),
+        unusedApp: UnusedAppRestrictions.exempt,
+        liveActivities: switchState,
+      );
+      await health.refresh();
+      var notified = 0;
+      health.addListener(() => notified++);
+
+      switchState.enabled = false;
+      await health.refresh();
+
+      expect(
+        notified,
+        1,
+        reason:
+            'the permission page watches this value, and nothing else changed '
+            'to wake it — a refresh that compared every field but this one '
+            'would leave the row showing the old state',
+      );
+      expect(health.liveActivitiesAllowed, isFalse);
+      expect(health.needsAttention, isFalse);
+    });
+
+    test('where they do not apply, the answer stays null', () async {
+      final health = _health(
+        execution: const BackgroundExecutionStatus(known: true),
+        unusedApp: UnusedAppRestrictions.exempt,
+        liveActivities: _FakeLiveActivities(null),
+      );
+      await health.refresh();
+
+      expect(health.liveActivitiesAllowed, isNull);
+      expect(health.needsAttention, isFalse);
+    });
   });
 }

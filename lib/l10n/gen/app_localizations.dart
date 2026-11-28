@@ -5706,6 +5706,24 @@ abstract class AppLocalizations {
   /// **'In “{vendor}” power-saving settings, set this app to “Unrestricted”.'**
   String permissionGuideVendorPower(Object vendor);
 
+  /// Permission-page row title: iOS Live Activities for this app. Use Apple's own localized name for the feature, as shown in Settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Live Activities'**
+  String get permissionLiveActivities;
+
+  /// Permission-page row description: what Live Activities show, and that alerts still arrive as notifications without them
+  ///
+  /// In en, this message translates to:
+  /// **'Keeps an earthquake early warning\'s latest details on the Lock Screen and in the Dynamic Island while it is in effect. Alerts still arrive as notifications when this is off.'**
+  String get permissionLiveActivitiesDesc;
+
+  /// Instruction for turning Live Activities back on in the app's Settings page; the quoted name matches Apple's Settings label
+  ///
+  /// In en, this message translates to:
+  /// **'Open System Settings to turn on “Live Activities”.'**
+  String get permissionGuideLiveActivities;
+
   /// No description provided for @permissionStillRequired.
   ///
   /// In en, this message translates to:

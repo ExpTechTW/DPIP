@@ -9,6 +9,7 @@ import 'package:dpip/core/geo/location_service.dart';
 import 'package:dpip/core/geo/town_directory.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/permissions/permission_health.dart';
+import 'package:dpip/core/platform/live_activity_authorization.dart';
 import 'package:dpip/core/settings/settings_store.dart';
 import 'package:dpip/features/settings/presentation/pages/permissions_page.dart';
 import 'package:dpip/l10n/gen/app_localizations.dart';
@@ -20,6 +21,24 @@ import 'package:provider/provider.dart';
 const Size _tall = Size(400, 2400);
 
 const _awesome = MethodChannel('awesome_notifications');
+
+/// Live Activities switched off, on a device they apply to.
+class _LiveActivitiesOff extends LiveActivityAuthorization {
+  @override
+  Future<bool?> isEnabled() async => false;
+}
+
+/// Answers without the geolocator channel, which never replies on the host —
+/// the Live Activities row waits on a read that comes after the location one.
+class _AnsweringLocation extends LocationService {
+  _AnsweringLocation() : super(const TownDirectory({}));
+
+  @override
+  Future<bool> granted() async => true;
+
+  @override
+  Future<bool> backgroundGranted() async => true;
+}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -97,5 +116,43 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 50));
     expect(find.text(l10n.onboardingPermLocation), findsOneWidget);
+  });
+
+  testWidgets('also lists Live Activities, which onboarding leaves out', (
+    tester,
+  ) async {
+    tester.view.physicalSize = _tall;
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    final store = SettingsStore.inMemory();
+    final notifications = NotificationService(store);
+    final location = _AnsweringLocation();
+
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          Provider.value(value: notifications),
+          Provider<LocationService>.value(value: location),
+          ChangeNotifierProvider(
+            create: (_) => PermissionHealth(
+              location: location,
+              notifications: notifications,
+              liveActivities: _LiveActivitiesOff(),
+            ),
+          ),
+        ],
+        child: MaterialApp(
+          localizationsDelegates: appLocalizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: const PermissionsPage(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+    expect(find.text(l10n.permissionLiveActivities), findsOneWidget);
+    expect(find.text(l10n.permissionLiveActivitiesDesc), findsOneWidget);
   });
 }

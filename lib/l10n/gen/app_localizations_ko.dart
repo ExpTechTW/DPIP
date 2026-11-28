@@ -2986,6 +2986,16 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
+  String get permissionLiveActivities => '실시간 현황';
+
+  @override
+  String get permissionLiveActivitiesDesc =>
+      '지진 경보가 발령된 동안 잠금 화면과 Dynamic Island에 최신 정보를 계속 표시합니다. 꺼져 있어도 경보는 알림으로 정상적으로 도착합니다.';
+
+  @override
+  String get permissionGuideLiveActivities => '시스템 설정에서 「실시간 현황」을 켜 주세요.';
+
+  @override
   String get permissionStillRequired => '아직 필요합니다. 설정에서 활성화하세요.';
 
   @override

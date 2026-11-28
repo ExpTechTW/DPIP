@@ -1860,6 +1860,9 @@
       "vendor": {}
     }
   },
+  "permissionLiveActivities": "即時動態",
+  "permissionLiveActivitiesDesc": "強震即時警報發布期間，喺鎖定畫面同動態島持續顯示最新資訊。關閉咗都會照常收到通知。",
+  "permissionGuideLiveActivities": "請到系統設定中開啟「即時動態」。",
   "permissionStillRequired": "仍然需要此權限,請到設定中開啟。",
   "permissionVerifyManually": "請手動確認此權限已喺系統設定中開啟。",
   "permissionBackgroundLocationOption": "「允許所有時間」",

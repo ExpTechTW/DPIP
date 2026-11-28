@@ -8,6 +8,7 @@ import 'package:dpip/core/logging/log.dart';
 import 'package:dpip/core/notifications/notification_service.dart';
 import 'package:dpip/core/platform/background_execution.dart';
 import 'package:dpip/core/platform/battery_optimization.dart';
+import 'package:dpip/core/platform/live_activity_authorization.dart';
 import 'package:dpip/core/platform/unused_app_restrictions.dart';
 import 'package:flutter/widgets.dart';
 
@@ -51,11 +52,18 @@ import 'package:flutter/widgets.dart';
 ///    matters. This app holds Apple's entitlement, so the grant is genuinely the
 ///    user's to give and to restore in Settings.
 ///
-/// **What deliberately does not count:** the app-standby bucket and the OEM
-/// battery managers. Neither is settable through any API, so a badge for them
-/// would be permanent by construction. They stay on the permission page, which
-/// has room to explain that they exist and cannot be measured; a badge that
-/// cannot be cleared teaches people to ignore badges.
+/// **What deliberately does not count:**
+///
+///  - the app-standby bucket and the OEM battery managers. Neither is settable
+///    through any API, so a badge for them would be permanent by construction.
+///    They stay on the permission page, which has room to explain that they
+///    exist and cannot be measured; a badge that cannot be cleared teaches
+///    people to ignore badges;
+///  - **Live Activities** (iOS 18+). With them off the alert still arrives, as
+///    a notification with its sound and its critical-alert grant intact; only
+///    the Lock Screen and Dynamic Island presentation is lost. Read here so the
+///    permission page can show it ([liveActivitiesAllowed]), and kept out of
+///    [needsAttention] on purpose — it is not a missing prerequisite.
 class PermissionHealth extends ChangeNotifier with WidgetsBindingObserver {
   PermissionHealth({
     required this._location,
@@ -66,15 +74,19 @@ class PermissionHealth extends ChangeNotifier with WidgetsBindingObserver {
     BackgroundExecutionService? execution,
     UnusedAppRestrictionsService? unusedApp,
     BatteryOptimization? battery,
+    LiveActivityAuthorization? liveActivities,
   }) : _execution = execution ?? BackgroundExecutionService(),
        _unusedApp = unusedApp ?? UnusedAppRestrictionsService(),
-       _battery = battery ?? BatteryOptimization();
+       _battery = battery ?? BatteryOptimization(),
+       _liveActivityAuthorization =
+           liveActivities ?? LiveActivityAuthorization();
 
   final LocationService _location;
   final NotificationService _notifications;
   final BackgroundExecutionService _execution;
   final UnusedAppRestrictionsService _unusedApp;
   final BatteryOptimization _battery;
+  final LiveActivityAuthorization _liveActivityAuthorization;
 
   bool _started = false;
 
@@ -87,6 +99,11 @@ class PermissionHealth extends ChangeNotifier with WidgetsBindingObserver {
   bool _keptActive = true;
   bool _batteryExempt = true;
   bool _critical = true;
+
+  /// Optimistic as well, which for this one means null — "nothing to show" —
+  /// rather than `true`: a ticked row would otherwise appear on a device the
+  /// switch does not exist on, until the first read took it away.
+  bool? _liveActivities;
 
   /// Whether any prerequisite is missing — what the badge watches.
   bool get needsAttention =>
@@ -117,6 +134,11 @@ class PermissionHealth extends ChangeNotifier with WidgetsBindingObserver {
   /// Whether a warning may sound through silent mode and Do Not Disturb. True
   /// on Android, where the notification channel carries that instead.
   bool get criticalAlertsAllowed => _critical;
+
+  /// Whether Live Activities are switched on for this app; null where they do
+  /// not apply (Android, iOS 17 and earlier) or could not be read. Never part
+  /// of [needsAttention] — see the class doc.
+  bool? get liveActivitiesAllowed => _liveActivities;
 
   /// Begins watching. Call once, after the first frame.
   void start() {
@@ -163,13 +185,15 @@ class PermissionHealth extends ChangeNotifier with WidgetsBindingObserver {
         : notify
         ? await _notifications.criticalAllowed()
         : false;
+    final liveActivities = await _liveActivityAuthorization.isEnabled();
     if (notify == _notify &&
         foreground == _foreground &&
         background == _background &&
         execute == _execute &&
         keptActive == _keptActive &&
         batteryExempt == _batteryExempt &&
-        critical == _critical) {
+        critical == _critical &&
+        liveActivities == _liveActivities) {
       return;
     }
     final was = needsAttention;
@@ -180,12 +204,14 @@ class PermissionHealth extends ChangeNotifier with WidgetsBindingObserver {
     _keptActive = keptActive;
     _batteryExempt = batteryExempt;
     _critical = critical;
+    _liveActivities = liveActivities;
     if (needsAttention != was) {
       Log.info(
         'permission health: needsAttention=$needsAttention '
         '(notify=$notify location=$foreground background=$background '
         'execute=$execute keptActive=$keptActive battery=$batteryExempt '
-        'critical=$critical bucket=${execution.standbyBucket})',
+        'critical=$critical liveActivities=$liveActivities '
+        'bucket=${execution.standbyBucket})',
       );
     }
     notifyListeners();

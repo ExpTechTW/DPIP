@@ -3042,6 +3042,17 @@ class AppLocalizationsVi extends AppLocalizations {
   }
 
   @override
+  String get permissionLiveActivities => 'Hoạt động trực tiếp';
+
+  @override
+  String get permissionLiveActivitiesDesc =>
+      'Hiển thị thông tin mới nhất của cảnh báo động đất trên Màn hình khóa và Dynamic Island trong suốt thời gian cảnh báo còn hiệu lực. Nếu tắt, cảnh báo vẫn đến dưới dạng thông báo như bình thường.';
+
+  @override
+  String get permissionGuideLiveActivities =>
+      'Mở Cài đặt Hệ thống để bật “Hoạt động trực tiếp”.';
+
+  @override
   String get permissionStillRequired => 'Vẫn cần thiết — mở Cài đặt để bật.';
 
   @override

@@ -3046,6 +3046,17 @@ class AppLocalizationsId extends AppLocalizations {
   }
 
   @override
+  String get permissionLiveActivities => 'Aktivitas Langsung';
+
+  @override
+  String get permissionLiveActivitiesDesc =>
+      'Menampilkan info terbaru peringatan dini gempa di Layar Terkunci dan Dynamic Island selama peringatan berlaku. Jika mati, peringatan tetap datang sebagai notifikasi.';
+
+  @override
+  String get permissionGuideLiveActivities =>
+      'Buka Pengaturan Sistem untuk mengaktifkan “Aktivitas Langsung”.';
+
+  @override
   String get permissionStillRequired =>
       'Masih diperlukan — buka Pengaturan untuk mengaktifkannya.';
 

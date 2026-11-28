@@ -1860,6 +1860,9 @@
       "vendor": {}
     }
   },
+  "permissionLiveActivities": "กิจกรรมสด",
+  "permissionLiveActivitiesDesc": "แสดงข้อมูลล่าสุดของการเตือนแผ่นดินไหวบนหน้าจอล็อกและ Dynamic Island ตลอดช่วงที่การเตือนยังมีผล หากปิดอยู่ คุณจะยังได้รับการเตือนเป็นการแจ้งเตือนตามปกติ",
+  "permissionGuideLiveActivities": "เปิดการตั้งค่าระบบเพื่อเปิด “กิจกรรมสด”",
   "permissionStillRequired": "ยังจำเป็น — เปิดการตั้งค่าเพื่อเปิดใช้งาน",
   "permissionVerifyManually": "โปรดตรวจสอบด้วยตนเองว่าสิทธิ์นี้เปิดใช้งานในการตั้งค่าระบบ",
   "permissionBackgroundLocationOption": "“อนุญาตตลอดเวลา”",

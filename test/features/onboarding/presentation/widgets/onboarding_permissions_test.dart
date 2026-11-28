@@ -193,6 +193,15 @@ void main() {
     expect(find.text(l10n.onboardingPermsTitle), findsOneWidget);
     expect(find.text(l10n.onboardingPermsBody), findsOneWidget);
     expect(find.byType(PermissionChecklist), findsOneWidget);
+    expect(
+      tester
+          .widget<PermissionChecklist>(find.byType(PermissionChecklist))
+          .showLiveActivities,
+      isFalse,
+      reason:
+          'onboarding lists what decides whether an alert arrives; Live '
+          'Activities only decide how one is shown, and start switched on',
+    );
   });
 
   testWidgets('both essentials granted finishes immediately, with no dialog', (

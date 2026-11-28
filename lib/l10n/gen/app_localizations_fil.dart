@@ -3056,6 +3056,17 @@ class AppLocalizationsFil extends AppLocalizations {
   }
 
   @override
+  String get permissionLiveActivities => 'Live Activities';
+
+  @override
+  String get permissionLiveActivitiesDesc =>
+      'Ipinapakita ang pinakabagong detalye ng babala sa lindol sa Lock Screen at sa Dynamic Island habang may bisa ito. Kapag naka-off, darating pa rin ang mga babala bilang notipikasyon.';
+
+  @override
+  String get permissionGuideLiveActivities =>
+      'Buksan ang System Settings upang i-on ang “Live Activities”.';
+
+  @override
   String get permissionStillRequired =>
       'Kailangan pa rin — buksan ang Settings para paganahin.';
 

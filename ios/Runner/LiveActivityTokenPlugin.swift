@@ -19,6 +19,12 @@ import Flutter
 /// `pushToStartToken` can be nil on the first read and arrive a moment later
 /// through `pushToStartTokenUpdates`, and the update sequence does not replay a
 /// token issued before it was observed — both are read here for that reason.
+///
+/// Beside the stream sits a one-shot MethodChannel,
+/// `com.exptech.dpip/live_activity_authorization`, whose `isEnabled` answers
+/// the same switch for the permission page (`PermissionHealth`). It is a
+/// channel of its own because the event stream is single-subscription and
+/// already has its one listener: a second one would take it over.
 public class LiveActivityTokenPlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
   private var sink: FlutterEventSink?
   private var tasks: [Task<Void, Never>] = []
@@ -26,10 +32,32 @@ public class LiveActivityTokenPlugin: NSObject, FlutterPlugin, FlutterStreamHand
   private var enabled = false
 
   public static func register(with registrar: FlutterPluginRegistrar) {
+    let instance = LiveActivityTokenPlugin()
     let channel = FlutterEventChannel(
       name: "com.exptech.dpip/live_activity_token",
       binaryMessenger: registrar.messenger())
-    channel.setStreamHandler(LiveActivityTokenPlugin())
+    channel.setStreamHandler(instance)
+    let authorization = FlutterMethodChannel(
+      name: "com.exptech.dpip/live_activity_authorization",
+      binaryMessenger: registrar.messenger())
+    registrar.addMethodCallDelegate(instance, channel: authorization)
+  }
+
+  /// `isEnabled` → `Bool` on iOS 18 and later, `nil` below it: "does not
+  /// apply", not "off", the same line the event stream draws by sending
+  /// nothing there.
+  public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+    switch call.method {
+    case "isEnabled":
+      result(LiveActivityTokenPlugin.activitiesEnabled())
+    default:
+      result(FlutterMethodNotImplemented)
+    }
+  }
+
+  static func activitiesEnabled() -> Bool? {
+    guard #available(iOS 18.0, *) else { return nil }
+    return ActivityAuthorizationInfo().areActivitiesEnabled
   }
 
   public func onListen(
