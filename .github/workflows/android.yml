@@ -18,6 +18,7 @@ jobs:
       contents: read
     outputs:
       android: ${{ steps.filter.outputs.android }}
+      unit_tests: ${{ steps.filter.outputs.unit_tests }}
       native: ${{ steps.filter.outputs.native }}
       release: ${{ steps.release.outputs.builds }}
     steps:
@@ -39,6 +40,35 @@ jobs:
               - 'assets/**'
               - 'lib/**'
               - 'pubspec.yaml'
+            # The JVM Widget suite's filter (`tool/dev/test_android.sh`), and
+            # narrower than `android` for the reason `native` gives below: no
+            # Dart reaches a Kotlin assertion, so a lib/- or assets/-only change
+            # spent 20-30 minutes of this job re-proving an unchanged tree. The
+            # APK build below still compiles every Dart change. What the suite
+            # does read outside android/:
+            #
+            #   - pubspec.lock as well as pubspec.yaml. The plugin versions decide
+            #     which Android projects the app module compiles against, and a
+            #     lockfile bump moves them without touching pubspec.yaml.
+            #   - mise.toml, and tool/patches with the script that applies them.
+            #     The pinned SDK is where the Flutter embedding and the Gradle
+            #     plugin the app module builds with come from, and a patch
+            #     changes it as much as a bump does.
+            #   - The script itself, the _lib.sh it sources, and this file.
+            #
+            # assets/ is not one of them. The township tables the Widget reads
+            # are android/app/src/main/assets, generated from assets/, and
+            # ci.yml fails a change to one that does not regenerate the other.
+            unit_tests:
+              - 'android/**'
+              - 'pubspec.yaml'
+              - 'pubspec.lock'
+              - 'mise.toml'
+              - 'tool/dev/_lib.sh'
+              - 'tool/dev/test_android.sh'
+              - 'tool/internal/apply_sdk_patches.sh'
+              - 'tool/patches/**'
+              - '.github/workflows/android.yml'
             # The emulator job's filter, and deliberately narrower than
             # `android`. What it tests — provider metadata, RemoteViews
             # inflation, the Widget's own SQLite — is decided entirely by the
@@ -69,9 +99,15 @@ jobs:
             echo "no changelog entry in this push: no snapshot, so it is built here"
           fi
 
+  # The required `Android` check. It holds two things with different inputs —
+  # the JVM Widget suite on `unit_tests`, and lint plus the APK on `android` —
+  # so it runs when either filter matches and gates each step on its own. A
+  # skipped step leaves the job green, which is what a pull request that
+  # touches only one side should read as. Neither half runs on a push
+  # release.yml builds, as before.
   Android:
     needs: changes
-    if: ${{ needs.changes.outputs.android == 'true' && needs.changes.outputs.release != 'true' }}
+    if: ${{ (needs.changes.outputs.android == 'true' || needs.changes.outputs.unit_tests == 'true') && needs.changes.outputs.release != 'true' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -128,6 +164,7 @@ jobs:
       # this step existed, a change to the Widget's JSON decoding, ordering or
       # presentation could ship with every other check green.
       - name: Run native Widget unit tests
+        if: needs.changes.outputs.unit_tests == 'true'
         run: bash tool/dev/test_android.sh
 
       # Lint reads the merged manifest and resources, which the unit tests
@@ -135,6 +172,7 @@ jobs:
       # app. It is a gate on new issues only — the pre-existing ones are in
       # android/app/lint-baseline.xml.
       - name: Run Android lint
+        if: needs.changes.outputs.android == 'true'
         run: bash tool/dev/lint_android.sh
 
       # No keystore, and deliberately so. This job builds the artifact nobody
@@ -151,9 +189,11 @@ jobs:
       # config when android/key.properties is absent, so what comes out is the
       # same release build, debug-signed.
       - name: Build Release APK
+        if: needs.changes.outputs.android == 'true'
         run: bash tool/dev/build.sh android
 
       - name: Upload Artifacts
+        if: needs.changes.outputs.android == 'true'
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: DPIP-Android-Release

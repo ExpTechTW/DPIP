@@ -30,6 +30,8 @@ jobs:
       contents: read
     outputs:
       ios: ${{ steps.filter.outputs.ios }}
+      runner_tests: ${{ steps.filter.outputs.runner_tests }}
+      widget_ui_tests: ${{ steps.filter.outputs.widget_ui_tests }}
       release: ${{ steps.release.outputs.builds }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -61,6 +63,55 @@ jobs:
               - 'tool/internal/apply_sdk_patches.sh'
               - 'tool/patches/**'
               - '.github/workflows/ios.yml'
+            # ios/RunnerTests' filter, and deliberately narrower than `ios`.
+            # The suite is Swift — the widget extension, the App Group snapshot
+            # storage, the WidgetKit timeline. The host app starts the Dart side
+            # while it runs, but no assertion reads it, so a lib/- or
+            # assets/-only change spent ~11 minutes of a macOS runner
+            # re-proving an unchanged tree. The IPA build still compiles every
+            # Dart change on `ios`. What the suite does read outside ios/:
+            #
+            #   - pubspec.yaml and pubspec.lock. The Runner app the suite is
+            #     hosted in links the plugins' Swift packages, and the two
+            #     decide which plugins at which versions.
+            #   - mise.toml, and tool/patches with the script that applies them:
+            #     the pinned SDK's Flutter framework, which Runner links too.
+            #   - The script itself, the _lib.sh it sources, and this file.
+            runner_tests:
+              - 'ios/**'
+              - 'pubspec.yaml'
+              - 'pubspec.lock'
+              - 'mise.toml'
+              - 'tool/dev/_lib.sh'
+              - 'tool/dev/test_ios.sh'
+              - 'tool/internal/apply_sdk_patches.sh'
+              - 'tool/patches/**'
+              - '.github/workflows/ios.yml'
+            # ios/WidgetFixtureUITests' filter, narrower again. The WidgetFixture
+            # app has no target dependency and links no package and no Flutter:
+            # only Foundation. It compiles sources from ios/DPIPWidgets,
+            # ios/Shared and ios/WidgetFixture, bundles resources from
+            # ios/DPIPWidgets, and its UI tests are ios/WidgetFixtureUITests; the
+            # targets, their build settings and the scheme are in
+            # ios/Runner.xcodeproj. Nothing from ios/DPIPWidgetIntentsExtension,
+            # ios/Runner or ios/RunnerTests is in it.
+            #
+            # Neither pub file is listed. The fixture links nothing from the
+            # plugin package the project references; that package only has to
+            # resolve, and `iOS build` resolves the same set on every change to
+            # either. mise.toml is: this job sets up on that SDK, the SDK writes
+            # that package, and a pin bump is rare enough to re-run this once.
+            # Then the script, the _lib.sh it sources, and this file.
+            widget_ui_tests:
+              - 'ios/DPIPWidgets/**'
+              - 'ios/Shared/**'
+              - 'ios/WidgetFixture/**'
+              - 'ios/WidgetFixtureUITests/**'
+              - 'ios/Runner.xcodeproj/**'
+              - 'mise.toml'
+              - 'tool/dev/_lib.sh'
+              - 'tool/dev/test_widget_ui.sh'
+              - '.github/workflows/ios.yml'
 
       # Whether release.yml builds this push, for the job below. It publishes
       # a snapshot only when a commit since the last tag carries a changelog
@@ -83,6 +134,8 @@ jobs:
 
   # Builds the app and runs ios/RunnerTests. Not the required check by itself:
   # the `iOS` job at the end of this file is, and it reads this job's result.
+  # The build runs on `ios`; the simulator and the suite only on
+  # `runner_tests`, and the job is green with those steps skipped.
   ios_build:
     name: iOS build
     needs: changes
@@ -136,6 +189,7 @@ jobs:
 
       - name: Select and boot iPhone simulator
         id: simulator
+        if: needs.changes.outputs.runner_tests == 'true'
         timeout-minutes: 5
         shell: bash
         run: |
@@ -180,6 +234,7 @@ jobs:
       # rather than launching clones for test workers.
       - name: Test (ios/RunnerTests)
         id: runner_tests
+        if: needs.changes.outputs.runner_tests == 'true'
         timeout-minutes: 30
         shell: bash
         env:
@@ -249,11 +304,12 @@ jobs:
 
   # ios/WidgetFixtureUITests, on a runner of its own so the suite runs beside
   # the build above instead of after it. Its result reaches the required `iOS`
-  # check through the job below.
+  # check through the job below. Gated on `widget_ui_tests`, every path of
+  # which is also on `ios`.
   ios_widget_ui_tests:
     name: iOS widget UI tests
     needs: changes
-    if: ${{ needs.changes.outputs.ios == 'true' && needs.changes.outputs.release != 'true' }}
+    if: ${{ needs.changes.outputs.widget_ui_tests == 'true' && needs.changes.outputs.release != 'true' }}
     runs-on: macos-latest
     permissions:
       contents: read
@@ -397,8 +453,9 @@ jobs:
   #
   # It fails when any job it needs failed or was cancelled, `changes`
   # included, and passes when each one passed or was skipped. Skipped is how a
-  # pull request that touches no iOS path, and a push release.yml builds
-  # instead, both end green.
+  # pull request that touches no iOS path, one that touches none of the widget
+  # fixture's, and a push release.yml builds instead, all end green. A
+  # RunnerTests step skipped inside `iOS build` leaves that job a success.
   #
   # `always()`, not the default: a failed job above would otherwise skip this
   # one, and a skipped required check counts as passing. Not `!cancelled()`
